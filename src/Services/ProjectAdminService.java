@@ -1,10 +1,10 @@
-package services;
+package Services;
 
-import models.Administrator;
-import models.User;
-import models.Appointment;
-import models.ReplenishmentRequest;
-import models.Inventory;
+import Models.Administrator;
+import Models.User;
+import Models.Appointment;
+import Models.ReplenishmentRequest;
+import Models.Inventory;
 import java.util.List;
 import java.util.ArrayList;
 import interfaces.IProjectAdmService;  // Import the interface

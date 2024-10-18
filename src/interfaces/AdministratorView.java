@@ -1,8 +1,8 @@
 package interfaces;
 
-import models.User;
-import models.Appointment;
-import models.Inventory;
+import Models.User;
+import Models.Appointment;
+import Models.Inventory;
 import java.util.List;
 
 public interface AdministratorView {

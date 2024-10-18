@@ -1,9 +1,9 @@
 package interfaces;
 
-import models.User;
-import models.Appointment;
-import models.Inventory;
-import models.ReplenishmentRequest;
+import Models.User;
+import Models.Appointment;
+import Models.Inventory;
+import Models.ReplenishmentRequest;
 import java.util.List;
 
 public interface IProjectAdmService {

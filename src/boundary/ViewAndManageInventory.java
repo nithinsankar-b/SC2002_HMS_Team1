@@ -1,8 +1,8 @@
 package boundary;
 
-import models.Inventory;
-import models.User;
-import models.Appointment;
+import Models.Inventory;
+import Models.User;
+import Models.Appointment;
 import java.util.Scanner;
 import interfaces.AdministratorView;
 
