@@ -1,0 +1,17 @@
+﻿Staff ID,Time Slot,Monday,Tuesday,Wednesday,Thursday,Friday,Saturday,Sunday
+D001,09:00 - 10:00,Available,Available,Available,Available,Available,Available,Available
+D001,10:00 - 11:00,Available,Available,Available,Available,Available,Available,Available
+D001,11:00 12:00,Available,Available,Available,Available,Available,Available,Available
+D001,12:00 - 13:00,Blocked,Blocked,Blocked,Blocked,Blocked,Blocked,Blocked
+D001,13:00 - 14:00,Available,Available,Available,Available,Available,Available,Available
+D001,14:00 - 15:00,Available,Available,Available,Available,Available,Available,Available
+D001,15:00 - 16:00,Available,Available,Available,Available,Available,Available,Available
+D001,16:00 - 17:00,Available,Available,Available,Available,Available,Available,Available
+D002,09:00 - 10:00,Available,Available,Available,Available,Available,Available,Available
+D002,10:00 - 11:00,Available,Available,Available,Available,Available,Available,Available
+D002,11:00 12:00,Available,Available,Available,Available,Available,Available,Available
+D002,12:00 - 13:00,Blocked,Blocked,Blocked,Blocked,Blocked,Blocked,Blocked
+D002,13:00 - 14:00,Available,Available,Available,Available,Available,Available,Available
+D002,14:00 - 15:00,Available,Available,Available,Available,Available,Available,Available
+D002,15:00 - 16:00,Available,Available,Available,Available,Available,Available,Available
+D002,16:00 - 17:00,Available,Available,Available,Available,Available,Available,Available
