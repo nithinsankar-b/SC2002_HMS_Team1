@@ -1,4 +1,4 @@
-package Services;
+package services;
 
 import models.Administrator;
 import models.User;
@@ -7,7 +7,7 @@ import models.ReplenishmentRequest;
 import models.Inventory;
 import java.util.List;
 import java.util.ArrayList;
-import java.util.stream.Collectors;
+import interfaces.IProjectAdmService;  // Import the interface
 
 public class ProjectAdminService implements IProjectAdmService {
     private Administrator administrator;
@@ -81,3 +81,4 @@ public class ProjectAdminService implements IProjectAdmService {
         return administrator.getInventory();
     }
 }
+
