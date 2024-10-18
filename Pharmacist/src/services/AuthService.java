@@ -28,8 +28,6 @@ public abstract class AuthService implements IAuthService {
         return true;
     }
     
-    //add hospital id within the authenticate function 
-    //authenticating password
-    //NO NEED TO DO THE ABOVE
+    
  
 }
