@@ -6,7 +6,7 @@ import java.util.Scanner;
 
 public class UserView {
     private UserService userService;
-    private String loggedInHospitalID; // Store the logged-in user's Hospital ID
+    private String loggedInHospitalID;
 
     public UserView(UserService userService) {
         this.userService = userService;
@@ -24,11 +24,11 @@ public class UserView {
         String password = scanner.nextLine();
 
         if (userService.login(hospitalID, password)) {
-            loggedInHospitalID = hospitalID; // Store the logged-in Hospital ID
+            loggedInHospitalID = hospitalID;
             System.out.println("Login successful!");
             String role = userService.getUserRole(hospitalID);
             System.out.println("Role: " + role);
-            //navigateToRoleSpecificPage(role); // Navigate based on role
+            //navigateToRoleSpecificPage(role);
         } else {
             System.out.println("Invalid Hospital ID or Password.");
         }
@@ -38,15 +38,15 @@ public class UserView {
         switch (role) {
             case "Patient":
                 PatientView patientView = new PatientView(userService);
-                patientView.display(); // Call the method to display the patient view
+                patientView.display();
                 break;
             case "Doctor":
                 DoctorView doctorView = new DoctorView(userService);
-                doctorView.display(); // Call the method to display the doctor view
+                doctorView.display();
                 break;
             case "Admin":
                 AdminView adminView = new AdminView(userService);
-                adminView.display(); // Call the method to display the admin view
+                adminView.display();
                 break;
             default:
                 System.out.println("Role not recognized.");
