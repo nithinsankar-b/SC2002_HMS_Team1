@@ -1,47 +1,39 @@
 package boundary;
 
-import Models.Inventory;
-import Models.User;
-import Models.Appointment;
-import java.util.Scanner;
+import models.Inventory;
+import models.Appointment;
+import models.User;
 import interfaces.AdministratorView;
+import java.util.Scanner;
 
 public class ViewAndManageInventory implements AdministratorView {
 
     private Scanner scanner = new Scanner(System.in);
 
-    // Collect input from the user to update the inventory
     public String getMedicineName() {
-        System.out.print("Enter Medicine Name: ");
+        System.out.print("Enter medicine name: ");
         return scanner.nextLine();
     }
 
     public int getMedicineQuantity() {
-        System.out.print("Enter Quantity: ");
+        System.out.print("Enter quantity: ");
         return scanner.nextInt();
     }
 
-    public int getLowStockAlertLevel() {
-        System.out.print("Enter Low Stock Alert Level: ");
-        return scanner.nextInt();
-    }
-
-    // Display inventory
     @Override
     public void displayInventory(Inventory inventory) {
         System.out.println("\n-- Inventory --");
-        inventory.displayStock();  // Assuming `displayStock()` is implemented in Inventory
+        System.out.println("Medicine Name: " + inventory.getMedicineName());
+        System.out.println("Stock Level: " + inventory.getStockLevel());
+        System.out.println("Low Stock Alert Level: " + inventory.getLowStockAlertLevel());
     }
 
-    // These methods are not applicable for inventory management, so we leave them empty
     @Override
     public void displayListOfStaff(List<User> staffList) {
-        // Not applicable for inventory
     }
 
     @Override
     public void displayAppointments(List<Appointment> appointments) {
-        // Not applicable for inventory
     }
 }
 

@@ -1,18 +1,16 @@
-package Services;
+package services;
 
-import Models.Administrator;
-import Models.User;
-import Models.Appointment;
-import Models.ReplenishmentRequest;
-import Models.Inventory;
+import models.Administrator;
+import models.User;
+import models.Appointment;
+import models.ReplenishmentRequest;
+import models.Inventory;
 import java.util.List;
 import java.util.ArrayList;
-import interfaces.IProjectAdmService;  // Import the interface
 
 public class ProjectAdminService implements IProjectAdmService {
     private Administrator administrator;
 
-    // Constructor
     public ProjectAdminService(Administrator administrator) {
         this.administrator = administrator;
     }
