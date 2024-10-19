@@ -1,25 +1,28 @@
-// src/services/AppointmentService.java
 package services;
 
+import interfaces.IAppointmentService; // Import the interface
 import models.Appointment;
 import enums.AppointmentStatus;
-import java.time.LocalDateTime;
 import models.Medication;
 
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
-public class AppointmentService {
+public class AppointmentService implements IAppointmentService { // Implement the interface
     private List<Appointment> appointments = new ArrayList<>();
 
+    @Override
     public boolean scheduleAppointment(Appointment appointment) {
         return appointments.add(appointment);
     }
 
+    @Override
     public boolean cancelAppointment(String appointmentId) {
         return appointments.removeIf(appointment -> appointment.getAppointmentId().equals(appointmentId));
     }
 
+    @Override
     public boolean rescheduleAppointment(String appointmentId, Appointment newAppointment) {
         for (int i = 0; i < appointments.size(); i++) {
             if (appointments.get(i).getAppointmentId().equals(appointmentId)) {
@@ -30,10 +33,12 @@ public class AppointmentService {
         return false; // Appointment not found
     }
 
+    @Override
     public List<Appointment> viewScheduledAppointments() {
         return appointments;
     }
 
+    @Override
     public Appointment getAppointment(String appointmentId) {
         for (Appointment appointment : appointments) {
             if (appointment.getAppointmentId().equals(appointmentId)) {
@@ -43,6 +48,7 @@ public class AppointmentService {
         return null; // Appointment not found
     }
 
+    @Override
     public void recordAppointmentOutcome(String appointmentId, String serviceProvided, List<Medication> prescribedMedications, String consultationNotes) {
         Appointment appointment = getAppointment(appointmentId);
         if (appointment != null && appointment.getStatus() == AppointmentStatus.PENDING) {

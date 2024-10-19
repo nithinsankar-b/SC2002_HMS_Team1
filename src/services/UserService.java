@@ -2,11 +2,12 @@ package services;
 
 import models.User;
 import enums.UserRole; // Import the UserRole enum
+import interfaces.IUserService; // Import the IUserService interface
 
 import java.util.HashMap;
 import java.util.Map;
 
-public class UserService {
+public class UserService implements IUserService {
     private Map<String, User> users;
 
     public UserService() {
@@ -16,12 +17,14 @@ public class UserService {
     }
 
     // Method to validate login
+    @Override
     public boolean login(String hospitalID, String password) {
         User user = users.get(hospitalID);
         return user != null && user.getPassword().equals(password);
     }
 
     // Method to change user password
+    @Override
     public boolean changePassword(String hospitalID, String oldPassword, String newPassword) {
         User user = users.get(hospitalID);
         if (user != null && user.getPassword().equals(oldPassword)) {
@@ -32,6 +35,7 @@ public class UserService {
     }
 
     // Method to get user role
+    @Override
     public UserRole getUserRole(String hospitalID) {
         User user = users.get(hospitalID);
         return user != null ? user.getRole() : null;
