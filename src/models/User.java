@@ -1,11 +1,13 @@
 package models;
 
+import enums.UserRole;
+
 public class User {
     private String hospitalID;
     private String password;
-    private String role;
+    private UserRole role; // Change from String to UserRole
 
-    public User(String hospitalID, String password, String role) {
+    public User(String hospitalID, String password, UserRole role) {
         this.hospitalID = hospitalID;
         this.password = password;
         this.role = role;
@@ -20,7 +22,7 @@ public class User {
         return password;
     }
 
-    public String getRole() {
+    public UserRole getRole() { // Change return type to UserRole
         return role;
     }
 
@@ -33,7 +35,7 @@ public class User {
         this.password = password;
     }
 
-    public void setRole(String role) {
+    public void setRole(UserRole role) { // Change parameter type to UserRole
         this.role = role;
     }
 }

@@ -1,6 +1,7 @@
 package views;
 
 import services.UserService;
+import enums.UserRole; // Import the UserRole enum
 
 import java.util.Scanner;
 
@@ -26,32 +27,44 @@ public class UserView {
         if (userService.login(hospitalID, password)) {
             loggedInHospitalID = hospitalID;
             System.out.println("Login successful!");
-            String role = userService.getUserRole(hospitalID);
+            UserRole role = userService.getUserRole(hospitalID);
             System.out.println("Role: " + role);
-            //navigateToRoleSpecificPage(role);
+            navigateToRoleSpecificPage(role);
         } else {
             System.out.println("Invalid Hospital ID or Password.");
         }
     }
 
-    /*private void navigateToRoleSpecificPage(String role) {
+    private void navigateToRoleSpecificPage(UserRole role) {
         switch (role) {
-            case "Patient":
-                PatientView patientView = new PatientView(userService);
-                patientView.display();
+            case PATIENT:
+                // Call to PatientView
+                // Example: PatientView patientView = new PatientView(userService);
+                // patientView.display();
+                System.out.println("Navigating to Patient view...");
                 break;
-            case "Doctor":
-                DoctorView doctorView = new DoctorView(userService);
-                doctorView.display();
+            case DOCTOR:
+                // Call to DoctorView
+                // Example: DoctorView doctorView = new DoctorView(userService);
+                // doctorView.display();
+                System.out.println("Navigating to Doctor view...");
                 break;
-            case "Admin":
-                AdminView adminView = new AdminView(userService);
-                adminView.display();
+            case PHARMACIST:
+                // Call to PharmacistView
+                // Example: PharmacistView pharmacistView = new PharmacistView(userService);
+                // pharmacistView.display();
+                System.out.println("Navigating to Pharmacist view...");
+                break;
+            case SUPERVISOR:
+                // Call to SupervisorView
+                // Example: SupervisorView supervisorView = new SupervisorView(userService);
+                // supervisorView.display();
+                System.out.println("Navigating to Supervisor view...");
                 break;
             default:
                 System.out.println("Role not recognized.");
         }
-    }*/
+    }
 
     public void displayChangePassword() {
         Scanner scanner = new Scanner(System.in);

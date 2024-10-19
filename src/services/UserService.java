@@ -1,6 +1,7 @@
 package services;
 
 import models.User;
+import enums.UserRole; // Import the UserRole enum
 
 import java.util.HashMap;
 import java.util.Map;
@@ -10,7 +11,8 @@ public class UserService {
 
     public UserService() {
         users = new HashMap<>();
-        users.put("12345", new User("12345", "password", "Patient"));
+        users.put("12345", new User("12345", "password", UserRole.PATIENT));
+        users.put("67890", new User("67890", "password", UserRole.DOCTOR));
     }
 
     // Method to validate login
@@ -30,7 +32,7 @@ public class UserService {
     }
 
     // Method to get user role
-    public String getUserRole(String hospitalID) {
+    public UserRole getUserRole(String hospitalID) {
         User user = users.get(hospitalID);
         return user != null ? user.getRole() : null;
     }
