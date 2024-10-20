@@ -4,13 +4,13 @@ import enums.MedicationStatus;
 
 public class Medication {
     private String name;
-    private int quantity; // Quantity of medication prescribed
-    private MedicationStatus status; // Pending or Dispensed
+    private int quantity;
+    private MedicationStatus status;
 
-    public Medication(String name, int quantity) {
+    public Medication(String name, int quantity, MedicationStatus status) {
         this.name = name;
         this.quantity = quantity;
-        this.status = MedicationStatus.PENDING; // Default status
+        this.status = status;
     }
 
     // Getters and Setters
@@ -36,5 +36,14 @@ public class Medication {
 
     public void setStatus(MedicationStatus status) {
         this.status = status;
+    }
+
+    @Override
+    public String toString() {
+        return "Medication{" +
+                "name='" + name + '\'' +
+                ", quantity=" + quantity +
+                ", status=" + status +
+                '}';
     }
 }

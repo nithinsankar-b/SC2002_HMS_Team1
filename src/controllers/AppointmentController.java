@@ -1,63 +1,58 @@
-// src/controllers/AppointmentController.java
 package controllers;
 
-import models.Appointment;
-import models.Medication;
 import services.AppointmentService;
+import models.Medication;
+import models.Appointment;
 
-import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.List;
 
 public class AppointmentController {
-    private AppointmentService appointmentService;
+    private List<Appointment> appointments;
 
     public AppointmentController() {
-        this.appointmentService = new AppointmentService();
+        this.appointments = new ArrayList<>();
     }
 
-    public void scheduleAppointment(String appointmentId, String patientId, String doctorId, LocalDateTime appointmentDateTime) {
-        Appointment appointment = new Appointment(appointmentId, patientId, doctorId, appointmentDateTime);
-        if (appointmentService.scheduleAppointment(appointment)) {
-            System.out.println("Appointment scheduled successfully.");
-        } else {
-            System.out.println("Failed to schedule appointment.");
+    public void scheduleAppointment(Appointment appointment) {
+        appointments.add(appointment);
+    }
+
+    public boolean cancelAppointment(String appointmentId) {
+        return appointments.removeIf(appointment -> appointment.getAppointmentId().equals(appointmentId));
+    }
+
+    public boolean rescheduleAppointment(String appointmentId, Appointment newAppointment) {
+        for (int i = 0; i < appointments.size(); i++) {
+            if (appointments.get(i).getAppointmentId().equals(appointmentId)) {
+                appointments.set(i, newAppointment);
+                return true;
+            }
         }
+        return false;
     }
 
-    public void cancelAppointment(String appointmentId) {
-        if (appointmentService.cancelAppointment(appointmentId)) {
-            System.out.println("Appointment canceled successfully.");
-        } else {
-            System.out.println("Failed to cancel appointment.");
+    public List<Appointment> viewScheduledAppointments() {
+        return new ArrayList<>(appointments);
+    }
+
+    public Appointment getAppointment(String appointmentId) {
+        for (Appointment appointment : appointments) {
+            if (appointment.getAppointmentId().equals(appointmentId)) {
+                return appointment;
+            }
         }
+        return null;
     }
 
-    public void rescheduleAppointment(String appointmentId, Appointment newAppointment) {
-        if (appointmentService.rescheduleAppointment(appointmentId, newAppointment)) {
-            System.out.println("Appointment rescheduled successfully.");
-        } else {
-            System.out.println("Failed to reschedule appointment.");
+    public void recordAppointmentOutcome(String appointmentId, String serviceProvided, String consultationNotes, List<Medication> medications) {
+        Appointment appointment = getAppointment(appointmentId);
+        if (appointment != null) {
+            appointment.setServiceProvided(serviceProvided);
+            appointment.setConsultationNotes(consultationNotes);
+            for (Medication medication : medications) {
+                appointment.addMedication(medication);
+            }
         }
-    }
-
-    public void recordOutcome(String appointmentId, String serviceProvided, List<Medication> prescribedMedications, String consultationNotes) {
-        appointmentService.recordAppointmentOutcome(appointmentId, serviceProvided, prescribedMedications, consultationNotes);
-        System.out.println("Appointment outcome recorded successfully.");
-    }
-
-    public void viewScheduledAppointments() {
-        appointmentService.viewScheduledAppointments().forEach(appointment -> {
-            System.out.println("Appointment ID: " + appointment.getAppointmentId());
-            System.out.println("Patient ID: " + appointment.getPatientId());
-            System.out.println("Doctor ID: " + appointment.getDoctorId());
-            System.out.println("Date & Time: " + appointment.getAppointmentDateTime());
-            System.out.println("Status: " + appointment.getStatus());
-            System.out.println("Service Provided: " + appointment.getServiceProvided());
-            System.out.println("Consultation Notes: " + appointment.getConsultationNotes());
-            appointment.getMedications().forEach(medication -> {
-                System.out.println("Medication: " + medication.getName() + ", Quantity: " + medication.getQuantity() + ", Status: " + medication.getStatus());
-            });
-            System.out.println("------------------------");
-        });
     }
 }

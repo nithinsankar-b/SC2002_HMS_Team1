@@ -1,66 +1,47 @@
-// src/models/Appointment.java
 package models;
 
-import java.time.LocalDateTime;
 import enums.AppointmentStatus;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import models.Medication;
+import enums.MedicationStatus;
 
 public class Appointment {
     private String appointmentId;
     private String patientId;
     private String doctorId;
     private LocalDateTime appointmentDateTime;
-    private AppointmentStatus status; // E.g., Pending, Completed, Canceled
-    private List<Medication> medications; // List of prescribed medications
-    private String consultationNotes; // Notes recorded during consultation
-    private String serviceProvided; // Type of service provided (e.g., consultation, X-ray, etc.)
-    private LocalDateTime appointmentOutcomeDate; // Date of appointment outcome record
+    private AppointmentStatus status;
+    private String consultationNotes;
+    private String serviceProvided;
+    private List<Medication> medications;
 
     public Appointment(String appointmentId, String patientId, String doctorId, LocalDateTime appointmentDateTime) {
         this.appointmentId = appointmentId;
         this.patientId = patientId;
         this.doctorId = doctorId;
         this.appointmentDateTime = appointmentDateTime;
-        this.status = AppointmentStatus.PENDING; // Default status
-        this.medications = new ArrayList<>();
+        this.status = AppointmentStatus.PENDING;
         this.consultationNotes = "";
         this.serviceProvided = "";
-        this.appointmentOutcomeDate = null; // No outcome record initially
+        this.medications = new ArrayList<>();
     }
 
-    // Getters and Setters
     public String getAppointmentId() {
         return appointmentId;
-    }
-
-    public void setAppointmentId(String appointmentId) {
-        this.appointmentId = appointmentId;
     }
 
     public String getPatientId() {
         return patientId;
     }
 
-    public void setPatientId(String patientId) {
-        this.patientId = patientId;
-    }
-
     public String getDoctorId() {
         return doctorId;
     }
 
-    public void setDoctorId(String doctorId) {
-        this.doctorId = doctorId;
-    }
-
     public LocalDateTime getAppointmentDateTime() {
         return appointmentDateTime;
-    }
-
-    public void setAppointmentDateTime(LocalDateTime appointmentDateTime) {
-        this.appointmentDateTime = appointmentDateTime;
     }
 
     public AppointmentStatus getStatus() {
@@ -69,14 +50,6 @@ public class Appointment {
 
     public void setStatus(AppointmentStatus status) {
         this.status = status;
-    }
-
-    public List<Medication> getMedications() {
-        return medications;
-    }
-
-    public void addMedication(Medication medication) {
-        medications.add(medication);
     }
 
     public String getConsultationNotes() {
@@ -95,11 +68,59 @@ public class Appointment {
         this.serviceProvided = serviceProvided;
     }
 
-    public LocalDateTime getAppointmentOutcomeDate() {
-        return appointmentOutcomeDate;
+    public List<Medication> getMedications() {
+        return medications;
     }
 
-    public void setAppointmentOutcomeDate(LocalDateTime appointmentOutcomeDate) {
-        this.appointmentOutcomeDate = appointmentOutcomeDate;
+    public void addMedication(Medication medication) {
+        medications.add(medication);
+    }
+
+    public static Appointment fromString(String line) {
+        String[] parts = line.split(",");
+        if (parts.length < 7) {
+            return null; // Ensure there are enough parts
+        }
+
+        String appointmentId = parts[0];
+        String patientId = parts[1];
+        String doctorId = parts[2];
+        LocalDateTime appointmentDateTime = LocalDateTime.parse(parts[3]);
+        AppointmentStatus status = AppointmentStatus.valueOf(parts[4]);
+        String consultationNotes = parts[5];
+        String serviceProvided = parts[6];
+
+        Appointment appointment = new Appointment(appointmentId, patientId, doctorId, appointmentDateTime);
+        appointment.setStatus(status);
+        appointment.setConsultationNotes(consultationNotes);
+        appointment.setServiceProvided(serviceProvided);
+
+        // Load medications from the remaining parts
+        if (parts.length > 7) {
+            String[] meds = parts[7].split(";");
+            for (String med : meds) {
+                String[] medParts = med.split(":");
+                if (medParts.length == 3) {
+                    String medicationName = medParts[0];
+                    int quantity = Integer.parseInt(medParts[1]);
+                    MedicationStatus medicationStatus = MedicationStatus.valueOf(medParts[2]);
+                    Medication medication = new Medication(medicationName, quantity, medicationStatus);
+                    appointment.addMedication(medication);
+                }
+            }
+        }
+
+        return appointment;
+    }
+
+    @Override
+    public String toString() {
+        StringBuilder medicationInfo = new StringBuilder();
+        for (Medication medication : medications) {
+            medicationInfo.append(medication.toString()).append(";");
+        }
+        return appointmentId + "," + patientId + "," + doctorId + "," +
+                appointmentDateTime + "," + status + "," +
+                consultationNotes + "," + serviceProvided + "," + medicationInfo.toString();
     }
 }
