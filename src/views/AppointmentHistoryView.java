@@ -35,11 +35,10 @@ public class AppointmentHistoryView implements iPatientView {
     }
 
     @Override
-    public void display() {
+    public void display(String patientID) {
         // Hard-coded patient ID for demonstration purposes; replace with actual patient input
-        String patientId = "P1001";
 
-        System.out.println("Displaying appointment history for Patient ID: " + patientId);
+        System.out.println("Displaying appointment history for Patient ID: " + patientID);
 
         // Get the list of all scheduled appointments from AppointmentService
         List<Appointment> appointments = appointmentService.viewScheduledAppointments();
@@ -47,7 +46,7 @@ public class AppointmentHistoryView implements iPatientView {
         // Filter appointments that belong to the patient and are in any status (completed, cancelled, rescheduled)
         boolean found = false;
         for (Appointment appointment : appointments) {
-            if (appointment.getPatientId().equals(patientId)) {
+            if (appointment.getPatientId().equals(patientID)) {
                 found = true;
                 System.out.println("Appointment ID: " + appointment.getAppointmentId());
                 System.out.println("Doctor ID: " + appointment.getDoctorId());
@@ -62,7 +61,7 @@ public class AppointmentHistoryView implements iPatientView {
         }
 
         if (!found) {
-            System.out.println("No appointment history found for Patient ID: " + patientId);
+            System.out.println("No appointment history found for Patient ID: " + patientID);
         }
     }
 }

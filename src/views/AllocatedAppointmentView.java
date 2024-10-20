@@ -35,11 +35,8 @@ public class AllocatedAppointmentView implements iPatientView {
     }
 
     @Override
-    public void display() {
-        // Hard-coded patient ID for demonstration purposes; replace with actual patient input
-        String patientId = "P1001"; 
-
-        System.out.println("Displaying allocated appointments for Patient ID: " + patientId);
+    public void display(String patientID) {
+        System.out.println("Displaying allocated appointments for Patient ID: " + patientID);
 
         // Get the list of all scheduled appointments from the AppointmentService
         List<Appointment> appointments = appointmentService.viewScheduledAppointments();
@@ -48,7 +45,7 @@ public class AllocatedAppointmentView implements iPatientView {
         boolean found = false;
         for (Appointment appointment : appointments) {
             // Check if the appointment is allocated to the patient and is pending
-            if (appointment.getPatientId().equals(patientId) && appointment.getStatus() == enums.AppointmentStatus.PENDING) {
+            if (appointment.getPatientId().equals(patientID) && appointment.getStatus() == enums.AppointmentStatus.PENDING) {
                 found = true;
                 System.out.println("Appointment ID: " + appointment.getAppointmentId());
                 System.out.println("Doctor ID: " + appointment.getDoctorId());
@@ -59,7 +56,7 @@ public class AllocatedAppointmentView implements iPatientView {
         }
 
         if (!found) {
-            System.out.println("No allocated appointments found for Patient ID: " + patientId);
+            System.out.println("No allocated appointments found for Patient ID: " + patientID);
         }
     }
 }

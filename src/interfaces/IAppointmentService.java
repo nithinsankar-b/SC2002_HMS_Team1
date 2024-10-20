@@ -1,9 +1,10 @@
 package interfaces;
 
+import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.util.List;
 import models.Appointment;
 import models.Medication;
-
-import java.util.List;
 
 public interface IAppointmentService {
     boolean scheduleAppointment(Appointment appointment);
@@ -12,4 +13,5 @@ public interface IAppointmentService {
     List<Appointment> viewScheduledAppointments();
     Appointment getAppointment(String appointmentId);
     void recordAppointmentOutcome(String appointmentId, String serviceProvided, List<Medication> prescribedMedications, String consultationNotes);
+    List<LocalDateTime> getAvailableSlots(String doctorId, LocalDate date);
 }

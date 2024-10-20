@@ -1,9 +1,10 @@
-// File: services/PatientService.java
 package services;
 
 import enums.AppointmentStatus;
 import java.io.BufferedReader;
+import java.io.BufferedWriter;
 import java.io.FileReader;
+import java.io.FileWriter;
 import java.io.IOException;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
@@ -35,6 +36,7 @@ public class PatientService {
         Patient patient = patients.get(hospitalID);
         if (patient != null) {
             patient.setContactInformation(newContactInformation);
+            savePatientsToCSV(); // Save changes after update
             return true;
         }
         return false;
@@ -78,6 +80,32 @@ public class PatientService {
             }
         } catch (IOException e) {
             System.out.println("Error reading the CSV file: " + e.getMessage());
+        }
+    }
+
+    // Method to save patients back to the CSV file
+    private void savePatientsToCSV() {
+        String csvFilePath = "../data/Patient_List.csv";
+        try (BufferedWriter bw = new BufferedWriter(new FileWriter(csvFilePath))) {
+            // Write the header
+            bw.write("Patient ID,Name,Date of Birth,Gender,Blood Type,Contact Information");
+            bw.newLine();
+
+            // Write each patient's information
+            for (Patient patient : patients.values()) {
+                String line = String.join(",",
+                        patient.getHospitalID(),
+                        patient.getName(),
+                        patient.getDateOfBirth().toString(),
+                        patient.getGender(),
+                        patient.getBloodType(),
+                        patient.getContactInformation());
+                bw.write(line);
+                bw.newLine();
+            }
+            System.out.println("Patient information saved successfully.");
+        } catch (IOException e) {
+            System.out.println("Error saving the CSV file: " + e.getMessage());
         }
     }
 
@@ -127,12 +155,12 @@ public class PatientService {
     }
 
     public boolean deletePatient(String hospitalID) {
-        // Remove the patient from the map by ID if present
         if (patients.containsKey(hospitalID)) {
             patients.remove(hospitalID);
+            savePatientsToCSV(); // Save changes after deletion
             return true;
         }
-        return false; // Return false if the patient was not found
+        return false;
     }
     
 }

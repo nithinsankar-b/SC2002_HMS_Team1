@@ -1,7 +1,10 @@
 package views;
 
+import controllers.PatientController;
 import enums.UserRole;
-import java.util.Scanner; // Import the UserRole enum
+import java.util.Scanner;
+import services.AppointmentService;
+import services.PatientService;
 import services.UserService;
 
 public class UserView {
@@ -37,10 +40,15 @@ public class UserView {
     private void navigateToRoleSpecificPage(UserRole role) {
         switch (role) {
             case PATIENT:
-                // Call to PatientView
-                // Example: PatientView patientView = new PatientView(userService);
-                // patientView.display();
-                System.out.println("Navigating to Patient view...");
+                // Create PatientService and AppointmentService
+                PatientService patientService = new PatientService();
+                AppointmentService appointmentService = new AppointmentService();
+
+                // Instantiate PatientController
+                PatientController patientController = new PatientController(patientService, appointmentService);
+
+                // Start the patient operations (menu)
+                patientController.start();
                 break;
             case DOCTOR:
                 // Call to DoctorView

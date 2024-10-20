@@ -1,7 +1,9 @@
 // File: controllers/PatientController.java
 package controllers;
 
+import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.util.List;
 import java.util.Scanner;
 import models.Patient;
 import services.AppointmentService;
@@ -28,6 +30,11 @@ public class PatientController {
         this.medicalRecordView = new MedicalRecordView(appointmentService);
     }
 
+    // Method to start the controller and handle patient operations
+    public void start() {
+        handlePatientOperations();
+    }
+
     // Main method to handle different patient operations
     public void handlePatientOperations() {
         Scanner scanner = new Scanner(System.in);
@@ -43,9 +50,15 @@ public class PatientController {
             System.out.println("6. Create Appointment");
             System.out.println("7. Cancel Appointment");
             System.out.println("8. Reschedule Appointment");
-            System.out.println("9. View All Patients");
-            System.out.println("10. Delete Patient");
-            System.out.println("11. Exit");
+
+            // Should probably be implemented for Doctor/Administrator?
+            // System.out.println("9. View All Patients");
+
+            // Should probably be implemented for Administrator/Nurse?
+            // System.out.println("10. Delete Patient");
+
+            System.out.println("9. View Available Appointment Slots");
+            System.out.println("10. Exit");
 
             int choice = scanner.nextInt();
             scanner.nextLine(); // Consume newline
@@ -54,14 +67,21 @@ public class PatientController {
                 case 1 -> viewPatientDetails(scanner);
                 case 2 -> viewAllocatedAppointments(scanner);
                 case 3 -> viewAppointmentHistory(scanner);
+                // Should probably include one more to view available appointment slots?
                 case 4 -> viewMedicalRecords(scanner);
                 case 5 -> updateContactInformation(scanner);
                 case 6 -> createAppointment(scanner);
                 case 7 -> cancelAppointment(scanner);
                 case 8 -> rescheduleAppointment(scanner);
-                case 9 -> viewAllPatients();
-                case 10 -> deletePatient(scanner);
-                case 11 -> isRunning = false;
+                // For doctor/administrator?
+                // case 9 -> viewAllPatients();
+                // For administrator/nuse?
+                // case 10 -> deletePatient(scanner);
+
+                case 9 -> viewAvailableAppointmentSlots(scanner);
+
+                // Exit the loop to stop HMS
+                case 10 -> isRunning = false;
                 default -> System.out.println("Invalid choice, please try again.");
             }
         }
@@ -83,22 +103,22 @@ public class PatientController {
     // Method to view allocated appointments
     private void viewAllocatedAppointments(Scanner scanner) {
         System.out.print("Enter Patient ID: ");
-        String patientId = scanner.nextLine();
-        allocatedAppointmentView.display();
+        String patientID = scanner.nextLine();
+        allocatedAppointmentView.display(patientID);
     }
 
     // Method to view appointment history
     private void viewAppointmentHistory(Scanner scanner) {
         System.out.print("Enter Patient ID: ");
-        String patientId = scanner.nextLine();
-        appointmentHistoryView.display();
+        String patientID = scanner.nextLine();
+        appointmentHistoryView.display(patientID);
     }
 
     // Method to view medical records
     private void viewMedicalRecords(Scanner scanner) {
         System.out.print("Enter Patient ID: ");
-        String patientId = scanner.nextLine();
-        medicalRecordView.display();
+        String patientID = scanner.nextLine();
+        medicalRecordView.display(patientID);
     }
 
     // Method to update contact information
@@ -169,22 +189,22 @@ public class PatientController {
         }
     }
 
-    // Method to view all patients
-    private void viewAllPatients() {
-        patientService.listAllPatients();
-    }
+    // Method to view available appointment slots
+    private void viewAvailableAppointmentSlots(Scanner scanner) {
+        System.out.print("Enter Doctor ID: ");
+        String doctorId = scanner.nextLine();
+        System.out.print("Enter date for available slots (yyyy-MM-dd): ");
+        String dateStr = scanner.nextLine();
 
-    // Method to delete a patient
-    private void deletePatient(Scanner scanner) {
-        System.out.print("Enter Patient ID: ");
-        String patientId = scanner.nextLine();
+        LocalDate date = LocalDate.parse(dateStr);
 
-        boolean success = patientService.deletePatient(patientId); // Use the deletePatient method in PatientService
-
-        if (success) {
-            System.out.println("Patient " + patientId + " deleted successfully.");
+        // Check back in AppointmentService again
+        List<LocalDateTime> availableSlots = appointmentService.getAvailableSlots(doctorId, date);
+        if (availableSlots.isEmpty()) {
+            System.out.println("No available slots for the given date.");
         } else {
-            System.out.println("Failed to delete patient. Patient not found.");
+            System.out.println("Available slots:");
+            availableSlots.forEach(slot -> System.out.println(slot));
         }
     }
-} 
+}
