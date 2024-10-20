@@ -125,4 +125,14 @@ public class PatientService {
 
         return false;
     }
+
+    public boolean deletePatient(String hospitalID) {
+        // Remove the patient from the map by ID if present
+        if (patients.containsKey(hospitalID)) {
+            patients.remove(hospitalID);
+            return true;
+        }
+        return false; // Return false if the patient was not found
+    }
+    
 }
