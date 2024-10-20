@@ -3,8 +3,6 @@ package views;
 import controllers.PatientController;
 import enums.UserRole;
 import java.util.Scanner;
-import services.AppointmentService;
-import services.PatientService;
 import services.UserService;
 
 public class UserView {
@@ -41,14 +39,13 @@ public class UserView {
         switch (role) {
             case PATIENT:
                 // Create PatientService and AppointmentService
-                PatientService patientService = new PatientService();
-                AppointmentService appointmentService = new AppointmentService();
+                PatientController patientController = new PatientController(null, null);
 
                 // Instantiate PatientController
-                PatientController patientController = new PatientController(patientService, appointmentService);
+                PatientView patientView = new PatientView(patientController);
 
                 // Start the patient operations (menu)
-                patientController.start();
+                patientView.start();
                 break;
             case DOCTOR:
                 // Call to DoctorView

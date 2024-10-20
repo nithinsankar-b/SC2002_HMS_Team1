@@ -147,7 +147,7 @@ public class PatientService {
 
         if (appointment != null && appointment.getPatientId().equals(patientID)) {
             Appointment updatedAppointment = new Appointment(appointmentID, patientID, appointment.getDoctorId(), newDate);
-            updatedAppointment.setStatus(AppointmentStatus.RESCHEDULED);
+            updatedAppointment.setStatus(AppointmentStatus.PENDING);
             return appointmentService.rescheduleAppointment(appointmentID, updatedAppointment);
         }
 
