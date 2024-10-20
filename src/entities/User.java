@@ -1,28 +1,32 @@
-public class User
-{
-    private String hospitalID;
-    private String password;
+/*
+ * What's the point of this folder?
+ * Where did it come from?
+*/
 
-    public User(String hospitalID, String password)
-    {
-        this.hospitalID = hospitalID;
-        this.password = password;
-    }
+// public class User
+// {
+//     private String hospitalID;
+//     private String password;
 
-    public String getHospitalID() {
-        return hospitalID;
-    }
+//     public User(String hospitalID, String password) {
+//         this.hospitalID = hospitalID;
+//         this.password = password;
+//     }
 
-    public String getRole() {
-        return role;
-    }
+//     public String getHospitalID() {
+//         return hospitalID;
+//     }
 
-    public void setHospitalID(String hospitalID) {
-        this.hospitalID = hospitalID;
-    }
+//     public String getRole() { 
+//         return role;
+//     }
 
-    public void setPassword(String password) {
-        this.password = password;
-    }
+//     public void setHospitalID(String hospitalID) {
+//         this.hospitalID = hospitalID;
+//     }
 
-}
+//     public void setPassword(String password) {
+//         this.password = password;
+//     }
+
+// }

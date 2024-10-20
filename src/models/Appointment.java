@@ -1,11 +1,10 @@
 // src/models/Appointment.java
 package models;
 
-import java.time.LocalDateTime;
 import enums.AppointmentStatus;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
-import models.Medication;
 
 public class Appointment {
     private String appointmentId;
@@ -13,7 +12,7 @@ public class Appointment {
     private String doctorId;
     private LocalDateTime appointmentDateTime;
     private AppointmentStatus status; // E.g., Pending, Completed, Canceled
-    private List<Medication> medications; // List of prescribed medications
+    private final List<Medication> medications; // List of prescribed medications
     private String consultationNotes; // Notes recorded during consultation
     private String serviceProvided; // Type of service provided (e.g., consultation, X-ray, etc.)
     private LocalDateTime appointmentOutcomeDate; // Date of appointment outcome record

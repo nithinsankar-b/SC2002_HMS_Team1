@@ -1,12 +1,11 @@
 package views;
 
+import enums.UserRole;
+import java.util.Scanner; // Import the UserRole enum
 import services.UserService;
-import enums.UserRole; // Import the UserRole enum
-
-import java.util.Scanner;
 
 public class UserView {
-    private UserService userService;
+    private final UserService userService;
     private String loggedInHospitalID;
 
     public UserView(UserService userService) {
@@ -14,24 +13,24 @@ public class UserView {
     }
 
     public void displayLogin() {
-        Scanner scanner = new Scanner(System.in);
+        try (Scanner scanner = new Scanner(System.in)) {
+            System.out.println("***WELCOME TO HOSPITAL MANAGEMENT SYSTEM***");
 
-        System.out.println("***WELCOME TO HOSPITAL MANAGEMENT SYSTEM***");
+            System.out.print("Enter Hospital ID: ");
+            String hospitalID = scanner.nextLine();
 
-        System.out.print("Enter Hospital ID: ");
-        String hospitalID = scanner.nextLine();
+            System.out.print("Enter Password: ");
+            String password = scanner.nextLine();
 
-        System.out.print("Enter Password: ");
-        String password = scanner.nextLine();
-
-        if (userService.login(hospitalID, password)) {
-            loggedInHospitalID = hospitalID;
-            System.out.println("Login successful!");
-            UserRole role = userService.getUserRole(hospitalID);
-            System.out.println("Role: " + role);
-            navigateToRoleSpecificPage(role);
-        } else {
-            System.out.println("Invalid Hospital ID or Password.");
+            if (userService.login(hospitalID, password)) {
+                loggedInHospitalID = hospitalID;
+                System.out.println("Login successful!");
+                UserRole role = userService.getUserRole(hospitalID);
+                System.out.println("Role: " + role);
+                navigateToRoleSpecificPage(role);
+            } else {
+                System.out.println("Invalid Hospital ID or Password.");
+            }
         }
     }
 
@@ -67,19 +66,21 @@ public class UserView {
     }
 
     public void displayChangePassword() {
-        Scanner scanner = new Scanner(System.in);
+        try (Scanner scanner = new Scanner(System.in)) {
+            // No need to ask for Hospital ID again
+            System.out.print("Enter Old Password: ");
+            String oldPassword = scanner.nextLine();
 
-        // No need to ask for Hospital ID again
-        System.out.print("Enter Old Password: ");
-        String oldPassword = scanner.nextLine();
+            System.out.print("Enter New Password: ");
+            String newPassword = scanner.nextLine();
 
-        System.out.print("Enter New Password: ");
-        String newPassword = scanner.nextLine();
+            if (userService.changePassword(loggedInHospitalID, oldPassword, newPassword)) {
+                System.out.println("Password changed successfully!");
+            } else {
+                System.out.println("Old password is incorrect. Password change failed.");
+            }
 
-        if (userService.changePassword(loggedInHospitalID, oldPassword, newPassword)) {
-            System.out.println("Password changed successfully!");
-        } else {
-            System.out.println("Old password is incorrect. Password change failed.");
+            scanner.close();
         }
     }
 }

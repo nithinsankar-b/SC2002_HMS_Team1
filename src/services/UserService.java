@@ -1,15 +1,15 @@
 package services;
 
-import models.User;
-import enums.UserRole; // Import the UserRole enum
-import interfaces.IUserService; // Import the IUserService interface
-
-import java.util.HashMap;
+import enums.UserRole;
+import interfaces.IUserService; // Import the UserRole enum
+import java.util.HashMap; // Import the IUserService interface
 import java.util.Map;
+import models.User;
 
 public class UserService implements IUserService {
-    private Map<String, User> users;
+    private final Map<String, User> users;
 
+    // There is already a database in the CSV file
     public UserService() {
         users = new HashMap<>();
         users.put("12345", new User("12345", "password", UserRole.PATIENT));

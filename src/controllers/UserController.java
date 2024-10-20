@@ -1,15 +1,12 @@
 package controllers;
 
 import services.UserService;
-import models.User;
 import views.UserView;
 
 public class UserController {
-    private UserService userService;
-    private UserView userView;
+    private final UserView userView;
 
     public UserController(UserService userService) {
-        this.userService = userService;
         this.userView = new UserView(userService);
     }
 

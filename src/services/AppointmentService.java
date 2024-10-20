@@ -1,16 +1,15 @@
 package services;
 
-import interfaces.IAppointmentService; // Import the interface
-import models.Appointment;
-import enums.AppointmentStatus;
-import models.Medication;
-
+import enums.AppointmentStatus; // Import the interface
+import interfaces.IAppointmentService;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
+import models.Appointment;
+import models.Medication;
 
 public class AppointmentService implements IAppointmentService { // Implement the interface
-    private List<Appointment> appointments = new ArrayList<>();
+    private final List<Appointment> appointments = new ArrayList<>();
 
     @Override
     public boolean scheduleAppointment(Appointment appointment) {
