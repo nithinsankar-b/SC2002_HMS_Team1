@@ -1,15 +1,14 @@
 // src/controllers/AppointmentController.java
 package controllers;
 
+import java.time.LocalDateTime;
+import java.util.List;
 import models.Appointment;
 import models.Medication;
 import services.AppointmentService;
 
-import java.time.LocalDateTime;
-import java.util.List;
-
 public class AppointmentController {
-    private AppointmentService appointmentService;
+    private final AppointmentService appointmentService;
 
     public AppointmentController() {
         this.appointmentService = new AppointmentService();
