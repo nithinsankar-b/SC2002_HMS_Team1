@@ -3,14 +3,12 @@ package services;
 import models.Appointment;
 import enums.AppointmentStatus;
 import models.Medication;
-import enums.MedicationStatus;
 
 import java.io.*;
-import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
-public class AppointmentService {
+public class AppointmentService{
     private static final String APPOINTMENT_FILE = "C:\\Users\\nithi\\Downloads\\SC2002_HMS_Team1\\src\\resources\\appointment.csv"; // Update path if needed
     private List<Appointment> appointments;
 

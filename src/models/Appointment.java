@@ -79,7 +79,7 @@ public class Appointment {
     public static Appointment fromString(String line) {
         String[] parts = line.split(",");
         if (parts.length < 7) {
-            return null; // Ensure there are enough parts
+            return null;
         }
 
         String appointmentId = parts[0];
@@ -95,7 +95,6 @@ public class Appointment {
         appointment.setConsultationNotes(consultationNotes);
         appointment.setServiceProvided(serviceProvided);
 
-        // Load medications from the remaining parts
         if (parts.length > 7) {
             String[] meds = parts[7].split(";");
             for (String med : meds) {
