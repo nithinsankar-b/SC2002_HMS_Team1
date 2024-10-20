@@ -19,6 +19,7 @@ public class AdministratorController {
     private ViewAndManageInventory inventoryView;
     private Scanner scanner = new Scanner(System.in);
 
+    // Constructor
     public AdministratorController(IProjectAdmService projectAdmService,
                                    ManageHospStaff staffView,
                                    AppointmentsView appointmentView,
@@ -29,6 +30,7 @@ public class AdministratorController {
         this.inventoryView = inventoryView;
     }
 
+    // Main menu for Administrator
     public void start() {
         boolean exit = false;
         while (!exit) {
@@ -64,6 +66,7 @@ public class AdministratorController {
         }
     }
 
+    // Manage Hospital Staff (Add/Remove/View)
     private void manageHospitalStaff() {
         System.out.println("\n-- Manage Hospital Staff --");
         System.out.println("1. Add Staff");
@@ -86,23 +89,27 @@ public class AdministratorController {
         }
     }
 
+    // Adding a new staff member
     private void addStaff() {
         User staff = staffView.getStaffDetails();  // Collect input from staffView
         projectAdmService.addStaff(staff);         // Call service layer to add staff
         staffView.displayListOfStaff(projectAdmService.getAllStaff());  // Display updated staff list
     }
 
+    // Removing a staff member
     private void removeStaff() {
         String staffID = staffView.getStaffIDForRemoval();  // Collect input for staff ID
         projectAdmService.removeStaff(new User(staffID, "", "", "", 0));  // Call service layer to remove staff
         staffView.displayListOfStaff(projectAdmService.getAllStaff());  // Display updated staff list
     }
 
+    // View the list of appointments
     private void viewAppointments() {
         List<Appointment> appointments = projectAdmService.viewAppointments();
         appointmentView.displayAppointments(appointments);  // Show appointments using the view
     }
 
+    // Manage the medication inventory
     private void manageInventory() {
         String medicineName = inventoryView.getMedicineName();  // Collect input from user
         int quantity = inventoryView.getMedicineQuantity();     // Collect input from user
@@ -111,6 +118,7 @@ public class AdministratorController {
         inventoryView.displayInventory(updatedInventory);  // Display updated inventory
     }
 
+    // Approve replenishment requests
     private void approveReplenishmentRequests() {
         System.out.print("Enter medicine name for replenishment request approval: ");
         scanner.nextLine();  // Consume newline
@@ -122,6 +130,7 @@ public class AdministratorController {
         projectAdmService.approveReplenishmentRequest(request);  // Approve the request
     }
 }
+
 
 
 
