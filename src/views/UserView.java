@@ -55,7 +55,7 @@ public class UserView {
                 // pharmacistView.display();
                 System.out.println("Navigating to Pharmacist view...");
                 break;
-            case SUPERVISOR:
+            case ADMINISTRATOR:
                 // Call to SupervisorView
                 // Example: SupervisorView supervisorView = new SupervisorView(userService);
                 // supervisorView.display();
