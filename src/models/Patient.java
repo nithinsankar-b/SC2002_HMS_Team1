@@ -2,6 +2,7 @@ package models;
 
 import enums.UserRole;
 import java.time.LocalDate;
+import models.User;
 
 // Inherits User class
 public class Patient extends User {
@@ -11,10 +12,10 @@ public class Patient extends User {
     private String bloodType;
     private String contactInformation; // Email address
     private boolean isRegistered; // Indicates if the patient is registered
+    private String patientID;
 
-    public Patient(String hospitalID, String password, String name, LocalDate dateOfBirth, String gender, String bloodType, String contactInformation) {
-        super(hospitalID, password, UserRole.PATIENT); // UserRole set to PATIENT
-        
+    public Patient(String hospitalID, String password, UserRole role,String name, LocalDate dateOfBirth, String gender, String bloodType, String contactInformation) {// UserRole set to PATIENT
+        super(hospitalID, password, role);
         // Initialize attributes based on the CSV file and other patient-specific data
         this.name = name;
         this.dateOfBirth = dateOfBirth;
@@ -25,6 +26,8 @@ public class Patient extends User {
     }
 
     // Getters
+    // To get PatientID use the method defined in User getHospitalID();
+
     public String getName() {
         return name;
     }

@@ -3,6 +3,8 @@ package views;
 import controllers.PatientController;
 import enums.UserRole;
 import java.util.Scanner;
+
+import models.User;
 import services.UserService;
 
 public class UserView {
@@ -23,19 +25,25 @@ public class UserView {
             System.out.print("Enter Password: ");
             String password = scanner.nextLine();
 
+
             if (userService.login(hospitalID, password)) {
                 loggedInHospitalID = hospitalID;
                 System.out.println("Login successful!");
                 UserRole role = userService.getUserRole(hospitalID);
+
+                // Creating the User object
+                User user = new User(hospitalID, password, role);
+
                 System.out.println("Role: " + role);
-                navigateToRoleSpecificPage(role);
+                System.out.println("=====================================");
+                navigateToRoleSpecificPage(user, role);
             } else {
                 System.out.println("Invalid Hospital ID or Password.");
             }
         }
     }
 
-    private void navigateToRoleSpecificPage(UserRole role) {
+    private void navigateToRoleSpecificPage(User user, UserRole role) {
         switch (role) {
             case PATIENT:
                 // Create PatientService and AppointmentService
@@ -45,25 +53,30 @@ public class UserView {
                 PatientView patientView = new PatientView(patientController);
 
                 // Start the patient operations (menu)
-                patientView.start();
+                System.out.println("Navigating to Patient view...");
+                System.out.println("=====================================");
+                patientView.start(user);
                 break;
             case DOCTOR:
                 // Call to DoctorView
                 // Example: DoctorView doctorView = new DoctorView(userService);
                 // doctorView.display();
                 System.out.println("Navigating to Doctor view...");
+                System.out.println("=====================================");
                 break;
-            case PHARMACIST:
+                case PHARMACIST:
                 // Call to PharmacistView
                 // Example: PharmacistView pharmacistView = new PharmacistView(userService);
                 // pharmacistView.display();
                 System.out.println("Navigating to Pharmacist view...");
+                System.out.println("=====================================");
                 break;
-            case SUPERVISOR:
+                case SUPERVISOR:
                 // Call to SupervisorView
                 // Example: SupervisorView supervisorView = new SupervisorView(userService);
                 // supervisorView.display();
                 System.out.println("Navigating to Supervisor view...");
+                System.out.println("=====================================");
                 break;
             default:
                 System.out.println("Role not recognized.");

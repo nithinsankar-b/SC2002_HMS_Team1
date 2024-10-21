@@ -14,5 +14,5 @@ public interface iPatientView {
     public void showErrorMessage(String message);
 
     // Method to display the main content of the view (Appointment/AppointmentHistory/MedicalRecord)
-    public void display(String patientID);
+    public void display(Patient patient);
 }

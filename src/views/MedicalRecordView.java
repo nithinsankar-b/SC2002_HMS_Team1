@@ -36,8 +36,8 @@ public class MedicalRecordView implements iPatientView {
     }
 
     @Override
-    public void display(String patientID) {
-        System.out.println("Displaying medical records for Patient ID: " + patientID);
+    public void display(Patient patient) {
+        System.out.println("Displaying medical records for Patient ID: " + patient.getHospitalID());
 
         // Get the list of all scheduled appointments from AppointmentService
         List<Appointment> appointments = appointmentService.viewScheduledAppointments();
@@ -45,7 +45,7 @@ public class MedicalRecordView implements iPatientView {
         // Filter appointments that belong to the patient and have been completed
         boolean found = false;
         for (Appointment appointment : appointments) {
-            if (appointment.getPatientId().equals(patientID) && appointment.getStatus() == enums.AppointmentStatus.COMPLETED) {
+            if (appointment.getPatientId().equals(patient.getHospitalID()) && appointment.getStatus() == enums.AppointmentStatus.COMPLETED) {
                 found = true;
                 System.out.println("Appointment ID: " + appointment.getAppointmentId());
                 System.out.println("Doctor ID: " + appointment.getDoctorId());
@@ -61,7 +61,7 @@ public class MedicalRecordView implements iPatientView {
         }
 
         if (!found) {
-            System.out.println("No medical records found for Patient ID: " + patientID);
+            System.out.println("No medical records found for Patient ID: " + patient.getHospitalID());
         }
     }
 }

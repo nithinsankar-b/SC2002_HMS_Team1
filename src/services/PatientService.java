@@ -15,19 +15,21 @@ import java.util.List;
 import java.util.Map;
 import models.Appointment;
 import models.Patient;
+import models.User;
 
 public class PatientService {
     private final Map<String, Patient> patients;
     private final AppointmentService appointmentService;
 
-    public PatientService() {
+    public PatientService(Patient patient) {
         this.patients = new HashMap<>();
         this.appointmentService = new AppointmentService(); // Initialize AppointmentService
-        loadPatients(); // Load patients from the CSV file
+        loadPatients(patient); // Load patients from the CSV file
     }
 
     // Method to retrieve a patient by their hospital ID
     public Patient getPatientById(String hospitalID) {
+        // Returns a patient object
         return patients.get(hospitalID);
     }
 
@@ -56,8 +58,8 @@ public class PatientService {
         });
     }
 
-    // Method to load patients from the CSV file
-    private void loadPatients() {
+//    // Method to load patients from the CSV file
+    private void loadPatients(Patient patient) {
         String csvFilePath = "../data/Patient_List.csv";
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
 
@@ -75,7 +77,6 @@ public class PatientService {
                 String contactInformation = values[5].trim();
 
                 // Check again. Do we need password?
-                Patient patient = new Patient(patientId, "defaultPassword", name, dob, gender, bloodType, contactInformation);
                 patients.put(patient.getHospitalID(), patient);
             }
         } catch (IOException e) {

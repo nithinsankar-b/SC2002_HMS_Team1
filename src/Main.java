@@ -17,20 +17,6 @@ public class Main {
                 UserService userService = new UserService();
                 UserController userController = new UserController(userService);
                 userController.run(); // Don't know what this function is for
-
-                // switch(user){
-                //     case PATIENT:
-                //          new PatientController().start();
-                //          break;
-                //     case DOCTOR:
-                //         new DoctorController().start();
-                //         break;
-                //     case ADMIN:
-                //         new AdminController().start();
-                //         break;
-                //     default:
-                //         System.out.println("Invalid user. Please try again.");
-                //         break;
             } while (true);
         } catch (Exception e) {
             // Need to save data and log out

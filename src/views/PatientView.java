@@ -1,13 +1,19 @@
 package views;
 
 import interfaces.iPatientView;
+
+import java.time.LocalDate;
 import java.util.Scanner;
 import models.Patient;
 import controllers.PatientController;
+import models.User;
+import services.AppointmentService;
+import services.PatientService;
 
 public class PatientView implements iPatientView {
     private final Scanner scanner;
     private final PatientController patientController;
+    private Patient patient;
 
     public PatientView(PatientController patientController) {
         this.scanner = new Scanner(System.in);
@@ -15,23 +21,25 @@ public class PatientView implements iPatientView {
     }
 
     // Main method to handle different patient operations
-    public void start() {
+    public void start(User user) {
         boolean isRunning = true;
 
         while (isRunning) {
             displayMenu();
             int choice = getUserInput();
 
+            patient = new Patient(user.getHospitalID(), user.getPassword(), user.getRole(), "James", LocalDate.of(2001, 1,1), "Male", "O+", "james@gmail.com");
+
             switch (choice) {
-                case 1 -> patientController.viewPatientDetails(scanner);
-                case 2 -> patientController.viewAllocatedAppointments(scanner);
-                case 3 -> patientController.viewAppointmentHistory(scanner);
-                case 4 -> patientController.viewMedicalRecords(scanner);
-                case 5 -> patientController.updateContactInformation(scanner);
-                case 6 -> patientController.createAppointment(scanner);
-                case 7 -> patientController.cancelAppointment(scanner);
-                case 8 -> patientController.rescheduleAppointment(scanner);
-                case 9 -> patientController.viewAvailableAppointmentSlots(scanner);
+                case 1 -> patientController.viewPatientDetails(patient);
+                case 2 -> patientController.viewAllocatedAppointments(patient);
+                case 3 -> patientController.viewAppointmentHistory(patient);
+                case 4 -> patientController.viewMedicalRecords(patient);
+                case 5 -> patientController.updateContactInformation(patient);
+                case 6 -> patientController.createAppointment(patient);
+                case 7 -> patientController.cancelAppointment(patient);
+                case 8 -> patientController.rescheduleAppointment(patient);
+                case 9 -> patientController.viewAvailableAppointmentSlots();
                 case 10 -> isRunning = false;
                 default -> showErrorMessage("Invalid choice, please try again.");
             }
@@ -54,9 +62,8 @@ public class PatientView implements iPatientView {
     }
 
     @Override
-    public void display(String patientID) {
-        System.out.println("Displaying information for patient ID: " + patientID);
-        start();
+    public void display(Patient patient) {
+        System.out.println("Displaying information for patient ID: " + patient.getHospitalID());
     }
 
     // Get user input with error checking
@@ -91,4 +98,12 @@ public class PatientView implements iPatientView {
     public void showErrorMessage(String message) {
         System.out.println("ERROR: " + message);
     }
+
+//    public static void main(String[] args) {
+//        AppointmentService appointmentService = new AppointmentService();
+//        PatientService patientService = new PatientService();
+//        PatientController patientController = new PatientController(patientService, appointmentService);
+//        PatientView patientView = new PatientView(patientController);
+//        patientView.start();
+//    }
 }
