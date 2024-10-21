@@ -1,7 +1,6 @@
 package controllers;
 
 import services.UserService;
-import models.User;
 import views.UserView;
 
 public class UserController {
@@ -15,6 +14,6 @@ public class UserController {
 
     public void run() {
         userView.displayLogin();
-        //userView.displayChangePassword();
+        // userView.displayChangePassword();
     }
 }

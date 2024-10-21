@@ -1,7 +1,7 @@
 package views;
 
 import services.UserService;
-import enums.UserRole; // Import the UserRole enum
+import enums.UserRole;
 
 import java.util.Scanner;
 
@@ -38,38 +38,23 @@ public class UserView {
     private void navigateToRoleSpecificPage(UserRole role) {
         switch (role) {
             case PATIENT:
-                // Call to PatientView
-                // Example: PatientView patientView = new PatientView(userService);
-                // patientView.display();
                 System.out.println("Navigating to Patient view...");
                 break;
             case DOCTOR:
-                // Call to DoctorView
-                // Example: DoctorView doctorView = new DoctorView(userService);
-                // doctorView.display();
                 System.out.println("Navigating to Doctor view...");
                 break;
             case PHARMACIST:
-                // Call to PharmacistView
-                // Example: PharmacistView pharmacistView = new PharmacistView(userService);
-                // pharmacistView.display();
                 System.out.println("Navigating to Pharmacist view...");
                 break;
             case ADMINISTRATOR:
-                // Call to SupervisorView
-                // Example: SupervisorView supervisorView = new SupervisorView(userService);
-                // supervisorView.display();
-                System.out.println("Navigating to Supervisor view...");
+                System.out.println("Navigating to Administrator view...");
                 break;
-            default:
-                System.out.println("Role not recognized.");
         }
     }
 
     public void displayChangePassword() {
         Scanner scanner = new Scanner(System.in);
 
-        // No need to ask for Hospital ID again
         System.out.print("Enter Old Password: ");
         String oldPassword = scanner.nextLine();
 

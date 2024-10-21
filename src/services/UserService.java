@@ -1,9 +1,12 @@
 package services;
 
 import models.User;
-import enums.UserRole; // Import the UserRole enum
-import interfaces.IUserService; // Import the IUserService interface
+import enums.UserRole;
+import interfaces.IUserService;
 
+import java.io.BufferedReader;
+import java.io.FileReader;
+import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -12,18 +15,39 @@ public class UserService implements IUserService {
 
     public UserService() {
         users = new HashMap<>();
-        users.put("12345", new User("12345", "password", UserRole.PATIENT));
-        users.put("67890", new User("67890", "password", UserRole.DOCTOR));
+        loadUsersFromCSV( "src\\resources\\User.csv"); // Adjusted for relative path
     }
 
-    // Method to validate login
+    // Load users from CSV
+    private void loadUsersFromCSV(String filePath) {
+        String line;
+        try (BufferedReader br = new BufferedReader(new FileReader(filePath))) {
+            while ((line = br.readLine()) != null) {
+                String[] userData = line.split(",");
+                if (userData.length == 3) {
+                    String hospitalID = userData[0].trim();
+                    String password = userData[1].trim();
+                    String roleString = userData[2].trim();
+                    if(roleString.equals("role"))
+                        continue;
+                    UserRole role = UserRole.valueOf(userData[2].trim());
+                    //System.out.println(hospitalID+password+userData[2].trim());
+                    users.put(hospitalID, new User(hospitalID, password, role));
+                }
+            }
+        } catch (IOException e) {
+            System.out.println("Error reading CSV file: " + e.getMessage());
+        }
+    }
+
+    // Login method
     @Override
     public boolean login(String hospitalID, String password) {
         User user = users.get(hospitalID);
         return user != null && user.getPassword().equals(password);
     }
 
-    // Method to change user password
+    // Change password
     @Override
     public boolean changePassword(String hospitalID, String oldPassword, String newPassword) {
         User user = users.get(hospitalID);
@@ -34,7 +58,7 @@ public class UserService implements IUserService {
         return false;
     }
 
-    // Method to get user role
+    // Get user role
     @Override
     public UserRole getUserRole(String hospitalID) {
         User user = users.get(hospitalID);
