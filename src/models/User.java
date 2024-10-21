@@ -5,7 +5,7 @@ import enums.UserRole;
 public class User {
     private String hospitalID;
     private String password;
-    private UserRole role; // Change from String to UserRole
+    private UserRole role;
 
     public User(String hospitalID, String password, UserRole role) {
         this.hospitalID = hospitalID;
@@ -22,7 +22,7 @@ public class User {
         return password;
     }
 
-    public UserRole getRole() { // Change return type to UserRole
+    public UserRole getRole() {
         return role;
     }
 
@@ -35,7 +35,7 @@ public class User {
         this.password = password;
     }
 
-    public void setRole(UserRole role) { // Change parameter type to UserRole
+    public void setRole(UserRole role) {
         this.role = role;
     }
 }

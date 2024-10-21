@@ -1,7 +1,10 @@
-// File: services/AppointmentService.java
 package services;
 
+import models.Appointment;
 import enums.AppointmentStatus;
+import models.Medication;
+
+import java.io.*;
 import interfaces.IAppointmentService;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
@@ -9,91 +12,116 @@ import java.time.LocalTime;
 import java.util.ArrayList;
 import java.util.List;
 import models.Appointment;
-import models.Medication;
 
-public class AppointmentService implements IAppointmentService { // Implement the interface
-    private final List<Appointment> appointments = new ArrayList<>(); // Consider thread safety if used in multi-threaded environments
+public class AppointmentService{
+    private static final String APPOINTMENT_FILE = "C:\\Users\\nithi\\Downloads\\SC2002_HMS_Team1\\src\\resources\\appointment.csv"; // Update path if needed
+    private List<Appointment> appointments;
 
-    @Override
+    public AppointmentService() {
+        this.appointments = new ArrayList<>();
+        createCSVIfNotExists();
+        loadAppointmentsFromCSV();
+    }
+
     public boolean scheduleAppointment(Appointment appointment) {
-        return appointments.add(appointment);
+        boolean success = appointments.add(appointment);
+        if (success) {
+            saveAppointmentsToCSV();
+        }
+        return success;
     }
 
-    @Override
     public boolean cancelAppointment(String appointmentId) {
-        return appointments.removeIf(appointment -> appointment.getAppointmentId().equals(appointmentId));
+        boolean success = appointments.removeIf(appointment -> appointment.getAppointmentId().equals(appointmentId));
+        if (success) {
+            saveAppointmentsToCSV();
+        }
+        return success;
     }
 
-    @Override
     public boolean rescheduleAppointment(String appointmentId, Appointment newAppointment) {
         for (int i = 0; i < appointments.size(); i++) {
             if (appointments.get(i).getAppointmentId().equals(appointmentId)) {
                 appointments.set(i, newAppointment);
-                return true; // Appointment rescheduled
+                saveAppointmentsToCSV();
+                return true;
             }
         }
-        return false; // Appointment not found
+        return false;
     }
 
-    @Override
     public List<Appointment> viewScheduledAppointments() {
         return appointments;
     }
 
-    @Override
     public Appointment getAppointment(String appointmentId) {
         for (Appointment appointment : appointments) {
             if (appointment.getAppointmentId().equals(appointmentId)) {
                 return appointment;
             }
         }
-        return null; // Appointment not found
+        return null;
     }
 
-    @Override
-    public void recordAppointmentOutcome(String appointmentId, String serviceProvided, List<Medication> prescribedMedications, String consultationNotes) {
+    public void recordAppointmentOutcome(String appointmentId, String serviceProvided, String consultationNotes, List<Medication> medications) {
         Appointment appointment = getAppointment(appointmentId);
         if (appointment != null && appointment.getStatus() == AppointmentStatus.PENDING) {
-            appointment.setStatus(AppointmentStatus.COMPLETED); // Change status to completed
-            appointment.setAppointmentOutcomeDate(LocalDateTime.now()); // Record date of outcome
+            appointment.setStatus(AppointmentStatus.COMPLETED);
             appointment.setServiceProvided(serviceProvided);
-            appointment.getMedications().clear(); // Clear existing medications
-            prescribedMedications.forEach(appointment::addMedication); // Add new prescribed medications
-            appointment.setConsultationNotes(consultationNotes); // Set consultation notes
+            appointment.setConsultationNotes(consultationNotes);
+            for (Medication medication : medications) {
+                appointment.addMedication(medication);
+            }
+            saveAppointmentsToCSV();
         }
     }
 
-    @Override
-    public List<LocalDateTime> getAvailableSlots(String doctorId, LocalDate date) {
-        List<LocalDateTime> availableSlots = new ArrayList<>();
-        
-        // Assuming working hours for doctors: 0900 to 1700HRS
-        LocalTime startTime = LocalTime.of(9, 0);
-        LocalTime endTime = LocalTime.of(17, 0);
+    // Create CSV file if it does not exist
+    private void createCSVIfNotExists() {
+        File file = new File(APPOINTMENT_FILE);
+        if (!file.exists()) {
+            try {
+                file.createNewFile();
+                // Write header to the CSV file
+                try (BufferedWriter writer = new BufferedWriter(new FileWriter(file))) {
+                    writer.write("appointmentId,patientId,doctorId,appointmentDateTime,status,consultationNotes,serviceProvided,medications");
+                    writer.newLine();
+                }
+            } catch (IOException e) {
+                System.err.println("Error creating CSV file at path: " + APPOINTMENT_FILE + " - " + e.getMessage());
+            }
+        }
+    }
 
-        // Create slots at 30-minute intervals between start and end time
-        LocalDateTime currentSlot = LocalDateTime.of(date, startTime);
-        LocalDateTime endSlot = LocalDateTime.of(date, endTime);
-
-        while (currentSlot.isBefore(endSlot)) {
-            boolean slotTaken = false;
-            
-            // Check if the slot is already booked by any existing appointment for the given doctor
-            for (Appointment appointment : appointments) {
-                if (appointment.getDoctorId().equals(doctorId) && 
-                    appointment.getAppointmentDateTime().isEqual(currentSlot)) {
-                    slotTaken = true;
-                    break;
+    // Load appointments from CSV file
+    private void loadAppointmentsFromCSV() {
+        try (BufferedReader reader = new BufferedReader(new FileReader(APPOINTMENT_FILE))) {
+            String line;
+            // Skip header line
+            reader.readLine();
+            while ((line = reader.readLine()) != null) {
+                Appointment appointment = Appointment.fromString(line);
+                if (appointment != null) {
+                    appointments.add(appointment);
                 }
             }
-
-            if (!slotTaken) {
-                availableSlots.add(currentSlot);
-            }
-
-            currentSlot = currentSlot.plusMinutes(30); // Move to the next 30-minute slot
+        } catch (IOException e) {
+            System.err.println("Error reading appointments from CSV at path: " + APPOINTMENT_FILE + " - " + e.getMessage());
         }
+    }
 
-        return availableSlots;
+    // Save appointments to CSV file
+    private void saveAppointmentsToCSV() {
+        try (BufferedWriter writer = new BufferedWriter(new FileWriter(APPOINTMENT_FILE))) {
+            // Write header to the CSV file
+            writer.write("appointmentId,patientId,doctorId,appointmentDateTime,status,consultationNotes,serviceProvided,medications");
+            writer.newLine();
+            for (Appointment appointment : appointments) {
+                writer.write(appointment.toString());
+                writer.newLine();
+            }
+        } catch (IOException e) {
+            System.err.println("Error writing appointments to CSV at path: " + APPOINTMENT_FILE + " - " + e.getMessage());
+        }
     }
 }
