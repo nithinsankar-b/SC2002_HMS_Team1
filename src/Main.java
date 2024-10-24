@@ -7,17 +7,10 @@ import services.UserService;
 public class Main {
     public static void main(String[] args) {
         try {
-            // Encapsulate main in while loop to allow multiple users to operate the application
-            do { 
-                // Need to initialize database??
-
-                // Need to set up authentication??
-
-                // Get user from authentication
-                UserService userService = new UserService();
-                UserController userController = new UserController(userService);
-                userController.run();
-            } while (true);
+            // Get user from authentication
+            UserService userService = new UserService();
+            UserController userController = new UserController(userService);
+            userController.run();
         } catch (Exception e) {
             // Need to save data and log out
             

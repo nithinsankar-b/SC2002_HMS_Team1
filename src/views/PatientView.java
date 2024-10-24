@@ -8,7 +8,6 @@ import java.util.Scanner;
 import models.Patient;
 import controllers.PatientController;
 import models.User;
-import services.AppointmentService;
 import services.PatientService;
 import services.UserService;
 
@@ -18,7 +17,7 @@ public class PatientView implements iPatientView {
     private final UserService userService;
 
     public PatientView(PatientController patientController, UserService userService) {
-        this.scanner = new Scanner(System.in);
+        this.scanner = new Scanner(System.in); // Do not close scanner here, managed centrally by UserView
         this.patientController = patientController;
         this.userService = userService;
     }
@@ -77,14 +76,15 @@ public class PatientView implements iPatientView {
                 case 6 -> patientController.createAppointment(patient);
                 case 7 -> patientController.cancelAppointment(patient);
                 case 8 -> patientController.rescheduleAppointment(patient);
-                 case 9 -> patientController.viewAvailableAppointmentSlots();
+                case 9 -> patientController.viewAvailableAppointmentSlots();
                 case 10 -> {
-                    isRunning = false;
+                    System.out.println("Logging out...");
+                    isRunning = false; // Exit the loop to log out
                 }
                 default -> showErrorMessage("Invalid choice, please try again.");
             }
 
-            // Only prompt to continue if the user has not chosen to exit
+            // Only prompt to continue if the user has not chosen to log out
             if (isRunning) {
                 System.out.println("\nDo you want to continue (Y/N): ");
                 String userInput = scanner.nextLine().trim().toUpperCase();
@@ -97,11 +97,8 @@ public class PatientView implements iPatientView {
             }
         }
 
-        scanner.close(); // Close the scanner when done
-        System.out.println("Thank You. Exiting HMS.");
-        System.exit(0);
+        // Do not close the scanner here as it's used in the main UserView
     }
-
 
     // Implementing the display method to show the main menu
     public void displayMenu() {
@@ -115,7 +112,7 @@ public class PatientView implements iPatientView {
         System.out.println("7. Cancel Appointment");
         System.out.println("8. Reschedule Appointment");
         System.out.println("9. View Available Appointment Slots");
-        System.out.println("10. Exit");
+        System.out.println("10. Log Out");
     }
 
     @Override
