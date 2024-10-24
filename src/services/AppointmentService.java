@@ -13,8 +13,8 @@ import java.util.ArrayList;
 import java.util.List;
 import models.Appointment;
 
-public class AppointmentService{
-    private static final String APPOINTMENT_FILE = "C:\\Users\\nithi\\Downloads\\SC2002_HMS_Team1\\src\\resources\\appointment.csv"; // Update path if needed
+public class AppointmentService implements IAppointmentService {
+    private static final String APPOINTMENT_FILE = "data/appointment.csv"; // Updated path to be relative
     private List<Appointment> appointments;
 
     public AppointmentService() {
@@ -23,6 +23,7 @@ public class AppointmentService{
         loadAppointmentsFromCSV();
     }
 
+    @Override
     public boolean scheduleAppointment(Appointment appointment) {
         boolean success = appointments.add(appointment);
         if (success) {
@@ -31,6 +32,7 @@ public class AppointmentService{
         return success;
     }
 
+    @Override
     public boolean cancelAppointment(String appointmentId) {
         boolean success = appointments.removeIf(appointment -> appointment.getAppointmentId().equals(appointmentId));
         if (success) {
@@ -39,6 +41,7 @@ public class AppointmentService{
         return success;
     }
 
+    @Override
     public boolean rescheduleAppointment(String appointmentId, Appointment newAppointment) {
         for (int i = 0; i < appointments.size(); i++) {
             if (appointments.get(i).getAppointmentId().equals(appointmentId)) {
@@ -50,30 +53,48 @@ public class AppointmentService{
         return false;
     }
 
+    @Override
     public List<Appointment> viewScheduledAppointments() {
-        return appointments;
+        return new ArrayList<>(appointments); // Return a copy to avoid modification from outside
     }
 
+    @Override
     public Appointment getAppointment(String appointmentId) {
-        for (Appointment appointment : appointments) {
-            if (appointment.getAppointmentId().equals(appointmentId)) {
-                return appointment;
-            }
-        }
-        return null;
+        return appointments.stream()
+                .filter(appointment -> appointment.getAppointmentId().equals(appointmentId))
+                .findFirst()
+                .orElse(null);
     }
 
-    public void recordAppointmentOutcome(String appointmentId, String serviceProvided, String consultationNotes, List<Medication> medications) {
+    @Override
+    public void recordAppointmentOutcome(String appointmentId, String serviceProvided, List<Medication> prescribedMedications, String consultationNotes) {
         Appointment appointment = getAppointment(appointmentId);
         if (appointment != null && appointment.getStatus() == AppointmentStatus.PENDING) {
             appointment.setStatus(AppointmentStatus.COMPLETED);
             appointment.setServiceProvided(serviceProvided);
             appointment.setConsultationNotes(consultationNotes);
-            for (Medication medication : medications) {
+            for (Medication medication : prescribedMedications) {
                 appointment.addMedication(medication);
             }
             saveAppointmentsToCSV();
         }
+    }
+
+    @Override
+    public List<LocalDateTime> getAvailableSlots(String doctorId, LocalDate date) {
+        List<LocalDateTime> availableSlots = new ArrayList<>();
+        LocalTime startTime = LocalTime.of(9, 0);
+        LocalTime endTime = LocalTime.of(17, 0);
+
+        for (LocalTime time = startTime; time.isBefore(endTime); time = time.plusMinutes(30)) {
+            LocalDateTime slot = LocalDateTime.of(date, time);
+            boolean isOccupied = appointments.stream()
+                    .anyMatch(appointment -> appointment.getDoctorId().equals(doctorId) && appointment.getAppointmentDateTime().equals(slot));
+            if (!isOccupied) {
+                availableSlots.add(slot);
+            }
+        }
+        return availableSlots;
     }
 
     // Create CSV file if it does not exist

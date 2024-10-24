@@ -6,6 +6,7 @@ import java.util.List;
 import java.util.Scanner;
 
 import models.Patient;
+import models.Appointment;
 import services.AppointmentService;
 import services.PatientService;
 import views.AllocatedAppointmentView;
@@ -70,8 +71,7 @@ public class PatientController {
     public void updateContactInformation(Patient patient) {
         if (patient != null) {
             Scanner scanner = new Scanner(System.in);
-            System.out.print("Patient ID: " + patient.getHospitalID());
-            System.out.print("\nEnter new contact information: ");
+            System.out.print("Enter new contact information: ");
             String newContactInfo = scanner.nextLine();
 
             boolean success = patientService.updatePatientContact(patient.getHospitalID(), newContactInfo);
@@ -89,7 +89,6 @@ public class PatientController {
     public void createAppointment(Patient patient) {
         if (patient != null) {
             Scanner scanner = new Scanner(System.in);
-            System.out.print("Patient ID: " + patient.getHospitalID() + "\n");
             System.out.print("Enter Doctor ID: ");
             String doctorId = scanner.nextLine();
 
@@ -98,7 +97,8 @@ public class PatientController {
 
             try {
                 LocalDateTime dateTime = LocalDateTime.parse(appointmentDateTime);
-                boolean success = patientService.createAppointment(patient.getHospitalID(), doctorId, dateTime);
+                Appointment appointment = new Appointment("Appointment: " + System.currentTimeMillis(), patient.getHospitalID(), doctorId, dateTime);
+                boolean success = appointmentService.scheduleAppointment(appointment);
                 if (success) {
                     System.out.println("Appointment created successfully.");
                 } else {
@@ -116,11 +116,10 @@ public class PatientController {
     public void cancelAppointment(Patient patient) {
         if (patient != null) {
             Scanner scanner = new Scanner(System.in);
-            System.out.print("Patient ID: " + patient.getHospitalID() + "\n");
             System.out.print("Enter Appointment ID: ");
             String appointmentId = scanner.nextLine();
 
-            boolean success = patientService.cancelAppointment(patient.getHospitalID(), appointmentId);
+            boolean success = appointmentService.cancelAppointment(appointmentId);
             if (success) {
                 System.out.println("Appointment cancelled successfully.");
             } else {
@@ -135,7 +134,6 @@ public class PatientController {
     public void rescheduleAppointment(Patient patient) {
         if (patient != null) {
             Scanner scanner = new Scanner(System.in);
-            System.out.print("Patient ID: " + patient.getHospitalID() + "\n");
             System.out.print("Enter Appointment ID: ");
             String appointmentId = scanner.nextLine();
             System.out.print("Enter new appointment date and time (yyyy-MM-ddTHH:mm): ");
@@ -143,11 +141,22 @@ public class PatientController {
 
             try {
                 LocalDateTime newDateTime = LocalDateTime.parse(newDateTimeStr);
-                boolean success = patientService.rescheduleAppointment(patient.getHospitalID(), appointmentId, newDateTime);
-                if (success) {
-                    System.out.println("Appointment rescheduled successfully.");
+                Appointment appointment = appointmentService.getAppointment(appointmentId);
+                if (appointment != null && appointment.getPatientId().equals(patient.getHospitalID())) {
+                    Appointment newAppointment = new Appointment(appointment.getAppointmentId(), appointment.getPatientId(), appointment.getDoctorId(), newDateTime);
+                    newAppointment.setServiceProvided("Rescheduled");
+                    newAppointment.setStatus(appointment.getStatus());
+                    newAppointment.setConsultationNotes(appointment.getConsultationNotes());
+                    newAppointment.getMedications().addAll(appointment.getMedications());
+
+                    boolean success = appointmentService.rescheduleAppointment(appointmentId, newAppointment);
+                    if (success) {
+                        System.out.println("Appointment rescheduled successfully.");
+                    } else {
+                        System.out.println("Failed to reschedule appointment. Please check the details and try again.");
+                    }
                 } else {
-                    System.out.println("Failed to reschedule appointment. Please check the details and try again.");
+                    System.out.println("Appointment not found or does not belong to the patient.");
                 }
             } catch (Exception e) {
                 System.out.println("Invalid date format. Please use yyyy-MM-ddTHH:mm.");
@@ -159,15 +168,14 @@ public class PatientController {
 
     // Method to view available appointment slots
     public void viewAvailableAppointmentSlots() {
-        System.out.print("Enter Doctor ID: ");
         Scanner scanner = new Scanner(System.in);
+        System.out.print("Enter Doctor ID: ");
         String doctorId = scanner.nextLine();
         System.out.print("Enter date for available slots (yyyy-MM-dd): ");
         String dateStr = scanner.nextLine();
 
         LocalDate date = LocalDate.parse(dateStr);
 
-        // Check back in AppointmentService again
         List<LocalDateTime> availableSlots = appointmentService.getAvailableSlots(doctorId, date);
         if (availableSlots.isEmpty()) {
             System.out.println("No available slots for the given date.");
