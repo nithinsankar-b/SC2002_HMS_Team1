@@ -5,18 +5,18 @@ import java.time.LocalDateTime;
 import enums.AppointmentStatus;
 import java.util.ArrayList;
 import java.util.List;
-import models.Medication;
+
 import enums.MedicationStatus;
 
 public class Appointment {
-    private String appointmentId;
-    private String patientId;
-    private String doctorId;
-    private LocalDateTime appointmentDateTime;
+    private final String appointmentId;
+    private final String patientId;
+    private final String doctorId;
+    private final LocalDateTime appointmentDateTime;
     private AppointmentStatus status;
     private String consultationNotes;
     private String serviceProvided;
-    private List<Medication> medications;
+    private final List<Medication> medications;
 
     public Appointment(String appointmentId, String patientId, String doctorId, LocalDateTime appointmentDateTime) {
         this.appointmentId = appointmentId;
@@ -77,14 +77,6 @@ public class Appointment {
         this.serviceProvided = serviceProvided;
     }
 
-    public List<Medication> getMedications() {
-        return medications;
-    }
-
-    public void addMedication(Medication medication) {
-        medications.add(medication);
-    }
-
     public static Appointment fromString(String line) {
         String[] parts = line.split(",");
         if (parts.length < 7) {
@@ -129,6 +121,6 @@ public class Appointment {
         }
         return appointmentId + "," + patientId + "," + doctorId + "," +
                 appointmentDateTime + "," + status + "," +
-                consultationNotes + "," + serviceProvided + "," + medicationInfo.toString();
+                consultationNotes + "," + serviceProvided + "," + medicationInfo;
     }
 }

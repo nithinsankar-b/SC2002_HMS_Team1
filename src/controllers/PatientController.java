@@ -42,6 +42,7 @@ public class PatientController {
 
     // Method to view allocated appointments
     public void viewAllocatedAppointments(Patient patient) {
+
         allocatedAppointmentView.display(patient);
     }
 
@@ -130,23 +131,23 @@ public class PatientController {
         }
     }
 
-    // Method to view available appointment slots
-    public void viewAvailableAppointmentSlots() {
-        System.out.print("Enter Doctor ID: ");
-        Scanner scanner = new Scanner(System.in);
-        String doctorId = scanner.nextLine();
-        System.out.print("Enter date for available slots (yyyy-MM-dd): ");
-        String dateStr = scanner.nextLine();
-
-        LocalDate date = LocalDate.parse(dateStr);
-
-        // Check back in AppointmentService again
-        List<LocalDateTime> availableSlots = appointmentService.getAvailableSlots(doctorId, date);
-        if (availableSlots.isEmpty()) {
-            System.out.println("No available slots for the given date.");
-        } else {
-            System.out.println("Available slots:");
-            availableSlots.forEach(System.out::println);
-        }
-    }
+//    // Method to view available appointment slots
+//    public void viewAvailableAppointmentSlots() {
+//        System.out.print("Enter Doctor ID: ");
+//        Scanner scanner = new Scanner(System.in);
+//        String doctorId = scanner.nextLine();
+//        System.out.print("Enter date for available slots (yyyy-MM-dd): ");
+//        String dateStr = scanner.nextLine();
+//
+//        LocalDate date = LocalDate.parse(dateStr);
+//
+//        // Check back in AppointmentService again
+//        List<LocalDateTime> availableSlots = appointmentService.getAvailableSlots(doctorId, date);
+//        if (availableSlots.isEmpty()) {
+//            System.out.println("No available slots for the given date.");
+//        } else {
+//            System.out.println("Available slots:");
+//            availableSlots.forEach(System.out::println);
+//        }
+//    }
 }

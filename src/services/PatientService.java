@@ -13,9 +13,10 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+
+import enums.UserRole;
 import models.Appointment;
 import models.Patient;
-import models.User;
 
 public class PatientService {
     private final Map<String, Patient> patients;
@@ -24,7 +25,7 @@ public class PatientService {
     public PatientService(Patient patient) {
         this.patients = new HashMap<>();
         this.appointmentService = new AppointmentService(); // Initialize AppointmentService
-        loadPatients(patient); // Load patients from the CSV file
+        loadPatientsFromCSV(); // Load patients from the CSV file
     }
 
     // Method to retrieve a patient by their hospital ID
@@ -58,35 +59,50 @@ public class PatientService {
         });
     }
 
-//    // Method to load patients from the CSV file
-    private void loadPatients(Patient patient) {
-        String csvFilePath = "../data/Patient_List.csv";
+    private void loadPatientsFromCSV() {
+        String filePath = "data\\Patient.csv";
+        String line;
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
 
-        try (BufferedReader br = new BufferedReader(new FileReader(csvFilePath))) {
-            String line;
-            br.readLine(); // Skip the header row
-
+        // Read file form this file path
+        try (BufferedReader br = new BufferedReader(new FileReader(filePath))) {
+            // While line is not empty
             while ((line = br.readLine()) != null) {
-                String[] values = line.split(",");
-                String patientId = values[0].trim();
-                String name = values[1].trim();
-                LocalDate dob = LocalDate.parse(values[2].trim(), formatter);
-                String gender = values[3].trim();
-                String bloodType = values[4].trim();
-                String contactInformation = values[5].trim();
+                // Storing each line in a list with delimiter that is a comma
+                String[] patientData = line.split(",");
 
-                // Check again. Do we need password?
-                patients.put(patient.getHospitalID(), patient);
+                if (patientData.length == 6) {
+                    // Getting each field from the array
+                    String patientId = patientData[0].trim();
+                    String name = patientData[1].trim();
+                    String dobString = patientData[2].trim();
+                    String gender = patientData[3].trim();
+                    String bloodType = patientData[4].trim();
+                    String contactInformation = patientData[5].trim();
+
+                    // Skip header row if it's detected
+                    if (patientId.equalsIgnoreCase("patientID")) {
+                        continue;
+                    }
+
+                    // Parsing the date into the appropriate format
+                    LocalDate dob = LocalDate.parse(dobString, formatter);
+
+                    // Putting a default password. Actual password is linked to hospitalID in User.
+                    String password = "defaultPassword";
+
+                    // Create a new Patient object and add it to the collection
+                    patients.put(patientId, new Patient(patientId,password, UserRole.PATIENT, name, dob, gender, bloodType, contactInformation));
+                }
             }
         } catch (IOException e) {
-            System.out.println("Error reading the CSV file: " + e.getMessage());
+            System.out.println("Error reading CSV file: " + e.getMessage());
         }
     }
 
     // Method to save patients back to the CSV file
     private void savePatientsToCSV() {
-        String csvFilePath = "../data/Patient_List.csv";
+        String csvFilePath = "data/Patient.csv";
         try (BufferedWriter bw = new BufferedWriter(new FileWriter(csvFilePath))) {
             // Write the header
             bw.write("Patient ID,Name,Date of Birth,Gender,Blood Type,Contact Information");

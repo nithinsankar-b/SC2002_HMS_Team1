@@ -1,8 +1,0 @@
-﻿hospitalID,password,role
-P1001,patient1,PATIENT
-P1002,patient2,PATIENT
-P1003,patient3,PATIENT
-D001,doctor1,DOCTOR
-D002,doctor2,DOCTOR
-P001,pharmacist1,PHARMACIST
-A001,administrator1,ADMINISTRATOR

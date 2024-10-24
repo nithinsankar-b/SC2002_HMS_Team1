@@ -23,12 +23,15 @@ public class PatientView implements iPatientView {
     // Main method to handle different patient operations
     public void start(User user) {
         boolean isRunning = true;
+        Scanner scanner = new Scanner(System.in);
 
         while (isRunning) {
             displayMenu();
             int choice = getUserInput();
 
-            patient = new Patient(user.getHospitalID(), user.getPassword(), user.getRole(), "James", LocalDate.of(2001, 1,1), "Male", "O+", "james@gmail.com");
+            // Need to modify it such that we get the patient details instead of manually keying it in.
+
+            patient = new Patient(user.getHospitalID(), user.getPassword(), user.getRole(), "James", LocalDate.of(2001, 1, 1), "Male", "O+", "james@gmail.com");
 
             switch (choice) {
                 case 1 -> patientController.viewPatientDetails(patient);
@@ -39,12 +42,31 @@ public class PatientView implements iPatientView {
                 case 6 -> patientController.createAppointment(patient);
                 case 7 -> patientController.cancelAppointment(patient);
                 case 8 -> patientController.rescheduleAppointment(patient);
-                case 9 -> patientController.viewAvailableAppointmentSlots();
-                case 10 -> isRunning = false;
+                // case 9 -> patientController.viewAvailableAppointmentSlots();
+                case 10 -> {
+                    isRunning = false;
+                }
                 default -> showErrorMessage("Invalid choice, please try again.");
             }
+
+            // Only prompt to continue if the user has not chosen to exit
+            if (isRunning) {
+                System.out.println("\nDo you want to continue (Y/N): ");
+                String userInput = scanner.nextLine().trim().toUpperCase();
+
+                if (userInput.equals("N")) {
+                    isRunning = false;
+                } else {
+                    System.out.println("==============================\n");
+                }
+            }
         }
+
+        scanner.close(); // Close the scanner when done
+        System.out.println("Thank You. Exiting HMS.");
+        System.exit(0);
     }
+
 
     // Implementing the display method to show the main menu
     public void displayMenu() {

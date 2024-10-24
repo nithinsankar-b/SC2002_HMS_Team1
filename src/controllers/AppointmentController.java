@@ -9,11 +9,12 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class AppointmentController {
-    private List<Appointment> appointments;
+    private final List<Appointment> appointments;
     private final AppointmentService appointmentService;
 
-    public AppointmentController() {
+    public AppointmentController(AppointmentService appointmentService) {
         this.appointments = new ArrayList<>();
+        this.appointmentService = appointmentService;
     }
 
     public void scheduleAppointment(Appointment appointment) {
@@ -49,12 +50,15 @@ public class AppointmentController {
 
     public void recordAppointmentOutcome(String appointmentId, String serviceProvided, String consultationNotes, List<Medication> medications) {
         Appointment appointment = getAppointment(appointmentId);
-        if (appointment != null) {
-            appointment.setServiceProvided(serviceProvided);
-            appointment.setConsultationNotes(consultationNotes);
-            for (Medication medication : medications) {
-                appointment.addMedication(medication);
-            }
+        if (appointment == null) {
+            // Log the error or throw an exception
+            System.out.println("Appointment not found for ID: " + appointmentId);
+            return;
+        }
+        appointment.setServiceProvided(serviceProvided);
+        appointment.setConsultationNotes(consultationNotes);
+        for (Medication medication : medications) {
+            appointment.addMedication(medication);
         }
     }
 }
