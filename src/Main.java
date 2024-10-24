@@ -16,7 +16,7 @@ public class Main {
                 // Get user from authentication
                 UserService userService = new UserService();
                 UserController userController = new UserController(userService);
-                userController.run(); // Don't know what this function is for
+                userController.run();
             } while (true);
         } catch (Exception e) {
             // Need to save data and log out

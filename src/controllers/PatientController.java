@@ -107,9 +107,10 @@ public class PatientController {
                     System.out.println("No available slots for the given date.");
                     return;
                 } else {
-                    DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd MMM yyyy, HH:mm 'HRS'");
-                    System.out.println("Available slots:");
-                    availableSlots.forEach(slot -> System.out.println(slot.format(formatter)));
+                    // Adjusted Formatter to show time in HH:mm format and include "HRS"
+                    DateTimeFormatter timeFormatter = DateTimeFormatter.ofPattern("HH:mm 'HRS'");
+                    System.out.println("Available time slots:");
+                    availableSlots.forEach(slot -> System.out.println(slot.toLocalTime().format(timeFormatter)));
                 }
 
                 // Ask user to pick a time
@@ -131,7 +132,7 @@ public class PatientController {
                                 appointment.getAppointmentDateTime().toLocalDate().equals(localDate));
 
                 if (hasAppointmentOnSameDay) {
-                    System.out.println("You already have an appointment booked on the same selected day. Please choose another day.");
+                    System.out.println("You already have an appointment booked on the selected day. Please choose another day.");
                     return;
                 }
 
@@ -181,30 +182,93 @@ public class PatientController {
             Scanner scanner = new Scanner(System.in);
             System.out.print("Enter Appointment ID: ");
             String appointmentId = scanner.nextLine();
-            System.out.print("Enter new appointment date and time (yyyy-MM-ddTHH:mm): ");
-            String newDateTimeStr = scanner.nextLine();
 
             try {
-                LocalDateTime newDateTime = LocalDateTime.parse(newDateTimeStr);
+                // Retrieve the existing appointment details
                 Appointment appointment = appointmentService.getAppointment(appointmentId);
                 if (appointment != null && appointment.getPatientId().equals(patient.getHospitalID())) {
-                    Appointment newAppointment = new Appointment(appointment.getAppointmentId(), appointment.getPatientId(), appointment.getDoctorId(), newDateTime);
-                    newAppointment.setServiceProvided("Rescheduled");
-                    newAppointment.setStatus(appointment.getStatus());
-                    newAppointment.setConsultationNotes(appointment.getConsultationNotes());
-                    newAppointment.getMedications().addAll(appointment.getMedications());
+                    String doctorId = appointment.getDoctorId();
 
-                    boolean success = appointmentService.rescheduleAppointment(appointmentId, newAppointment);
-                    if (success) {
-                        System.out.println("Appointment rescheduled successfully.");
+                    // Display current appointment date and time
+                    LocalDateTime currentDateTime = appointment.getAppointmentDateTime();
+                    DateTimeFormatter currentFormatter = DateTimeFormatter.ofPattern("dd MMM yyyy, HH:mm 'HRS'");
+                    System.out.println("Current Appointment Slot: " + currentDateTime.format(currentFormatter));
+
+                    // Ask for the new appointment date in yyyy-MM-dd format
+                    System.out.print("Enter new appointment date (yyyy-MM-dd): ");
+                    String newDateStr = scanner.nextLine();
+
+                    // Define the formatter for date
+                    DateTimeFormatter dateFormatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
+
+                    // Parse the date
+                    LocalDate newDate = LocalDate.parse(newDateStr, dateFormatter);
+
+                    // Fetch available slots for that doctor on the specified date
+                    List<LocalDateTime> availableSlots = appointmentService.getAvailableSlots(doctorId, newDate);
+                    if (availableSlots.isEmpty()) {
+                        System.out.println("No available slots for the given date.");
+                        return; // Exit the method if no slots are available
                     } else {
-                        System.out.println("Failed to reschedule appointment. Please check the details and try again.");
+                        // Display the available slots to the user
+                        System.out.println("Available slots:");
+                        DateTimeFormatter slotFormatter = DateTimeFormatter.ofPattern("HH:mm 'HRS'");
+                        availableSlots.forEach(slot -> System.out.println(slot.format(slotFormatter)));
+
+                        // Ask the user to enter a new time from the available options
+                        System.out.print("Enter new appointment time (e.g., 1430, 1430HRS, or 14:30): ");
+                        String newTimeStr = scanner.nextLine();
+
+                        // Normalize the input to extract the numeric time
+                        newTimeStr = newTimeStr.replaceAll("[^0-9]", "");
+
+                        // Ensure the time is in the correct format (HH:mm)
+                        if (newTimeStr.length() == 4) {
+                            newTimeStr = newTimeStr.substring(0, 2) + ":" + newTimeStr.substring(2);
+                        }
+
+                        // Parse the time to LocalTime
+                        LocalTime newTime = LocalTime.parse(newTimeStr);
+
+                        // Combine the date and time to create a LocalDateTime object
+                        LocalDateTime newDateTime = LocalDateTime.of(newDate, newTime);
+
+                        // Validate that the entered time is one of the available slots
+                        if (!availableSlots.contains(newDateTime)) {
+                            System.out.println("The entered time is not available. Please choose from the available slots.");
+                            return; // Exit the method if the time is not valid
+                        }
+
+                        // Check if the chosen slot is the same as the current appointment time
+                        if (currentDateTime.isEqual(newDateTime)) {
+                            System.out.println("The new date and time are the same as the existing appointment. No changes made.");
+                            return; // Exit the method if no changes are needed
+                        }
+
+                        // Proceed to reschedule if the date or time is different
+                        Appointment newAppointment = new Appointment(
+                                appointment.getAppointmentId(),
+                                appointment.getPatientId(),
+                                appointment.getDoctorId(),
+                                newDateTime
+                        );
+                        newAppointment.setServiceProvided("Rescheduled");
+                        newAppointment.setStatus(appointment.getStatus());
+                        newAppointment.setConsultationNotes(appointment.getConsultationNotes());
+                        newAppointment.getMedications().addAll(appointment.getMedications());
+
+                        boolean success = appointmentService.rescheduleAppointment(appointmentId, newAppointment);
+                        if (success) {
+                            System.out.println("Appointment rescheduled successfully.");
+                        } else {
+                            System.out.println("Failed to reschedule appointment. Please check the details and try again.");
+                        }
                     }
                 } else {
                     System.out.println("Appointment not found or does not belong to the patient.");
                 }
             } catch (Exception e) {
-                System.out.println("Invalid date format. Please use yyyy-MM-ddTHH:mm.");
+                System.out.println("Invalid input. Please try again.");
             }
         } else {
             System.out.println("Patient not found.");
@@ -226,7 +290,14 @@ public class PatientController {
             System.out.println("No available slots for the given date.");
         } else {
             System.out.println("Available slots:");
-            availableSlots.forEach(System.out::println);
+
+            // Define the date and time format in 24-hour format
+            DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd MMM yyyy, HH:mm 'HRS'");
+
+            // Format and display each slot
+            availableSlots.forEach(slot ->
+                    System.out.println(slot.format(formatter))
+            );
         }
     }
 }
