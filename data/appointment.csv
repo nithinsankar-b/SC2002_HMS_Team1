@@ -1,0 +1,3 @@
+appointmentId,patientId,doctorId,appointmentDateTime,status,consultationNotes,serviceProvided,medications
+1729780939773,P1003,D003,2023-12-31T15:00,PENDING,,Rescheduled,
+1729781140141,P1003,D003,2023-12-31T13:30,PENDING,,Rescheduled,
