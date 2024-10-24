@@ -1,6 +1,8 @@
 package views;
 
 import interfaces.iPatientView;
+
+import java.time.format.DateTimeFormatter;
 import java.util.List;
 import models.Appointment;
 import models.Patient;
@@ -34,14 +36,16 @@ public class AppointmentHistoryView implements iPatientView {
         System.out.println("ERROR: " + message);
     }
 
+    // Display method with formatted date and time, including "HRS"
     @Override
     public void display(Patient patient) {
-        // Hard-coded patient ID for demonstration purposes; replace with actual patient input
-
         System.out.println("Displaying appointment history for Patient ID: " + patient.getHospitalID());
 
         // Get the list of all scheduled appointments from AppointmentService
         List<Appointment> appointments = appointmentService.viewScheduledAppointments();
+
+        // Define a DateTimeFormatter for a 24-hour format
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd MMM yyyy, HH:mm"); // Example: 24 Oct 2024, 14:30
 
         // Filter appointments that belong to the patient and are in any status (completed, cancelled, rescheduled)
         boolean found = false;
@@ -50,7 +54,11 @@ public class AppointmentHistoryView implements iPatientView {
                 found = true;
                 System.out.println("Appointment ID: " + appointment.getAppointmentId());
                 System.out.println("Doctor ID: " + appointment.getDoctorId());
-                System.out.println("Date & Time: " + appointment.getAppointmentDateTime());
+
+                // Format the appointment date and time
+                String formattedDateTime = appointment.getAppointmentDateTime().format(formatter) + " HRS";
+                System.out.println("Date & Time: " + formattedDateTime);
+
                 System.out.println("Status: " + appointment.getStatus());
                 if (appointment.getStatus() == enums.AppointmentStatus.COMPLETED) {
                     System.out.println("Service Provided: " + appointment.getServiceProvided());

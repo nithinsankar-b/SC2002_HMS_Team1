@@ -2,6 +2,7 @@ package controllers;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.time.LocalTime;
 import java.util.List;
 import java.util.Scanner;
 
@@ -89,15 +90,24 @@ public class PatientController {
     public void createAppointment(Patient patient) {
         if (patient != null) {
             Scanner scanner = new Scanner(System.in);
-            System.out.print("Enter Doctor ID: ");
+            System.out.print("Enter Doctor ID (Case Sensitive): ");
             String doctorId = scanner.nextLine();
 
-            System.out.print("Enter appointment date and time (yyyy-MM-ddTHH:mm): ");
-            String appointmentDateTime = scanner.nextLine();
+            System.out.print("Enter appointment date (yyyy-MM-dd): ");
+            String date = scanner.nextLine();
+
+            System.out.print("Enter appointment time (24HRS format -> HH:mm): ");
+            String time = scanner.nextLine();
 
             try {
-                LocalDateTime dateTime = LocalDateTime.parse(appointmentDateTime);
-                Appointment appointment = new Appointment("Appointment: " + System.currentTimeMillis(), patient.getHospitalID(), doctorId, dateTime);
+                // Parse the date and time separately and combine them
+                LocalDate localDate = LocalDate.parse(date);
+                LocalTime localTime = LocalTime.parse(time);
+                LocalDateTime dateTime = LocalDateTime.of(localDate, localTime);
+
+                String appointmentId = String.valueOf(System.currentTimeMillis());
+                Appointment appointment = new Appointment(appointmentId, patient.getHospitalID(), doctorId, dateTime);
+
                 boolean success = appointmentService.scheduleAppointment(appointment);
                 if (success) {
                     System.out.println("Appointment created successfully.");
@@ -105,7 +115,7 @@ public class PatientController {
                     System.out.println("Failed to create appointment.");
                 }
             } catch (Exception e) {
-                System.out.println("Invalid date format. Please use yyyy-MM-ddTHH:mm.");
+                System.out.println("Invalid date or time format. Please use yyyy-MM-dd for date and HH:mm for time.");
             }
         } else {
             System.out.println("Patient not found.");

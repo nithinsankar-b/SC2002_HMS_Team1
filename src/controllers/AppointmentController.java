@@ -10,12 +10,9 @@ import java.util.List;
 
 public class AppointmentController {
     private final List<Appointment> appointments;
-    private final AppointmentService appointmentService;
 
     public AppointmentController(AppointmentService appointmentService) {
-        this.appointments = new ArrayList<>();
-        this.appointmentService = appointmentService;
-    }
+        this.appointments = new ArrayList<>();}
 
     public void scheduleAppointment(Appointment appointment) {
         appointments.add(appointment);
