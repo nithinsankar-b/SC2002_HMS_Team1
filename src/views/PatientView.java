@@ -89,7 +89,7 @@ public class PatientView implements iPatientView {
                 System.out.println("\nDo you want to continue (Y/N): ");
                 String userInput = scanner.nextLine().trim().toUpperCase();
 
-                if (userInput.equals("N")) {
+                if (userInput.equals("N") || userInput.equals("NO")) {
                     isRunning = false;
                 } else {
                     System.out.println("==============================\n");

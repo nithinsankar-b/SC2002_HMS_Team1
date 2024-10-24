@@ -1,34 +1,28 @@
 package services;
 
-import enums.AppointmentStatus;
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
 import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.time.LocalDate;
-import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
-import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 
 import enums.UserRole;
-import models.Appointment;
 import models.Patient;
 import models.User;
 
 public class PatientService {
     private final Map<String, Patient> patients;
-    private final AppointmentService appointmentService;
     private final UserService userService;
 
     public PatientService(UserService userService) {
         this.userService = userService;
         this.patients = new HashMap<>();
-        this.appointmentService = new AppointmentService(); // Initialize AppointmentService
-        // UserService will provide user details
+        new AppointmentService();// Initialize AppointmentService
+// UserService will provide user details
         loadPatientsFromCSV(); // Load patients from the CSV file
     }
 
@@ -60,6 +54,7 @@ public class PatientService {
     }
 
     // Method to list all patients
+    // For administrator to use
     public void listAllPatients() {
         patients.values().forEach(patient -> {
             System.out.println("Patient ID: " + patient.getHospitalID());
@@ -128,7 +123,6 @@ public class PatientService {
                 bw.write(line);
                 bw.newLine();
             }
-            System.out.println("Patient information saved successfully.");
         } catch (IOException e) {
             System.out.println("Error saving the CSV file: " + e.getMessage());
         }

@@ -76,7 +76,7 @@ public class PatientController {
 
             boolean success = patientService.updatePatientContact(patient.getHospitalID(), newContactInfo);
             if (success) {
-                System.out.println("Contact information updated successfully.");
+                System.out.println("Contact information updated successfully.\nUpdated information will be reflected upon next login.");
             } else {
                 System.out.println("Failed to update contact information. Patient not found.");
             }
