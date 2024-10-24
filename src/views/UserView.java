@@ -3,10 +3,11 @@ package views;
 import controllers.PatientController;
 import enums.UserRole;
 import services.UserService;
+import services.AppointmentService;
+import services.PatientService;
+import models.User;
 
 import java.util.Scanner;
-
-import models.User;
 
 public class UserView {
     private final UserService userService;
@@ -65,15 +66,17 @@ public class UserView {
     private void navigateToRoleSpecificPage(User user, UserRole role) {
         switch (role) {
             case PATIENT:
-
-                // Create PatientService and AppointmentService
-                PatientController patientController = new PatientController(null, null);
+                // Create the AppointmentService and PatientService instances
+                AppointmentService appointmentService = new AppointmentService();
+                PatientService patientService = new PatientService(userService);
 
                 // Instantiate PatientController
-                PatientView patientView = new PatientView(patientController);
+                PatientController patientController = new PatientController(patientService, appointmentService);
+
+                // Instantiate PatientView
+                PatientView patientView = new PatientView(patientController, userService);
 
                 // Start the patient operations (menu)
-
                 System.out.println("Navigating to Patient view...");
                 System.out.println("=====================================");
                 patientView.start(user);
@@ -83,17 +86,17 @@ public class UserView {
                 System.out.println("Navigating to Doctor view...");
                 System.out.println("=====================================");
                 break;
+
             case PHARMACIST:
-                // Call to PharmacistView
                 // Example: PharmacistView pharmacistView = new PharmacistView(userService);
-                // pharmacistView.display()
                 System.out.println("Navigating to Pharmacist view...");
                 System.out.println("=====================================");
                 break;
+
             case ADMINISTRATOR:
                 System.out.println("Navigating to Administrator view...");
-
                 break;
+
             default:
                 System.out.println("Role not recognized.");
         }

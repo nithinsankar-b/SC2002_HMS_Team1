@@ -11,23 +11,18 @@ public class Patient extends User {
     private String gender;
     private String bloodType;
     private String contactInformation; // Email address
-    private boolean isRegistered; // Indicates if the patient is registered
-    private String patientID;
+    private Boolean isRegistered;
 
-    public Patient(String hospitalID, String password, UserRole role,String name, LocalDate dateOfBirth, String gender, String bloodType, String contactInformation) {// UserRole set to PATIENT
-        super(hospitalID, password, role);
-        // Initialize attributes based on the CSV file and other patient-specific data
+    public Patient(User user, String name, LocalDate dateOfBirth, String gender, String bloodType, String contactInformation) {
+        super(user.getHospitalID(), user.getPassword(), UserRole.PATIENT); // Initialize with User data and set role to PATIENT
         this.name = name;
         this.dateOfBirth = dateOfBirth;
         this.gender = gender;
         this.bloodType = bloodType;
         this.contactInformation = contactInformation;
-        this.isRegistered = true; // Initialize the registration status
     }
 
     // Getters
-    // To get PatientID use the method defined in User getHospitalID();
-
     public String getName() {
         return name;
     }
@@ -48,7 +43,7 @@ public class Patient extends User {
         return contactInformation; // Get email address
     }
 
-    public boolean getIsRegistered() {
+    public Boolean getRegistrationStatus() {
         return isRegistered;
     }
 
@@ -73,7 +68,7 @@ public class Patient extends User {
         this.contactInformation = contactInformation; // Set email address
     }
 
-    public void setIsRegistered(boolean isRegistered) {
-        this.isRegistered = isRegistered;
+    public void setRegistrationStatus() {
+        this.isRegistered = true;
     }
 }

@@ -9,7 +9,6 @@ import java.io.FileReader;
 import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
-import models.User;
 
 public class UserService implements IUserService {
     private final Map<String, User> users;
@@ -66,4 +65,19 @@ public class UserService implements IUserService {
         User user = users.get(hospitalID);
         return user != null ? user.getRole() : null;
     }
+
+    // Returns a user by the UserID
+    public User getUserById(String hospitalID) {
+        return users.get(hospitalID);
+    }
+
+    public boolean updateUser(User user) {
+        if (users.containsKey(user.getHospitalID())) {
+            users.put(user.getHospitalID(), user);
+            return true;
+        }
+        return false;
+    }
+
+
 }

@@ -9,9 +9,9 @@ public class Main {
         try {
             // Encapsulate main in while loop to allow multiple users to operate the application
             do { 
-                // Need to initialize database
+                // Need to initialize database??
 
-                // Need to set up authentication
+                // Need to set up authentication??
 
                 // Get user from authentication
                 UserService userService = new UserService();

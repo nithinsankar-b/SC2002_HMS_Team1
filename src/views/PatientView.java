@@ -3,35 +3,70 @@ package views;
 import interfaces.iPatientView;
 
 import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
 import java.util.Scanner;
 import models.Patient;
 import controllers.PatientController;
 import models.User;
 import services.AppointmentService;
 import services.PatientService;
+import services.UserService;
 
 public class PatientView implements iPatientView {
     private final Scanner scanner;
     private final PatientController patientController;
-    private Patient patient;
+    private final UserService userService;
 
-    public PatientView(PatientController patientController) {
+    public PatientView(PatientController patientController, UserService userService) {
         this.scanner = new Scanner(System.in);
         this.patientController = patientController;
+        this.userService = userService;
     }
 
     // Main method to handle different patient operations
     public void start(User user) {
+        PatientService patientService = new PatientService(userService);
         boolean isRunning = true;
-        Scanner scanner = new Scanner(System.in);
+
+        // Load patient details from the User object
+        Patient patient = patientService.getPatientById(user.getHospitalID());
+        if (patient == null) {
+            // Add logic to guide the user to register a new patient if not found.
+            System.out.println("Patient record not found for user: " + user.getHospitalID());
+            System.out.println("Do you want to register a new patient? (Y/N): ");
+            String userInput = scanner.nextLine().trim().toUpperCase();
+
+            if (userInput.equals("Y")) {
+                // Prompt the user for patient information
+                System.out.print("Enter Patient Name: ");
+                String name = scanner.nextLine().trim();
+
+                System.out.print("Enter Date of Birth (yyyy-MM-dd): ");
+                String dobString = scanner.nextLine().trim();
+                LocalDate dateOfBirth = LocalDate.parse(dobString, DateTimeFormatter.ISO_LOCAL_DATE);
+
+                System.out.print("Enter Gender: ");
+                String gender = scanner.nextLine().trim();
+
+                System.out.print("Enter Blood Type: ");
+                String bloodType = scanner.nextLine().trim();
+
+                System.out.print("Enter Contact Information (email or phone): ");
+                String contactInformation = scanner.nextLine().trim();
+
+                // Register new patient using user data
+                patient = new Patient(user, name, dateOfBirth, gender, bloodType, contactInformation);
+                patientService.addPatient(patient);
+                System.out.println("New patient registered successfully.");
+            } else {
+                System.out.println("Unable to proceed without patient information.");
+                return;
+            }
+        }
 
         while (isRunning) {
             displayMenu();
             int choice = getUserInput();
-
-            // Need to modify it such that we get the patient details instead of manually keying it in.
-
-            patient = new Patient(user.getHospitalID(), user.getPassword(), user.getRole(), "James", LocalDate.of(2001, 1, 1), "Male", "O+", "james@gmail.com");
 
             switch (choice) {
                 case 1 -> patientController.viewPatientDetails(patient);
@@ -42,7 +77,7 @@ public class PatientView implements iPatientView {
                 case 6 -> patientController.createAppointment(patient);
                 case 7 -> patientController.cancelAppointment(patient);
                 case 8 -> patientController.rescheduleAppointment(patient);
-                // case 9 -> patientController.viewAvailableAppointmentSlots();
+                 case 9 -> patientController.viewAvailableAppointmentSlots();
                 case 10 -> {
                     isRunning = false;
                 }
@@ -120,12 +155,4 @@ public class PatientView implements iPatientView {
     public void showErrorMessage(String message) {
         System.out.println("ERROR: " + message);
     }
-
-//    public static void main(String[] args) {
-//        AppointmentService appointmentService = new AppointmentService();
-//        PatientService patientService = new PatientService();
-//        PatientController patientController = new PatientController(patientService, appointmentService);
-//        PatientView patientView = new PatientView(patientController);
-//        patientView.start();
-//    }
 }

@@ -17,20 +17,34 @@ import java.util.Map;
 import enums.UserRole;
 import models.Appointment;
 import models.Patient;
+import models.User;
 
 public class PatientService {
     private final Map<String, Patient> patients;
     private final AppointmentService appointmentService;
+    private final UserService userService;
 
-    public PatientService(Patient patient) {
+    public PatientService(UserService userService) {
+        this.userService = userService;
         this.patients = new HashMap<>();
         this.appointmentService = new AppointmentService(); // Initialize AppointmentService
+        // UserService will provide user details
         loadPatientsFromCSV(); // Load patients from the CSV file
+    }
+
+    // Method to add a new patient
+    public void addPatient(Patient patient) {
+        if (!patients.containsKey(patient.getHospitalID())) {
+            patients.put(patient.getHospitalID(), patient);
+            savePatientsToCSV(); // Save the updated patient list to CSV
+            System.out.println("Patient added successfully.");
+        } else {
+            System.out.println("Patient already exists.");
+        }
     }
 
     // Method to retrieve a patient by their hospital ID
     public Patient getPatientById(String hospitalID) {
-        // Returns a patient object
         return patients.get(hospitalID);
     }
 
@@ -54,25 +68,22 @@ public class PatientService {
             System.out.println("Gender: " + patient.getGender());
             System.out.println("Blood Type: " + patient.getBloodType());
             System.out.println("Contact Information: " + patient.getContactInformation());
-            System.out.println("Registered: " + patient.getIsRegistered());
             System.out.println("------------------------");
         });
     }
 
     private void loadPatientsFromCSV() {
-        String filePath = "data\\Patient.csv";
+        String filePath = "data/Patient.csv";
         String line;
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
 
-        // Read file form this file path
         try (BufferedReader br = new BufferedReader(new FileReader(filePath))) {
-            // While line is not empty
+            // Skip the header line
+            br.readLine();
             while ((line = br.readLine()) != null) {
-                // Storing each line in a list with delimiter that is a comma
                 String[] patientData = line.split(",");
 
                 if (patientData.length == 6) {
-                    // Getting each field from the array
                     String patientId = patientData[0].trim();
                     String name = patientData[1].trim();
                     String dobString = patientData[2].trim();
@@ -80,19 +91,17 @@ public class PatientService {
                     String bloodType = patientData[4].trim();
                     String contactInformation = patientData[5].trim();
 
-                    // Skip header row if it's detected
-                    if (patientId.equalsIgnoreCase("patientID")) {
-                        continue;
-                    }
-
-                    // Parsing the date into the appropriate format
                     LocalDate dob = LocalDate.parse(dobString, formatter);
 
-                    // Putting a default password. Actual password is linked to hospitalID in User.
-                    String password = "defaultPassword";
+                    // Try to find an existing user if applicable
+                    User existingUser = userService.getUserById(patientId);
+                    String password = (existingUser != null) ? existingUser.getPassword() : "defaultPassword";
 
                     // Create a new Patient object and add it to the collection
-                    patients.put(patientId, new Patient(patientId,password, UserRole.PATIENT, name, dob, gender, bloodType, contactInformation));
+                    // Conditional expression checks if user exists
+                    // If YES, use it
+                    // Otherwise, creates a new User object
+                    patients.put(patientId, new Patient(existingUser != null ? existingUser : new User(patientId, password, UserRole.PATIENT), name, dob, gender, bloodType, contactInformation));
                 }
             }
         } catch (IOException e) {
@@ -108,7 +117,6 @@ public class PatientService {
             bw.write("Patient ID,Name,Date of Birth,Gender,Blood Type,Contact Information");
             bw.newLine();
 
-            // Write each patient's information
             for (Patient patient : patients.values()) {
                 String line = String.join(",",
                         patient.getHospitalID(),
@@ -125,59 +133,4 @@ public class PatientService {
             System.out.println("Error saving the CSV file: " + e.getMessage());
         }
     }
-
-    // Method to get all appointments for a given patient
-    public Appointment[] getPatientAppointments(String patientID) {
-        List<Appointment> allAppointments = appointmentService.viewScheduledAppointments();
-        List<Appointment> patientAppointments = new ArrayList<>();
-
-        for (Appointment appointment : allAppointments) {
-            if (appointment.getPatientId().equals(patientID)) {
-                patientAppointments.add(appointment);
-            }
-        }
-         // Convert the list to an array and return
-        return patientAppointments.toArray(Appointment[]::new);
-    }
-
-    // Method to create an appointment for a patient
-    public boolean createAppointment(String patientID, String doctorID, LocalDateTime appointmentDate) {
-        String appointmentID = "APPT" + System.currentTimeMillis(); // Generate a unique ID
-        Appointment newAppointment = new Appointment(appointmentID, patientID, doctorID, appointmentDate);
-        return appointmentService.scheduleAppointment(newAppointment);
-    }
-
-    // Method to cancel an existing appointment for a patient
-    public boolean cancelAppointment(String patientID, String appointmentID) {
-        Appointment appointment = appointmentService.getAppointment(appointmentID);
-
-        if (appointment != null && appointment.getPatientId().equals(patientID)) {
-            return appointmentService.cancelAppointment(appointmentID);
-        }
-
-        return false;
-    }
-
-    // Method to reschedule an existing appointment for a patient
-    public boolean rescheduleAppointment(String patientID, String appointmentID, LocalDateTime newDate) {
-        Appointment appointment = appointmentService.getAppointment(appointmentID);
-
-        if (appointment != null && appointment.getPatientId().equals(patientID)) {
-            Appointment updatedAppointment = new Appointment(appointmentID, patientID, appointment.getDoctorId(), newDate);
-            updatedAppointment.setStatus(AppointmentStatus.PENDING);
-            return appointmentService.rescheduleAppointment(appointmentID, updatedAppointment);
-        }
-
-        return false;
-    }
-
-    public boolean deletePatient(String hospitalID) {
-        if (patients.containsKey(hospitalID)) {
-            patients.remove(hospitalID);
-            savePatientsToCSV(); // Save changes after deletion
-            return true;
-        }
-        return false;
-    }
-    
 }
