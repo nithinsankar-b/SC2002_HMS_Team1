@@ -3,6 +3,7 @@ package controllers;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
+import java.time.format.DateTimeFormatter;
 import java.util.List;
 import java.util.Scanner;
 
@@ -96,23 +97,57 @@ public class PatientController {
             System.out.print("Enter appointment date (yyyy-MM-dd): ");
             String date = scanner.nextLine();
 
-            System.out.print("Enter appointment time (24HRS format -> HH:mm): ");
-            String time = scanner.nextLine();
-
             try {
-                // Parse the date and time separately and combine them
+                // Parse the date
                 LocalDate localDate = LocalDate.parse(date);
+
+                // Display available slots for the given day
+                List<LocalDateTime> availableSlots = appointmentService.getAvailableSlots(doctorId, localDate);
+                if (availableSlots.isEmpty()) {
+                    System.out.println("No available slots for the given date.");
+                    return;
+                } else {
+                    DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd MMM yyyy, HH:mm 'HRS'");
+                    System.out.println("Available slots:");
+                    availableSlots.forEach(slot -> System.out.println(slot.format(formatter)));
+                }
+
+                // Ask user to pick a time
+                System.out.print("Enter appointment time (24HRS format -> HH:mm): ");
+                String time = scanner.nextLine();
+
+                // Parse the time and combine with date
+                time = time.replaceAll("[^0-9]", "");
+                if (time.length() == 4) {
+                    time = time.substring(0, 2) + ":" + time.substring(2);
+                }
                 LocalTime localTime = LocalTime.parse(time);
                 LocalDateTime dateTime = LocalDateTime.of(localDate, localTime);
 
-                String appointmentId = String.valueOf(System.currentTimeMillis());
-                Appointment appointment = new Appointment(appointmentId, patient.getHospitalID(), doctorId, dateTime);
+                // Check if the patient already has an appointment on the same day
+                List<Appointment> patientAppointments = appointmentService.viewScheduledAppointments();
+                boolean hasAppointmentOnSameDay = patientAppointments.stream()
+                        .anyMatch(appointment -> appointment.getPatientId().equals(patient.getHospitalID()) &&
+                                appointment.getAppointmentDateTime().toLocalDate().equals(localDate));
 
-                boolean success = appointmentService.scheduleAppointment(appointment);
-                if (success) {
-                    System.out.println("Appointment created successfully.");
+                if (hasAppointmentOnSameDay) {
+                    System.out.println("You already have an appointment booked on the same selected day. Please choose another day.");
+                    return;
+                }
+
+                // Check if the time slot is available
+                if (availableSlots.contains(dateTime)) {
+                    String appointmentId = String.valueOf(System.currentTimeMillis());
+                    Appointment appointment = new Appointment(appointmentId, patient.getHospitalID(), doctorId, dateTime);
+
+                    boolean success = appointmentService.scheduleAppointment(appointment);
+                    if (success) {
+                        System.out.println("Appointment created successfully.");
+                    } else {
+                        System.out.println("Failed to create appointment.");
+                    }
                 } else {
-                    System.out.println("Failed to create appointment.");
+                    System.out.println("The selected time slot is not available. Please choose another time.");
                 }
             } catch (Exception e) {
                 System.out.println("Invalid date or time format. Please use yyyy-MM-dd for date and HH:mm for time.");
