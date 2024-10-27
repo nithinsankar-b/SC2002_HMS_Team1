@@ -1,8 +1,8 @@
 package controllers;
 
-import boundary.ManageHospStaff;
-import boundary.ViewAndManageInventory;
-import boundary.AppointmentsView;
+import views.ManageHospStaff;
+import views.ViewAndManageInventory;
+import views.AppointmentsView;
 import models.Staff;
 import services.AppointmentService;
 import services.InventoryService;
