@@ -67,7 +67,6 @@ public class InventoryService implements IInventoryService {
                 }
             }
             inventoryDataStore.setInventoryList(inventoryList);
-            System.out.println("Inventory data loaded from CSV successfully.");
         } catch (IOException | IllegalArgumentException e) {
             System.out.println("Error reading inventory CSV file: " + e.getMessage());
         }

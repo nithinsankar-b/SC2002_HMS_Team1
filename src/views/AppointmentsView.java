@@ -3,13 +3,13 @@ package views;
 import models.Appointment;
 import models.Inventory;
 import models.Staff;
-import interfaces.AdministratorView;
+import interfaces.IAdministratorView;
 import interfaces.IAppointmentService;
 
 import java.util.List;
 import java.util.Scanner;
 
-public class AppointmentsView implements AdministratorView {
+public class AppointmentsView implements IAdministratorView {
 
     private final Scanner scanner = new Scanner(System.in);
     private final IAppointmentService appointmentService;  // Dependency on AppointmentService
@@ -52,6 +52,18 @@ public class AppointmentsView implements AdministratorView {
     @Override
     public void displayInventory(List<Inventory> inventory) {
         // Not applicable for AppointmentsView
+    }
+
+    @Override
+    public void displayMenu() {
+        // TODO Auto-generated method stub
+        throw new UnsupportedOperationException("Unimplemented method 'displayMenu'");
+    }
+
+    @Override
+    public int getMenuChoice() {
+        // TODO Auto-generated method stub
+        throw new UnsupportedOperationException("Unimplemented method 'getMenuChoice'");
     }
 }
 

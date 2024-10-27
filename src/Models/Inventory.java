@@ -9,12 +9,13 @@ public class Inventory {
 	    private int lowLevelAlert;
 	    private ReplenishmentStatus replenishmentStatus;
 
-	    public Inventory(String medicineName, int currentStock, int lowLevelAlert, ReplenishmentStatus replenishmentStatus) {
-	        this.medicineName = medicineName;
-	        this.currentStock = currentStock;
-	        this.lowLevelAlert = lowLevelAlert;
-	        this.replenishmentStatus = replenishmentStatus;
-	    }
+		public Inventory(String medicineName, int currentStock, int lowLevelAlert, ReplenishmentStatus replenishmentStatus) {
+			this.medicineName = medicineName;
+			this.currentStock = currentStock;
+			this.lowLevelAlert = lowLevelAlert;
+			this.replenishmentStatus = (replenishmentStatus != null) ? replenishmentStatus : ReplenishmentStatus.PENDING;
+		}
+		
 
 	    // Getters and setters
 	    public String getMedicineName() {

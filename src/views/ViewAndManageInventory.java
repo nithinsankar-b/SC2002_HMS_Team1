@@ -4,14 +4,14 @@ import models.Appointment;
 import models.Inventory;
 import models.Staff;
 import models.SubmitReplenishmentRequest;
-import interfaces.AdministratorView;
+import interfaces.IAdministratorView;
 import interfaces.IInventoryService;
 import enums.ReplenishmentStatus;
 
 import java.util.List;
 import java.util.Scanner;
 
-public class ViewAndManageInventory implements AdministratorView {
+public class ViewAndManageInventory implements IAdministratorView {
     private final Scanner scanner = new Scanner(System.in);
     private final IInventoryService inventoryService;
 
@@ -39,33 +39,36 @@ public class ViewAndManageInventory implements AdministratorView {
         return choice;
     }
 
-    // Method to get the details of a new medication
-    public Inventory getNewMedicationDetails() {
-        System.out.print("Enter Medicine Name: ");
-        String name = scanner.nextLine();
-        
-        System.out.print("Enter Initial Stock Level: ");
-        int stock = scanner.nextInt();
-        
-        System.out.print("Enter Low Stock Alert Level: ");
-        int lowStockAlert = scanner.nextInt();
-        
-        scanner.nextLine(); // Consume the newline left-over from nextInt()
+// Method to get the details of a new medication
+public Inventory getNewMedicationDetails() {
+    System.out.print("Enter Medicine Name: ");
+    String name = scanner.nextLine();
+    
+    System.out.print("Enter Initial Stock Level: ");
+    int stock = scanner.nextInt();
+    
+    System.out.print("Enter Low Stock Alert Level: ");
+    int lowStockAlert = scanner.nextInt();
+    
+    scanner.nextLine(); // Consume the newline left-over from nextInt()
 
+    // Loop until a valid replenishment status is entered or default to PENDING
+    ReplenishmentStatus replenishmentStatus = null;
+    while (replenishmentStatus == null) {
         System.out.print("Enter Replenishment Status (e.g., REPLENISHED, PENDING): ");
         String replenishmentStatusStr = scanner.nextLine().toUpperCase();
 
-        // Convert the string to ReplenishmentStatus enum, with error handling
-        ReplenishmentStatus replenishmentStatus;
         try {
             replenishmentStatus = ReplenishmentStatus.valueOf(replenishmentStatusStr);
         } catch (IllegalArgumentException e) {
             System.out.println("Invalid Replenishment Status. Defaulting to PENDING.");
             replenishmentStatus = ReplenishmentStatus.PENDING; // Default value if input is invalid
         }
-
-        return new Inventory(name, stock, lowStockAlert, replenishmentStatus);
     }
+
+    return new Inventory(name, stock, lowStockAlert, replenishmentStatus);
+}
+
 
     // Method to add new medication
     public void addNewMedication() {

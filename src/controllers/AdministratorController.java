@@ -1,74 +1,49 @@
 package controllers;
-
-import views.ManageHospStaff;
-import views.ViewAndManageInventory;
-import views.AppointmentsView;
-import models.Staff;
+import views.AdminView;
 import services.AppointmentService;
 import services.InventoryService;
 import services.ProjectAdminService;
 import stores.InventoryDataStore;
-import interfaces.IAppointmentService;
-import models.Administrator;
-import java.util.List;
-import java.util.Scanner;
-import models.Inventory;
 import interfaces.IInventoryService;
+import models.Administrator;
+import models.Appointment;
+import models.Inventory;
+import models.Staff;
+
+import java.util.List;
 
 public class AdministratorController {
 
     private final ProjectAdminService adminService;
     private final AppointmentService appointmentService;
-    private final ManageHospStaff staffView;
-    private final AppointmentsView appointmentsView;
-    private final ViewAndManageInventory inventoryView;
-    private final Scanner scanner = new Scanner(System.in);  // Initialize here directly
+    private final AdminView adminView;
+    private final InventoryService inventoryService;
 
-    // Constructor to initialize services and views
     public AdministratorController(AppointmentService appointmentService) {
-        // Initialize InventoryDataStore and InventoryService
         InventoryDataStore inventoryDataStore = new InventoryDataStore();
-        IInventoryService inventoryService = new InventoryService(inventoryDataStore);
+        this.inventoryService = new InventoryService(inventoryDataStore);
 
-        // Initialize ProjectAdminService with Administrator and inventoryService
         this.adminService = new ProjectAdminService(new Administrator("admin01", "password", null), inventoryService);
         this.appointmentService = appointmentService;
-
-        // Pass the initialized inventoryService to ViewAndManageInventory
-        this.inventoryView = new ViewAndManageInventory(inventoryService);
-
-        // Initialize other views
-        this.staffView = new ManageHospStaff();
-        this.appointmentsView = new AppointmentsView(appointmentService);
+        this.adminView = new AdminView();
     }
 
-    // Start the administrator session and present the main menu
     public void start() {
-        Scanner scanner = new Scanner(System.in);
         boolean exit = false;
 
         while (!exit) {
-            // Display main menu options
-            System.out.println("==== Administrator Menu ====");
-            System.out.println("1. Manage Hospital Staff");
-            System.out.println("2. Manage Inventory");
-            System.out.println("3. View Appointments");
-            System.out.println("4. Exit");
-            System.out.print("Enter your choice: ");
-            
-            int choice = scanner.nextInt();
-            scanner.nextLine();  // Consume newline character
+            adminView.displayMenu();
+            int choice = adminView.getMenuChoice();
 
-            // Handle user choice
             switch (choice) {
                 case 1:
-                    manageHospitalStaff();  // Call staff management section
+                    manageHospitalStaff();
                     break;
                 case 2:
-                    manageInventory();  // Call inventory management section
+                    manageInventory();
                     break;
                 case 3:
-                    manageAppointments();  // Call appointments management section
+                    manageAppointments();
                     break;
                 case 4:
                     exit = true;
@@ -80,129 +55,135 @@ public class AdministratorController {
         }
     }
 
-    // Manage hospital staff: show menu with add, remove, and view staff options
     public void manageHospitalStaff() {
         boolean exit = false;
-    
+
         while (!exit) {
-            staffView.displayMenu();  // Show the staff menu
-            int choice = staffView.getMenuChoice();  // Get the user's choice
-    
+            System.out.println("\n-- Manage Hospital Staff --");
+            System.out.println("1. Add or Update Staff");
+            System.out.println("2. Remove Staff");
+            System.out.println("3. View Staff List");
+            System.out.println("4. Return to Main Menu");
+            System.out.print("Choose an option: ");
+            
+            int choice = adminView.getMenuChoice();
+
             switch (choice) {
-                case 1: // Add or update staff
-                    Staff newStaff = staffView.getStaffDetails();  // Get new staff details from view
-                    adminService.addOrUpdateStaff(newStaff);  // Add or update the staff via the service
+                case 1:
+                    Staff newStaff = adminView.getStaffDetails();
+                    adminService.addOrUpdateStaff(newStaff);
                     System.out.println("Staff added/updated successfully.");
                     break;
-    
-                case 2: // Remove staff
-                    String staffId = staffView.getStaffIDForRemoval();  // Get the staff ID to remove
-                    boolean removed = adminService.removeStaff(staffId);  // Attempt to remove staff
+
+                case 2:
+                    String staffId = adminView.getStaffIDForRemoval();
+                    boolean removed = adminService.removeStaff(staffId);
                     if (removed) {
                         System.out.println("Staff removed successfully.");
+                    } else {
+                        System.out.println("Staff not found.");
                     }
-                    // No need to print anything else as "Staff not found" is handled in removeStaff
                     break;
-    
-                case 3: // View all staff
-                    List<Staff> staffList = adminService.getAllStaff();  // Get all staff from the service
-                    staffView.displayListOfStaff(staffList);  // Display the list of staff
+
+                case 3:
+                    List<Staff> staffList = adminService.getAllStaff();
+                    adminView.displayListOfStaff(staffList);
                     break;
-    
-                case 4: // Return to main menu
-                    exit = true;
+
+                case 4:
+                    exit = true;  // Return to main menu
                     break;
-    
+
                 default:
-                    System.out.println("Invalid choice, please try again.");
+                    System.out.println("Invalid choice. Please try again.");
             }
         }
     }
 
     public void manageInventory() {
         boolean exit = false;
-    
+
         while (!exit) {
-            inventoryView.displayMenu();  // Display menu
-            int choice = inventoryView.getMenuChoice();  // Get user input
-    
+            System.out.println("\n-- Inventory Management --");
+            System.out.println("1. Add New Medication");
+            System.out.println("2. Remove Medication");
+            System.out.println("3. Update Stock");
+            System.out.println("4. Update Low Stock Alert");
+            System.out.println("5. Approve Replenishment Request");
+            System.out.println("6. View Inventory");
+            System.out.println("7. Return to Main Menu");
+            System.out.print("Choose an option: ");
+            
+            int choice = adminView.getMenuChoice();
+
             switch (choice) {
-                case 1: // Add new medication
-                    Inventory newMedicine = inventoryView.getNewMedicationDetails();
-                    adminService.addMedication(newMedicine);
+                case 1:
+                    Inventory newMedicine = adminView.getNewMedicationDetails();
+                    inventoryService.addMedication(newMedicine);
                     System.out.println("Medication added successfully.");
                     break;
-    
-                case 2: // Remove medication
-                    String medicineName = inventoryView.getMedicineNameForRemoval();
-                    
-                    // Remove medication and check if it was successful
-                    if (adminService.removeMedication(medicineName)) {
+
+                case 2:
+                    String medicineName = adminView.getMedicineNameForRemoval();
+                    if (inventoryService.removeMedication(medicineName)) {
                         System.out.println("Medication removed successfully.");
                     } else {
-                        System.out.println("Medicine does not exist.");
+                        System.out.println("Medicine not found.");
                     }
                     break;
-    
-                case 3: // Update stock
-                    medicineName = inventoryView.getMedicineName();
-                    
-                    // Update stock and check if it was successful
-                    int quantity = inventoryView.getMedicineQuantity();
-                    if (adminService.updateStockLevel(medicineName, quantity)) {
+
+                case 3:
+                    medicineName = adminView.getMedicineName();
+                    int quantity = adminView.getMedicineQuantity();
+                    if (inventoryService.updateStockLevel(medicineName, quantity)) {
                         System.out.println("Stock updated.");
                     } else {
-                        System.out.println("Medicine does not exist.");
+                        System.out.println("Medicine not found.");
                     }
                     break;
-    
-                case 4: // Update low stock alert
-                    medicineName = inventoryView.getMedicineName();
-                    
-                    // Update low stock alert and check if it was successful
-                    int lowStockAlertLevel = inventoryView.getLowStockAlertLevel();
-                    if (adminService.updateLowStockAlert(medicineName, lowStockAlertLevel)) {
+
+                case 4:
+                    medicineName = adminView.getMedicineName();
+                    int lowStockAlertLevel = adminView.getLowStockAlertLevel();
+                    if (inventoryService.updateLowStockAlert(medicineName, lowStockAlertLevel)) {
                         System.out.println("Low stock alert updated.");
                     } else {
-                        System.out.println("Medicine does not exist.");
+                        System.out.println("Medicine not found.");
                     }
                     break;
-    
-                    case 5: // Approve replenishment request
-                    System.out.print("Enter the medicine name for replenishment approval: ");
-                    String medicineReplenish = scanner.nextLine();  // Use the entered medicine name
-                    
-                    // Call the approveReplenishmentRequest method with the specified medicine name
-                    boolean success = adminService.approveReplenishmentRequest(medicineReplenish);
-                    
-                    // Check if the replenishment was approved successfully
+
+                case 5:
+                    String medicineReplenish = adminView.getMedicineName();
+                    boolean success = inventoryService.approveReplenishmentRequest(medicineReplenish);
                     if (success) {
-                        System.out.println("Replenishment request approved and stock updated for: " + medicineReplenish);
+                        System.out.println("Replenishment request approved and stock updated.");
                     } else {
-                        System.out.println("Replenishment request not found or already processed for: " + medicineReplenish);
+                        System.out.println("Replenishment request not found or already processed.");
                     }
                     break;
-    
-                case 6: // View inventory
-                    List<Inventory> inventoryList = adminService.getAllInventory();
-                    inventoryView.displayInventory(inventoryList);
+
+                case 6:
+                    inventoryService.viewMedicationInventory();  // This should display the inventory
                     break;
-    
+
                 case 7:
-                    exit = true;
+                    exit = true;  // Return to main menu
                     break;
-    
+
                 default:
                     System.out.println("Invalid choice. Please try again.");
             }
         }
     }
-    
-    // Manage appointments: view scheduled appointments
+
     public void manageAppointments() {
-        appointmentsView.viewScheduledAppointments();  // Use AppointmentsView to display appointments
+        List<Appointment> appointments = appointmentService.viewScheduledAppointments();
+        adminView.displayAppointments(appointments);
     }
 }
+
+
+
 
 
 

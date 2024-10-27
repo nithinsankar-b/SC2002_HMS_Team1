@@ -6,9 +6,9 @@ import models.Inventory;
 import models.Appointment;
 import java.util.List;
 import java.util.Scanner;
-import interfaces.AdministratorView;
+import interfaces.IAdministratorView;
 
-public class ManageHospStaff implements AdministratorView {
+public class ManageHospStaff implements IAdministratorView {
 
     private Scanner scanner = new Scanner(System.in);
 
