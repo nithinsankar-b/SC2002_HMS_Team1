@@ -12,9 +12,6 @@ public class StaffDataStore {
     public void loadStaffFromCSV(String csvFilePath) throws IOException {
         BufferedReader reader = new BufferedReader(new FileReader(csvFilePath));
         String line;
-        // Skip the header
-        reader.readLine();
-
         while ((line = reader.readLine()) != null) {
             String[] fields = line.split(",");
             // Assuming fields are: id, name, gender, role, age
