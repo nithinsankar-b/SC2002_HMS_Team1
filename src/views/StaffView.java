@@ -1,23 +1,24 @@
-package boundary;
 
-import Models.User;
-import Models.Inventory;
-import Models.Appointment;
+package views;
+
+import models.Staff;
+import models.Appointment;
+import models.Inventory;
 import java.util.List;
 import interfaces.AdministratorView;
 
 public class StaffView implements AdministratorView {
 
     @Override
-    public void displayListOfStaff(List<User> staffList) {
+    public void displayListOfStaff(List<Staff> staffList) {
         System.out.println("Staff Members:");
-        for (User staff : staffList) {
-            System.out.println("Staff ID: " + staff.getUserID() + ", Role: " + staff.getRole());
+        for (Staff staff : staffList) {
+            System.out.println("Staff ID: " + staff.getName() + ", Role: " + staff.getRole());
         }
     }
 
     @Override
-    public void displayInventory(Inventory inventory) {
+    public void displayInventory(List<Inventory> inventory) {
         // Not applicable for StaffView
     }
 

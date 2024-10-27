@@ -1,37 +1,29 @@
 package models;
-
-import utils.CSVUtils;
+import enums.UserRole;
 import java.util.HashMap;
-import java.util.List;
-import java.util.ArrayList;
 
 public class Administrator extends User {
+    private HashMap<String, Staff> hospitalStaff;  // Changed to Staff type for clarity
 
-    private HashMap<String, User> hospitalStaff;   
-    private List<Appointment> appointments;        
-    private Inventory inventory;                   
-
-    // Constructor to load data from CSV files
-    public Administrator(String userID, String password, String name, String email, String staffFilePath, String inventoryFilePath) {
-        super(userID, password, name, email);  
-        this.hospitalStaff = CSVUtils.loadStaffFromCSV(staffFilePath);  // Load staff from CSV
-        this.inventory = CSVUtils.loadInventoryFromCSV(inventoryFilePath);  // Load inventory from CSV
-        this.appointments = new ArrayList<>();  // Assuming appointments are initialized later
+    // Constructor
+    public Administrator(String hospitalID, String password,UserRole role) {
+        super(hospitalID, password, role);
+        super.setRole(UserRole.ADMINISTRATOR);  // Set appropriate role
+        this.hospitalStaff = new HashMap<>();
     }
 
-    // Getters and Setters
-    public HashMap<String, User> getHospitalStaff() {
+    // Getter and Setter for hospital staff
+    public HashMap<String, Staff> getHospitalStaff() {
         return hospitalStaff;
     }
 
-    public Inventory getInventory() {
-        return inventory;
+    public void setHospitalStaff(HashMap<String, Staff> hospitalStaff) {
+        this.hospitalStaff = hospitalStaff;
     }
 
-    public List<Appointment> getAppointments() {
-        return appointments;
-    }
 }
+
+
 
 
 

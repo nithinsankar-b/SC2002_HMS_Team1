@@ -1,22 +1,23 @@
 package interfaces;
 
-import models.User;
-import models.Appointment;
+import models.Staff;
 import models.Inventory;
-import models.ReplenishmentRequest;
 import java.util.List;
 
 public interface IProjectAdmService {
-    void addStaff(User staffMember);
-    void removeStaff(User staffMember);
-    void updateStaff(User staffMember);
-    List<User> getAllStaff();
+    
+    // Staff Management
+    void addOrUpdateStaff(Staff staffMember);  // Add or update a staff member
+    boolean removeStaff(String staffId);          // Remove a staff member by ID
+    List<Staff> getAllStaff();                 // Retrieve all staff members
 
-    List<Appointment> viewAppointments();
-
-    void updateStockLevel(String medicineName, int quantity);
-    void updateLowStockAlert(String medicineName, int lowStockLevel);
-    void approveReplenishmentRequest(ReplenishmentRequest request);
-    Inventory getInventory();
+    // Inventory Management
+    boolean updateStockLevel(String medicineName, int quantity);  // Update stock level for a specific medicine
+    boolean updateLowStockAlert(String medicineName, int lowStockLevel);  // Update the low stock alert level for a medicine
+    boolean removeMedication(String medicineName);  // Remove a medication from the inventory
+    List<Inventory> getAllInventory();    // Retrieve all inventory items
 }
+
+
+
 
