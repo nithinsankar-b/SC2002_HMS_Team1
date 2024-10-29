@@ -2,6 +2,7 @@ package services;
 
 import models.Appointment;
 import enums.AppointmentStatus;
+import enums.MedicationStatus;
 import models.Medication;
 
 import java.io.*;
@@ -11,10 +12,9 @@ import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.util.ArrayList;
 import java.util.List;
-import models.Appointment;
 
 public class AppointmentService implements IAppointmentService {
-    private static final String APPOINTMENT_FILE = "data/appointment.csv"; // Updated path to be relative
+    private static final String APPOINTMENT_FILE = "data/appointment.csv";
     private List<Appointment> appointments;
 
     public AppointmentService() {
@@ -65,17 +65,32 @@ public class AppointmentService implements IAppointmentService {
                 .findFirst()
                 .orElse(null);
     }
+    
+    @Override
+    public Appointment getAppointmentById(String appointmentId) {
+        return getAppointment(appointmentId); // Reuse existing method
+    }
+
 
     @Override
     public void recordAppointmentOutcome(String appointmentId, String serviceProvided, List<Medication> prescribedMedications, String consultationNotes) {
         Appointment appointment = getAppointment(appointmentId);
         if (appointment != null && appointment.getStatus() == AppointmentStatus.PENDING) {
+            appointment.setMedicationStatus(MedicationStatus.PENDING);
             appointment.setStatus(AppointmentStatus.COMPLETED);
             appointment.setServiceProvided(serviceProvided);
             appointment.setConsultationNotes(consultationNotes);
             for (Medication medication : prescribedMedications) {
                 appointment.addMedication(medication);
             }
+            saveAppointmentsToCSV();
+        }
+    }
+    
+    public void updateMedicationStatus(String appointmentId) {
+        Appointment appointment = getAppointment(appointmentId);
+        if (appointment != null) {
+            appointment.setMedicationStatus(MedicationStatus.DISPENSED);
             saveAppointmentsToCSV();
         }
     }
@@ -105,7 +120,7 @@ public class AppointmentService implements IAppointmentService {
                 file.createNewFile();
                 // Write header to the CSV file
                 try (BufferedWriter writer = new BufferedWriter(new FileWriter(file))) {
-                    writer.write("appointmentId,patientId,doctorId,appointmentDateTime,status,consultationNotes,serviceProvided,medications");
+                    writer.write("appointmentId,patientId,doctorId,appointmentDateTime,status,consultationNotes,serviceProvided,medications,quantity,medicationStatus");
                     writer.newLine();
                 }
             } catch (IOException e) {
@@ -135,7 +150,7 @@ public class AppointmentService implements IAppointmentService {
     private void saveAppointmentsToCSV() {
         try (BufferedWriter writer = new BufferedWriter(new FileWriter(APPOINTMENT_FILE))) {
             // Write header to the CSV file
-            writer.write("appointmentId,patientId,doctorId,appointmentDateTime,status,consultationNotes,serviceProvided,medications");
+            writer.write("appointmentId,patientId,doctorId,appointmentDateTime,status,consultationNotes,serviceProvided,medications,quantity,medicationStatus");
             writer.newLine();
             for (Appointment appointment : appointments) {
                 writer.write(appointment.toString());
