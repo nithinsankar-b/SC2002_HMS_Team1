@@ -1,10 +1,15 @@
 package views;
 
+import controllers.AdministratorController;
 import controllers.PatientController;
 import enums.UserRole;
 import services.UserService;
+import stores.InventoryDataStore;
 import services.AppointmentService;
+import services.InventoryService;
 import services.PatientService;
+import services.ProjectAdminService;
+import models.Administrator;
 import models.User;
 
 import java.util.Scanner;
@@ -118,8 +123,7 @@ public class UserView {
                 break;
 
             case ADMINISTRATOR:
-                System.out.println("Navigating to Administrator view...");
-                System.out.println(SEPARATOR);
+                navigateToAdministratorPage(user);
                 // Implement the AdministratorView and corresponding logic here
                 break;
 
@@ -144,6 +148,26 @@ public class UserView {
         System.out.println(SEPARATOR);
         patientView.start(user);
     }
+
+    private void navigateToAdministratorPage(User user) {
+    // Create the necessary services for Administrator
+    InventoryDataStore inventoryDataStore = new InventoryDataStore();
+    InventoryService inventoryService = new InventoryService(inventoryDataStore);
+    ProjectAdminService adminService = new ProjectAdminService(new Administrator(user.getHospitalID(), user.getPassword(), null), inventoryService);
+    AppointmentService appointmentService = new AppointmentService();
+
+    // Instantiate AdministratorController
+    AdministratorController adminController = new AdministratorController(appointmentService);
+
+    // Instantiate AdminView
+    AdminView adminView = new AdminView();
+
+    // Start the administrator operations (menu)
+    System.out.println("Navigating to Administrator view...");
+    System.out.println(SEPARATOR);
+    adminController.start();
+}
+
 
     public void displayChangePassword() {
         try (Scanner scanner = new Scanner(System.in)) {
