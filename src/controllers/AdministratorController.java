@@ -9,7 +9,6 @@ import models.Administrator;
 import models.Appointment;
 import models.Inventory;
 import models.Staff;
-
 import java.util.List;
 
 public class AdministratorController {
@@ -17,16 +16,19 @@ public class AdministratorController {
     private final ProjectAdminService adminService;
     private final AppointmentService appointmentService;
     private final AdminView adminView;
-    private final InventoryService inventoryService;
+    private final InventoryService inventoryService;  // Add this field
 
-    public AdministratorController(AppointmentService appointmentService) {
+    public AdministratorController(AppointmentService appointmentService, ProjectAdminService adminService) {
+        this.appointmentService = appointmentService;
+        this.adminService = adminService;
+
+        // Initialize InventoryService
         InventoryDataStore inventoryDataStore = new InventoryDataStore();
         this.inventoryService = new InventoryService(inventoryDataStore);
 
-        this.adminService = new ProjectAdminService(new Administrator("admin01", "password", null), inventoryService);
-        this.appointmentService = appointmentService;
-        this.adminView = new AdminView();
+        this.adminView = new AdminView(this, adminService);  // Pass `this` and `adminService` to AdminView
     }
+
 
     public void start() {
         boolean exit = false;

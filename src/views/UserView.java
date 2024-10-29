@@ -157,10 +157,10 @@ public class UserView {
     AppointmentService appointmentService = new AppointmentService();
 
     // Instantiate AdministratorController
-    AdministratorController adminController = new AdministratorController(appointmentService);
+    AdministratorController adminController = new AdministratorController(appointmentService, adminService);
 
     // Instantiate AdminView
-    AdminView adminView = new AdminView();
+    AdminView adminView = new AdminView(adminController, adminService);
 
     // Start the administrator operations (menu)
     System.out.println("Navigating to Administrator view...");

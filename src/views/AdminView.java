@@ -4,11 +4,22 @@ import interfaces.IAdministratorView;
 import models.Staff;
 import models.Appointment;
 import models.Inventory;
+import services.ProjectAdminService;
+import controllers.AdministratorController;
+
 import java.util.List;
 import java.util.Scanner;
 
 public class AdminView implements IAdministratorView {
     private final Scanner scanner = new Scanner(System.in);
+    private final AdministratorController adminController;
+    private final ProjectAdminService adminService;
+
+    // Constructor to initialize AdminView with dependencies
+    public AdminView(AdministratorController adminController, ProjectAdminService adminService) {
+        this.adminController = adminController;
+        this.adminService = adminService;
+    }
 
     public void displayMenu() {
         System.out.println("==== Administrator Menu ====");
@@ -22,10 +33,14 @@ public class AdminView implements IAdministratorView {
     @Override
     public void displayListOfStaff(List<Staff> staffList) {
         System.out.println("Hospital Staff List:");
-        for (Staff staff : staffList) {
-            System.out.println("Staff ID: " + staff.getId() + ", Name: " + staff.getName() +
-                               ", Role: " + staff.getRole() + ", Gender: " + staff.getGender() +
-                               ", Age: " + staff.getAge());
+        if (staffList.isEmpty()) {
+            System.out.println("No staff members found.");
+        } else {
+            for (Staff staff : staffList) {
+                System.out.println("Staff ID: " + staff.getId() + ", Name: " + staff.getName() +
+                                   ", Role: " + staff.getRole() + ", Gender: " + staff.getGender() +
+                                   ", Age: " + staff.getAge());
+            }
         }
     }
 
@@ -108,4 +123,5 @@ public class AdminView implements IAdministratorView {
         return scanner.nextInt();
     }
 }
+
 
