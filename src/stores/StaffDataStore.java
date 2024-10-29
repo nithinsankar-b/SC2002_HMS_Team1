@@ -17,11 +17,11 @@ public class StaffDataStore {
             // Assuming fields are: id, name, gender, role, age
             String id = fields[0];
             String name = fields[1];
-            String gender = fields[2];
-            String role = fields[3];
+            String role = fields[2];
+            String gender = fields[3];
             int age = Integer.parseInt(fields[4]);
 
-            Staff staff = new Staff(id, name, gender, role, age);
+            Staff staff = new Staff(id, name, role, gender, age);
             staffList.put(id, staff);  // Add to staffList
         }
         reader.close();
@@ -32,7 +32,7 @@ public class StaffDataStore {
         BufferedWriter writer = new BufferedWriter(new FileWriter(csvFilePath));
         for (Staff staff : staffList.values()) {
             writer.write(staff.getId() + "," + staff.getName() + "," +
-                         staff.getGender() + "," + staff.getRole() + "," +
+                         staff.getRole() + "," + staff.getGender() + "," +
                          staff.getAge());
             writer.newLine();
         }
