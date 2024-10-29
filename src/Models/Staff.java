@@ -1,17 +1,18 @@
 package models;
+
 public class Staff {
     private String id;
     private String name;
-    private String gender;
     private String role;
+    private String gender;
     private int age;
 
     // Constructor
-    public Staff(String id, String name, String gender, String role, int age) {
+    public Staff(String id, String name, String role, String gender, int age) {
         this.id = id;
         this.name = name;
-        this.gender = gender;
         this.role = role;
+        this.gender = gender;
         this.age = age;
     }
 
@@ -32,20 +33,20 @@ public class Staff {
         this.name = name;
     }
 
-    public String getGender() {
-        return gender;
-    }
-
-    public void setGender(String gender) {
-        this.gender = gender;
-    }
-
     public String getRole() {
         return role;
     }
 
     public void setRole(String role) {
         this.role = role;
+    }
+
+    public String getGender() {
+        return gender;
+    }
+
+    public void setGender(String gender) {
+        this.gender = gender;
     }
 
     public int getAge() {
@@ -56,4 +57,5 @@ public class Staff {
         this.age = age;
     }
 }
+
 

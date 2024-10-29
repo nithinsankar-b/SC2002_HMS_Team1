@@ -17,10 +17,15 @@ public class StaffView implements IAdministratorView {
         } else {
             System.out.println("Staff Members:");
             for (Staff staff : staffList) {
-                System.out.println("Staff ID: " + staff.getId() + ", Name: " + staff.getName() + ", Role: " + staff.getRole());
+                System.out.println("Staff ID: " + staff.getId() + 
+                                   ", Name: " + staff.getName() + 
+                                   ", Gender: " + staff.getGender() + 
+                                   ", Role: " + staff.getRole() + 
+                                   ", Age: " + staff.getAge());
             }
         }
     }
+    
     
     
 

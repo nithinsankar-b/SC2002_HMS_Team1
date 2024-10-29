@@ -72,17 +72,44 @@ public class AdminView implements IAdministratorView {
     public Staff getStaffDetails() {
         System.out.print("Enter Staff ID: ");
         String staffID = scanner.nextLine();
+    
         System.out.print("Enter Name: ");
         String name = scanner.nextLine();
-        System.out.print("Enter Role (DOCTOR/PHARMACIST): ");
-        String role = scanner.nextLine();
-        System.out.print("Enter Gender: ");
-        String gender = scanner.nextLine();
+    
+        // Validate Role with first letter capitalized
+        String role;
+        while (true) {
+            System.out.print("Enter Role (Doctor/Pharmacist/Administrator): ");
+            role = scanner.nextLine().trim();
+            role = role.substring(0, 1).toUpperCase() + role.substring(1).toLowerCase();
+            if (role.equals("Doctor") || role.equals("Pharmacist") || role.equals("Administrator")) {
+                break;
+            } else {
+                System.out.println("Invalid input. Role must be Doctor, Pharmacist, or Administrator.");
+            }
+        }
+    
+        // Validate Gender with first letter capitalized
+        String gender;
+        while (true) {
+            System.out.print("Enter Gender (Male/Female): ");
+            gender = scanner.nextLine().trim();
+            gender = gender.substring(0, 1).toUpperCase() + gender.substring(1).toLowerCase();
+            if (gender.equals("Male") || gender.equals("Female")) {
+                break;
+            } else {
+                System.out.println("Invalid input. Gender must be Male or Female.");
+            }
+        }
+    
         System.out.print("Enter Age: ");
         int age = scanner.nextInt();
         scanner.nextLine();  // Consume newline
+    
         return new Staff(staffID, name, role, gender, age);
     }
+    
+    
 
     public String getStaffIDForRemoval() {
         System.out.print("Enter Staff ID to remove: ");
