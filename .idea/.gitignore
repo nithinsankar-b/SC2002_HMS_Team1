@@ -9,6 +9,8 @@
 
 
 # Ignores all .class files
-*.classg
+*.class
+
+
 
 .idea
