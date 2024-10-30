@@ -9,6 +9,13 @@ import services.AppointmentService;
 import services.InventoryService;
 import services.PatientService;
 import services.PharmacistService;
+import services.DoctorService;
+import services.ScheduleService;
+import services.AppointmentRequestService;
+import services.MedicalRecordService;
+
+import views.DoctorView;
+import controllers.DoctorController;
 import views.PharmacistView;
 import views.PatientView;
 import models.User;
@@ -114,8 +121,7 @@ public class UserView {
                 break;
 
             case DOCTOR:
-                System.out.println("Navigating to Doctor view...");
-                System.out.println(SEPARATOR);
+                navigateToDoctorPage(user);
                 // Implement the DoctorView and corresponding logic here
                 break;
 
@@ -168,6 +174,30 @@ public class UserView {
         System.out.println("Navigating to Pharmacist view...");
         System.out.println(SEPARATOR);
         pharmacistView.start(user);
+    }
+
+    private void navigateToDoctorPage(User user) {
+        // Create the necessary services
+        ScheduleService scheduleService = new ScheduleService();
+
+        MedicalRecordService medicalRecordService = new MedicalRecordService();
+
+        AppointmentService appointmentService = new AppointmentService();
+
+        AppointmentRequestService appointmentRequestService = new AppointmentRequestService(scheduleService, appointmentService);
+
+        DoctorService doctorService = new DoctorService( userService,scheduleService,medicalRecordService, appointmentService);
+
+        // Instantiate DoctorController
+        DoctorController doctorController = new DoctorController(doctorService,  scheduleService,  medicalRecordService, appointmentService);
+
+        // Instantiate DoctorView
+        DoctorView doctorView = new DoctorView( doctorController, doctorService, userService, scheduleService, medicalRecordService, appointmentService);
+
+        // Start the doctor operations (menu)
+        System.out.println("Navigating to Doctor view...");
+        System.out.println(SEPARATOR);
+        doctorView.start(user);
     }
 
 

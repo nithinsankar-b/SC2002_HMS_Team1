@@ -97,7 +97,7 @@ public class InventoryService implements IInventoryService {
         return (lowLevelAlert * 2) - currentStock; // Example: Double the low-level threshold
     }
 
- // Method to update stock for a medication
+    // Method to update stock for a medication
     public void updateStock(String medicineName, int quantity) {
         List<Inventory> inventoryDataList = inventoryDataStore.getInventoryList();
 
@@ -105,7 +105,7 @@ public class InventoryService implements IInventoryService {
             if (data.getMedicineName().equalsIgnoreCase(medicineName)) {
                 data.setCurrentStock(data.getCurrentStock() - quantity);
                 System.out.println("Updated stock for medicine: " + medicineName + ". New stock: " + data.getCurrentStock());
-                
+
                 // Check if stock falls below the low-level alert and update status
                 if (data.getCurrentStock() <= data.getLowLevelAlert()) {
                     data.setInventoryStatus(InventoryStatus.LOWSTOCK);
@@ -117,12 +117,12 @@ public class InventoryService implements IInventoryService {
         }
         System.out.println("Medicine not found: " + medicineName);
     }
-    
+
 
     // Method to view current medication inventory
     public void viewMedicationInventory() {
         List<Inventory> inventoryDataList = inventoryDataStore.getInventoryList();
-        
+
         if (inventoryDataList.isEmpty()) {
             System.out.println("No medications in inventory.");
             return;
@@ -131,9 +131,9 @@ public class InventoryService implements IInventoryService {
         System.out.println("Current Medication Inventory:");
         for (Inventory item : inventoryDataList) {
             System.out.println("Medicine Name: " + item.getMedicineName() +
-                               " | Current Stock: " + item.getCurrentStock() +
-                               " | Low Level Alert: " + item.getLowLevelAlert() +
-                               " | Replenishment Status: " + item.getReplenishmentStatus());
+                    " | Current Stock: " + item.getCurrentStock() +
+                    " | Low Level Alert: " + item.getLowLevelAlert() +
+                    " | Replenishment Status: " + item.getReplenishmentStatus());
         }
     }
 
