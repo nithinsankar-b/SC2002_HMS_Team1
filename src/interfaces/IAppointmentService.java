@@ -14,4 +14,5 @@ public interface IAppointmentService {
     Appointment getAppointment(String appointmentId);
     void recordAppointmentOutcome(String appointmentId, String serviceProvided, List<Medication> prescribedMedications, String consultationNotes);
     List<LocalDateTime> getAvailableSlots(String doctorId, LocalDate date);
+    Appointment getAppointmentById(String appointmentId);
 }

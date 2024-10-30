@@ -1,12 +1,10 @@
-// src/models/Appointment.java
 package models;
 
 import java.time.LocalDateTime;
 import enums.AppointmentStatus;
+import enums.MedicationStatus;
 import java.util.ArrayList;
 import java.util.List;
-
-import enums.MedicationStatus;
 
 public class Appointment {
     private final String appointmentId;
@@ -17,7 +15,11 @@ public class Appointment {
     private String consultationNotes;
     private String serviceProvided;
     private final List<Medication> medications;
+    private int quantity; // Single quantity for the medication
+    private MedicationStatus medicationStatus;
+    private String medication;
 
+    // Constructor with quantity handling
     public Appointment(String appointmentId, String patientId, String doctorId, LocalDateTime appointmentDateTime) {
         this.appointmentId = appointmentId;
         this.patientId = patientId;
@@ -27,100 +29,73 @@ public class Appointment {
         this.consultationNotes = "";
         this.serviceProvided = "";
         this.medications = new ArrayList<>();
+        this.quantity = 0; // Default quantity
+        this.medicationStatus = MedicationStatus.PENDING;
+        this.medication = "";
     }
 
-    public String getAppointmentId() {
-        return appointmentId;
-    }
+    // Getters and Setters
+    public String getAppointmentId() { return appointmentId; }
+    public String getPatientId() { return patientId; }
+    public String getDoctorId() { return doctorId; }
+    public LocalDateTime getAppointmentDateTime() { return appointmentDateTime; }
+    public AppointmentStatus getStatus() { return status; }
+    public void setStatus(AppointmentStatus status) { this.status = status; }
 
-    public String getPatientId() {
-        return patientId;
-    }
+    public List<Medication> getMedications() { return medications; }
+    public void addMedication(Medication medication) { medications.add(medication); }
 
-    public String getDoctorId() {
-        return doctorId;
-    }
+    public String getConsultationNotes() { return consultationNotes; }
+    public void setConsultationNotes(String consultationNotes) { this.consultationNotes = consultationNotes; }
+    
+    public String getServiceProvided() { return serviceProvided; }
+    public void setServiceProvided(String serviceProvided) { this.serviceProvided = serviceProvided; }
+    
+    public MedicationStatus getMedicationStatus() { return medicationStatus; }
+    public void setMedicationStatus(MedicationStatus status) { this.medicationStatus = status; }
+    
+    public String getMedication() { return medication; }
+    public void setMedication(String medication) { this.medication = medication; }
 
-    public LocalDateTime getAppointmentDateTime() {
-        return appointmentDateTime;
-    }
+    public int getQuantity() { return quantity; }
+    public void setQuantity(int quantity) { this.quantity = quantity; }
 
-    public AppointmentStatus getStatus() {
-        return status;
-    }
-
-    public void setStatus(AppointmentStatus status) {
-        this.status = status;
-    }
-
-    public List<Medication> getMedications() {
-        return medications;
-    }
-
-    public void addMedication(Medication medication) {
-        medications.add(medication);
-    }
-
-    public String getConsultationNotes() {
-        return consultationNotes;
-    }
-
-    public void setConsultationNotes(String consultationNotes) {
-        this.consultationNotes = consultationNotes;
-    }
-
-    public String getServiceProvided() {
-        return serviceProvided;
-    }
-
-    public void setServiceProvided(String serviceProvided) {
-        this.serviceProvided = serviceProvided;
-    }
-
+    // Static method to create an Appointment from a CSV string line
     public static Appointment fromString(String line) {
         String[] parts = line.split(",");
-        if (parts.length < 7) {
+        if (parts.length < 9) {
             return null;
         }
 
-        String appointmentId = parts[0];
-        String patientId = parts[1];
-        String doctorId = parts[2];
-        LocalDateTime appointmentDateTime = LocalDateTime.parse(parts[3]);
-        AppointmentStatus status = AppointmentStatus.valueOf(parts[4]);
-        String consultationNotes = parts[5];
-        String serviceProvided = parts[6];
+        String appointmentId = parts[0].replace("\"", "").trim();
+        String patientId = parts[1].trim();
+        String doctorId = parts[2].trim();
+        LocalDateTime appointmentDateTime = LocalDateTime.parse(parts[3].trim());
+        AppointmentStatus status = AppointmentStatus.valueOf(parts[4].trim());
+        String consultationNotes = parts[5].trim();
+        String serviceProvided = parts[6].trim();
+        
+        
+        String medication = parts[7].trim();
+        int quantity = Integer.parseInt(parts[8].trim());
+        MedicationStatus medicationStatus = MedicationStatus.valueOf(parts[9].trim());
 
         Appointment appointment = new Appointment(appointmentId, patientId, doctorId, appointmentDateTime);
         appointment.setStatus(status);
         appointment.setConsultationNotes(consultationNotes);
         appointment.setServiceProvided(serviceProvided);
-
-        if (parts.length > 7) {
-            String[] meds = parts[7].split(";");
-            for (String med : meds) {
-                String[] medParts = med.split(":");
-                if (medParts.length == 3) {
-                    String medicationName = medParts[0];
-                    int quantity = Integer.parseInt(medParts[1]);
-                    MedicationStatus medicationStatus = MedicationStatus.valueOf(medParts[2]);
-                    Medication medication = new Medication(medicationName, quantity, medicationStatus);
-                    appointment.addMedication(medication);
-                }
-            }
-        }
+        appointment.setQuantity(quantity);
+        appointment.setMedication(medication);
+        appointment.setMedicationStatus(medicationStatus);
 
         return appointment;
     }
 
     @Override
     public String toString() {
-        StringBuilder medicationInfo = new StringBuilder();
-        for (Medication medication : medications) {
-            medicationInfo.append(medication.toString()).append(";");
-        }
         return appointmentId + "," + patientId + "," + doctorId + "," +
-                appointmentDateTime + "," + status + "," +
-                consultationNotes + "," + serviceProvided + "," + medicationInfo;
+               appointmentDateTime + "," + status + "," +
+               consultationNotes + "," + serviceProvided + "," +
+                medication + "," + quantity + "," + medicationStatus;
     }
 }

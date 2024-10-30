@@ -1,10 +1,14 @@
 package views;
 
 import controllers.PatientController;
+import controllers.PharmacistController;
 import enums.UserRole;
 import services.UserService;
+import stores.InventoryDataStore;
 import services.AppointmentService;
+import services.InventoryService;
 import services.PatientService;
+import services.PharmacistService;
 import models.User;
 
 import java.util.Scanner;
@@ -40,6 +44,8 @@ public class UserView {
                 running = promptToExitOrRetry(scanner);
             }
         } catch (Exception e) {
+        	e.printStackTrace(); // Print stack trace for better debugging
+            System.out.println("Error encountered: " + e.getMessage());
             System.out.println("Error encountered. Please reboot HMS Application.");
         } finally {
             System.out.println("Thank You. Exiting HMS.");
@@ -112,9 +118,7 @@ public class UserView {
                 break;
 
             case PHARMACIST:
-                System.out.println("Navigating to Pharmacist view...");
-                System.out.println(SEPARATOR);
-                // Implement the PharmacistView and corresponding logic here
+                navigateToPharmacistPage(user);
                 break;
 
             case ADMINISTRATOR:
@@ -143,6 +147,25 @@ public class UserView {
         System.out.println("Navigating to Patient view...");
         System.out.println(SEPARATOR);
         patientView.start(user);
+    }
+    
+    private void navigateToPharmacistPage(User user) {
+        // Create the AppointmentService and PatientService instances
+        AppointmentService appointmentService = new AppointmentService();
+        InventoryDataStore inventoryDataStore = new InventoryDataStore();
+        InventoryService inventoryService = new InventoryService(inventoryDataStore);
+        PharmacistService pharmacistService = new PharmacistService(userService, appointmentService, inventoryService);
+        PatientService patientService = new PatientService(userService);
+        // Instantiate PatientController
+        PharmacistController pharmacistController = new PharmacistController(pharmacistService, inventoryService,appointmentService);
+
+        // Instantiate PatientView
+        PharmacistView pharmacistView = new PharmacistView(pharmacistController, pharmacistService, userService, patientService);
+
+        // Start the patient operations (menu)
+        System.out.println("Navigating to Pharmacist view...");
+        System.out.println(SEPARATOR);
+        pharmacistView.start(user);
     }
 
     public void displayChangePassword() {
