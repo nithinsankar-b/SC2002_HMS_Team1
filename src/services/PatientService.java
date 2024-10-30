@@ -13,6 +13,8 @@ import java.util.Map;
 import enums.UserRole;
 import models.Patient;
 import models.User;
+import services.UserService;
+import services.AppointmentService;
 
 public class PatientService {
     private final Map<String, Patient> patients;

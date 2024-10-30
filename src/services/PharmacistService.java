@@ -16,7 +16,12 @@ import models.User;
 import models.Appointment;
 import models.Medication;
 import models.Patient;
+import models.Pharmacist;
 import enums.MedicationStatus;
+
+import services.UserService;
+import services.AppointmentService;
+import services.InventoryService;
 
 public class PharmacistService {
     private final Map<String, Pharmacist> pharmacists;
