@@ -2,6 +2,8 @@ package models;
 
 import enums.UserRole;
 
+import models.User;
+
 // Inherits User class
 public class Pharmacist extends User {
 

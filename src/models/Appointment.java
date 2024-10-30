@@ -5,6 +5,7 @@ import enums.AppointmentStatus;
 import enums.MedicationStatus;
 import java.util.ArrayList;
 import java.util.List;
+import models.Medication;
 
 public class Appointment {
     private final String appointmentId;

@@ -9,6 +9,8 @@ import services.AppointmentService;
 import services.InventoryService;
 import services.PatientService;
 import services.PharmacistService;
+import views.PharmacistView;
+import views.PatientView;
 import models.User;
 
 import java.util.Scanner;
