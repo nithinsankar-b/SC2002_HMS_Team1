@@ -64,4 +64,8 @@ public class UserService implements IUserService {
         User user = users.get(hospitalID);
         return user != null ? user.getRole() : null;
     }
+
+    public Map<String, User> getUsers() {
+        return users;
+    }
 }
