@@ -170,6 +170,7 @@ public class UserView {
         pharmacistView.start(user);
     }
 
+
     public void displayChangePassword() {
         try (Scanner scanner = new Scanner(System.in)) {
             // No need to ask for Hospital ID again
