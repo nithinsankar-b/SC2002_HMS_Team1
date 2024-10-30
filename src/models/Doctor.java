@@ -1,6 +1,8 @@
 package models;
 import enums.UserRole;
 
+import models.User;
+
 public class Doctor extends User {
 	
     private String name;

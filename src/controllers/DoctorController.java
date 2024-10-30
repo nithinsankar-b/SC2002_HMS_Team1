@@ -1,8 +1,16 @@
 package controllers;
-import models.*;
-import services.*;
-import views.*;
-import enums.*;
+
+import services.DoctorService;
+import services.AppointmentService;
+import services.ScheduleService;
+import services.AppointmentRequestService;
+import services.MedicalRecordService;
+import views.ViewMedicalRecords;
+import views.ViewPendingAppointmentRequest;
+import views.ViewPersonalSchedule;
+import views.ViewUpcomingAppointments;
+
+import models.Doctor;
 
 import java.util.List;
 import java.util.Scanner;

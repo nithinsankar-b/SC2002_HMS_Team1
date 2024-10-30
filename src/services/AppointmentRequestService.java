@@ -11,6 +11,12 @@ import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
+import services.DoctorService;
+import services.AppointmentService;
+import services.ScheduleService;
+import services.AppointmentRequestService;
+import services.MedicalRecordService;
+
 public class AppointmentRequestService {
     private final ScheduleService scheduleService;
     private final AppointmentService appointmentService;
