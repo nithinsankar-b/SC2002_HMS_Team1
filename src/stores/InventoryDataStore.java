@@ -4,11 +4,12 @@ import models.Inventory;
 import enums.ReplenishmentStatus;
 
 import java.io.BufferedReader;
+import java.io.BufferedWriter;
 import java.io.FileReader;
+import java.io.FileWriter;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
-
 public class InventoryDataStore {
 
     private List<Inventory> inventoryList;
@@ -69,5 +70,24 @@ public class InventoryDataStore {
     // Add individual inventory item
     public void addInventory(Inventory inventory) {
         inventoryList.add(inventory);
+    }
+
+    public void writeInventoryToCSV(String inventoryCsvPath) {
+        try (BufferedWriter writer = new BufferedWriter(new FileWriter(inventoryCsvPath))) {
+            // Write header
+            writer.write("MedicineName,CurrentStock,LowStockAlert");
+            writer.newLine();
+
+            // Write each inventory item to the CSV
+            for (Inventory item : inventoryList) {
+                writer.write(item.getMedicineName() + "," + item.getCurrentStock() + "," + item.getLowLevelAlert());
+                writer.newLine();
+            }
+
+            System.out.println("Inventory data successfully written to " + inventoryCsvPath);
+
+        } catch (IOException e) {
+            System.err.println("Error writing inventory data to CSV: " + e.getMessage());
+        }
     }
 }
