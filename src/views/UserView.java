@@ -20,9 +20,14 @@ import views.PatientView;
 import views.DoctorView;
 import views.PharmacistView;
 
-
 import java.util.Scanner;
 
+/**
+ * The UserView class is responsible for handling the user interface
+ * for the Hospital Management System (HMS). It manages user
+ * authentication and navigates users to their role-specific views
+ * based on their roles (Patient, Doctor, Pharmacist, Administrator).
+ */
 public class UserView {
     private final UserService userService;
     private String loggedInHospitalID;
@@ -31,10 +36,20 @@ public class UserView {
     private static final String WELCOME_MESSAGE = "***WELCOME TO HOSPITAL MANAGEMENT SYSTEM***";
     private static final String SEPARATOR = "===========================================";
 
+    /**
+     * Constructs a UserView instance with the specified UserService.
+     *
+     * @param userService the UserService used for user-related operations
+     */
     public UserView(UserService userService) {
         this.userService = userService;
     }
 
+    /**
+     * Displays the login interface for the user.
+     * This method runs in a loop until the user successfully logs in
+     * or chooses to exit the application.
+     */
     public void displayLogin() {
         try (Scanner scanner = new Scanner(System.in)) {
             boolean running = true;
@@ -61,6 +76,13 @@ public class UserView {
         }
     }
 
+    /**
+     * Attempts to log in the user by prompting for their Hospital ID
+     * and password, allowing up to three attempts.
+     *
+     * @param scanner the Scanner object for user input
+     * @return true if authentication is successful, false otherwise
+     */
     private boolean attemptLogin(Scanner scanner) {
         int attempts = 3; // Maximum number of attempts allowed
         boolean isAuthenticated = false;
@@ -98,6 +120,13 @@ public class UserView {
         return isAuthenticated;
     }
 
+    /**
+     * Prompts the user to decide whether to exit the application
+     * or attempt to log in again.
+     *
+     * @param scanner the Scanner object for user input
+     * @return true to retry login, false to exit the application
+     */
     private boolean promptToExitOrRetry(Scanner scanner) {
         while (true) {
             System.out.print("Would you like to exit the application? (yes/no): ");
@@ -114,6 +143,12 @@ public class UserView {
         }
     }
 
+    /**
+     * Navigates to the role-specific page based on the user's role.
+     *
+     * @param user the User object representing the logged-in user
+     * @param role the UserRole of the logged-in user
+     */
     private void navigateToRoleSpecificPage(User user, UserRole role) {
         switch (role) {
             case PATIENT:
@@ -169,6 +204,11 @@ public class UserView {
         }
     }
 
+    /**
+     * Displays the change password interface for the logged-in user.
+     * It prompts for the old password and the new password, and attempts
+     * to change the password using the UserService.
+     */
     public void displayChangePassword() {
         try (Scanner scanner = new Scanner(System.in)) {
             // No need to ask for Hospital ID again
