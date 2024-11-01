@@ -7,10 +7,10 @@ import models.Doctor;
 
 
 
-public class ViewPendingAppointmentRequest  {
+public class PendingAppointmentRequestView  {
 	private final AppointmentRequestService appointmentRequestService;
 	
-	public ViewPendingAppointmentRequest(ScheduleService scheduleService,AppointmentService appointmentService ) {
+	public PendingAppointmentRequestView(ScheduleService scheduleService,AppointmentService appointmentService ) {
 		this.appointmentRequestService = new AppointmentRequestService(scheduleService, appointmentService);
 	}
 	  //View pending appointment requests

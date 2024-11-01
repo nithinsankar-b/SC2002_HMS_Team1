@@ -99,7 +99,7 @@ public class DoctorView {
         System.out.println("3. View Upcoming Appointments");
         System.out.println("4. View Pending Appointment Requests");
         System.out.println("5. Set Date to Available");
-        System.out.println("6. Block Out Date");
+        System.out.println("6. Set Date to Unavailable");
         System.out.println("7. Accept Appointment Request");
         System.out.println("8. Decline Appointment Request");
         System.out.println("9. Add New Diagnosis for Patient");

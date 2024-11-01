@@ -2,10 +2,10 @@ package views;
 
 import services.MedicalRecordService;
 
-public class ViewMedicalRecords  {
+public class PatientMedicalRecordView  {
     private final MedicalRecordService medicalRecordService;
     
-    public ViewMedicalRecords(MedicalRecordService medicalRecordService) {
+    public PatientMedicalRecordView(MedicalRecordService medicalRecordService) {
     	this.medicalRecordService = medicalRecordService;
     }
     

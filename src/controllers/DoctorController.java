@@ -1,8 +1,23 @@
 package controllers;
+<<<<<<< Updated upstream
 import models.*;
 import services.*;
 import views.*;
 import enums.*;
+=======
+
+import services.DoctorService;
+import services.AppointmentService;
+import services.ScheduleService;
+import services.AppointmentRequestService;
+import services.MedicalRecordService;
+import views.PatientMedicalRecordView;
+import views.PendingAppointmentRequestView;
+import views.PersonalScheduleView;
+import views.UpcomingAppointmentsView;
+
+import models.Doctor;
+>>>>>>> Stashed changes
 
 import java.util.List;
 import java.util.Scanner;
@@ -12,10 +27,10 @@ public class DoctorController {
 	private final ScheduleService scheduleService;
 	private final AppointmentRequestService appointmentRequestService;
 	private final MedicalRecordService medicalRecordService;
-    private final ViewMedicalRecords viewMedicalRecords;
-    private final ViewPendingAppointmentRequest viewPendingAppointmentRequest;
-    private final ViewPersonalSchedule viewPersonalSchedule;
-    private final ViewUpcomingAppointments viewUpcomingAppointments;
+    private final PatientMedicalRecordView viewMedicalRecords;
+    private final PendingAppointmentRequestView viewPendingAppointmentRequest;
+    private final PersonalScheduleView viewPersonalSchedule;
+    private final UpcomingAppointmentsView viewUpcomingAppointments;
     
 
     public DoctorController(DoctorService doctorService, ScheduleService scheduleService, MedicalRecordService medicalRecordService, AppointmentService appointmentService ) {
@@ -26,10 +41,10 @@ public class DoctorController {
         this.appointmentRequestService = new AppointmentRequestService(scheduleService, appointmentService);
 		
         // the views
-        this.viewMedicalRecords = new ViewMedicalRecords(medicalRecordService);
-        this.viewPendingAppointmentRequest = new ViewPendingAppointmentRequest(scheduleService, appointmentService);
-        this.viewPersonalSchedule = new ViewPersonalSchedule(scheduleService);
-        this.viewUpcomingAppointments = new ViewUpcomingAppointments(scheduleService);
+        this.viewMedicalRecords = new PatientMedicalRecordView(medicalRecordService);
+        this.viewPendingAppointmentRequest = new PendingAppointmentRequestView(scheduleService, appointmentService);
+        this.viewPersonalSchedule = new PersonalScheduleView(scheduleService);
+        this.viewUpcomingAppointments = new UpcomingAppointmentsView(scheduleService);
         
     }
     //viewing medical records
