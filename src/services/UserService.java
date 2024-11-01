@@ -13,13 +13,11 @@ import java.util.Map;
 public class UserService implements IUserService {
     private final Map<String, User> users;
 
-    // There is already a database in the CSV file
     public UserService() {
         users = new HashMap<>();
-        loadUsersFromCSV( "data/User.csv"); // Adjusted for relative path
+        loadUsersFromCSV("data/User.csv"); // Adjusted for relative path
     }
 
-    // Load users from CSV
     private void loadUsersFromCSV(String filePath) {
         String line;
         try (BufferedReader br = new BufferedReader(new FileReader(filePath))) {
@@ -31,8 +29,7 @@ public class UserService implements IUserService {
                     String roleString = userData[2].trim();
                     if(roleString.equals("role"))
                         continue;
-                    UserRole role = UserRole.valueOf(userData[2].trim());
-                    //System.out.println(hospitalID+password+userData[2].trim());
+                    UserRole role = UserRole.valueOf(roleString.trim());
                     users.put(hospitalID, new User(hospitalID, password, role));
                 }
             }
@@ -41,14 +38,12 @@ public class UserService implements IUserService {
         }
     }
 
-    // Login method
     @Override
     public boolean login(String hospitalID, String password) {
         User user = users.get(hospitalID);
         return user != null && user.getPassword().equals(password);
     }
 
-    // Change password
     @Override
     public boolean changePassword(String hospitalID, String oldPassword, String newPassword) {
         User user = users.get(hospitalID);
@@ -59,14 +54,12 @@ public class UserService implements IUserService {
         return false;
     }
 
-    // Get user role
     @Override
     public UserRole getUserRole(String hospitalID) {
         User user = users.get(hospitalID);
         return user != null ? user.getRole() : null;
     }
 
-    // Returns a user by the UserID
     public User getUserById(String hospitalID) {
         return users.get(hospitalID);
     }
@@ -78,6 +71,4 @@ public class UserService implements IUserService {
         }
         return false;
     }
-
-
 }
