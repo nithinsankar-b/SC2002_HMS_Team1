@@ -5,14 +5,9 @@ import services.AppointmentService;
 import services.ScheduleService;
 import services.AppointmentRequestService;
 import services.MedicalRecordService;
-import views.ViewMedicalRecords;
-import views.ViewPendingAppointmentRequest;
-import views.ViewPersonalSchedule;
-import views.ViewUpcomingAppointments;
 
 import models.Doctor;
 
-import java.util.List;
 import java.util.Scanner;
 public class DoctorController {
 	private final DoctorService doctorService;
@@ -20,10 +15,10 @@ public class DoctorController {
 	private final ScheduleService scheduleService;
 	private final AppointmentRequestService appointmentRequestService;
 	private final MedicalRecordService medicalRecordService;
-    private final ViewMedicalRecords viewMedicalRecords;
-    private final ViewPendingAppointmentRequest viewPendingAppointmentRequest;
-    private final ViewPersonalSchedule viewPersonalSchedule;
-    private final ViewUpcomingAppointments viewUpcomingAppointments;
+    private final views.MedicalRecordsView medicalRecordsView;
+    private final views.PendingAppointmentRequestView viewPendingAppointmentRequest;
+    private final views.PersonalScheduleView personalScheduleView;
+    private final views.UpcomingAppointmentsView viewUpcomingAppointments;
     
 
     public DoctorController(DoctorService doctorService, ScheduleService scheduleService, MedicalRecordService medicalRecordService, AppointmentService appointmentService ) {
@@ -34,16 +29,16 @@ public class DoctorController {
         this.appointmentRequestService = new AppointmentRequestService(scheduleService, appointmentService);
 		
         // the views
-        this.viewMedicalRecords = new ViewMedicalRecords(medicalRecordService);
-        this.viewPendingAppointmentRequest = new ViewPendingAppointmentRequest(scheduleService, appointmentService);
-        this.viewPersonalSchedule = new ViewPersonalSchedule(scheduleService);
-        this.viewUpcomingAppointments = new ViewUpcomingAppointments(scheduleService);
+        this.medicalRecordsView = new views.MedicalRecordsView(medicalRecordService);
+        this.viewPendingAppointmentRequest = new views.PendingAppointmentRequestView(scheduleService, appointmentService);
+        this.personalScheduleView = new views.PersonalScheduleView(scheduleService);
+        this.viewUpcomingAppointments = new views.UpcomingAppointmentsView(scheduleService);
         
     }
     //viewing medical records
     public void medicalRecordsView(String patientId) {
     	
-    	viewMedicalRecords.printMedicalRecords(patientId);
+    	medicalRecordsView.printMedicalRecords(patientId);
     }
     //viewing pending appt request
     public void pendingAppointmentsView(Doctor doctor) {
@@ -51,7 +46,7 @@ public class DoctorController {
     }
     //viewing personal schedule
     public void personalScheduleView(Doctor doctor) {
-    	viewPersonalSchedule.displayPersonalSchedule(doctor);
+    	personalScheduleView.displayPersonalSchedule(doctor);
     }
     //view upcoming appointments
     public void upcomingAppointmentsView(Doctor doctor) {

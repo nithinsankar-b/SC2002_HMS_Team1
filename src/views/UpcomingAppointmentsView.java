@@ -3,10 +3,10 @@ package views;
 import services.ScheduleService;
 import models.Doctor;
 
-public class ViewUpcomingAppointments {
+public class UpcomingAppointmentsView {
 	private final ScheduleService scheduleService;
 	
-	public ViewUpcomingAppointments(ScheduleService scheduleService) {
+	public UpcomingAppointmentsView(ScheduleService scheduleService) {
 		this.scheduleService = scheduleService;
 	}
     //View upcoming appointments
