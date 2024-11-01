@@ -10,7 +10,6 @@ import java.io.FileWriter;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
-
 public class InventoryDataStore {
 
     private List<Inventory> inventoryList;
@@ -22,7 +21,7 @@ public class InventoryDataStore {
     
     private void loadInventoryFromCSV() {
         String line="";
-        try (BufferedReader br = new BufferedReader(new FileReader("data\\Inventory.csv"))) {
+        try (BufferedReader br = new BufferedReader(new FileReader("data/inventory.csv"))) {
             boolean isFirstLine = true; // Flag to skip the header
 
             while ((line = br.readLine()) != null) {
@@ -84,13 +83,11 @@ public class InventoryDataStore {
                 writer.write(item.getMedicineName() + "," + item.getCurrentStock() + "," + item.getLowLevelAlert());
                 writer.newLine();
             }
-            
+
             System.out.println("Inventory data successfully written to " + inventoryCsvPath);
-            
+
         } catch (IOException e) {
             System.err.println("Error writing inventory data to CSV: " + e.getMessage());
         }
     }
 }
-
-

@@ -2,6 +2,7 @@ package views;
 
 import controllers.AdministratorController;
 import controllers.PatientController;
+import controllers.PharmacistController;
 import enums.UserRole;
 import services.UserService;
 import stores.InventoryDataStore;
@@ -10,6 +11,18 @@ import services.InventoryService;
 import services.PatientService;
 import services.ProjectAdminService;
 import models.Administrator;
+=======
+import services.PharmacistService;
+import services.DoctorService;
+import services.ScheduleService;
+import services.AppointmentRequestService;
+import services.MedicalRecordService;
+
+import views.DoctorView;
+import controllers.DoctorController;
+import views.PharmacistView;
+import views.PatientView;
+
 import models.User;
 
 import java.util.Scanner;
@@ -45,6 +58,8 @@ public class UserView {
                 running = promptToExitOrRetry(scanner);
             }
         } catch (Exception e) {
+        	e.printStackTrace(); // Print stack trace for better debugging
+            System.out.println("Error encountered: " + e.getMessage());
             System.out.println("Error encountered. Please reboot HMS Application.");
         } finally {
             System.out.println("Thank You. Exiting HMS.");
@@ -111,15 +126,12 @@ public class UserView {
                 break;
 
             case DOCTOR:
-                System.out.println("Navigating to Doctor view...");
-                System.out.println(SEPARATOR);
+                navigateToDoctorPage(user);
                 // Implement the DoctorView and corresponding logic here
                 break;
 
             case PHARMACIST:
-                System.out.println("Navigating to Pharmacist view...");
-                System.out.println(SEPARATOR);
-                // Implement the PharmacistView and corresponding logic here
+                navigateToPharmacistPage(user);
                 break;
 
             case ADMINISTRATOR:
@@ -148,6 +160,50 @@ public class UserView {
         System.out.println(SEPARATOR);
         patientView.start(user);
     }
+    
+    private void navigateToPharmacistPage(User user) {
+        // Create the AppointmentService and PatientService instances
+        AppointmentService appointmentService = new AppointmentService();
+        InventoryDataStore inventoryDataStore = new InventoryDataStore();
+        InventoryService inventoryService = new InventoryService(inventoryDataStore);
+        PharmacistService pharmacistService = new PharmacistService(userService, appointmentService, inventoryService);
+        PatientService patientService = new PatientService(userService);
+        // Instantiate PatientController
+        PharmacistController pharmacistController = new PharmacistController(pharmacistService, inventoryService,appointmentService);
+
+        // Instantiate PatientView
+        PharmacistView pharmacistView = new PharmacistView(pharmacistController, pharmacistService, userService, patientService);
+
+        // Start the patient operations (menu)
+        System.out.println("Navigating to Pharmacist view...");
+        System.out.println(SEPARATOR);
+        pharmacistView.start(user);
+    }
+
+    private void navigateToDoctorPage(User user) {
+        // Create the necessary services
+        ScheduleService scheduleService = new ScheduleService();
+
+        MedicalRecordService medicalRecordService = new MedicalRecordService();
+
+        AppointmentService appointmentService = new AppointmentService();
+
+        AppointmentRequestService appointmentRequestService = new AppointmentRequestService(scheduleService, appointmentService);
+
+        DoctorService doctorService = new DoctorService( userService,scheduleService,medicalRecordService, appointmentService);
+
+        // Instantiate DoctorController
+        DoctorController doctorController = new DoctorController(doctorService,  scheduleService,  medicalRecordService, appointmentService);
+
+        // Instantiate DoctorView
+        DoctorView doctorView = new DoctorView( doctorController, doctorService, userService, scheduleService, medicalRecordService, appointmentService);
+
+        // Start the doctor operations (menu)
+        System.out.println("Navigating to Doctor view...");
+        System.out.println(SEPARATOR);
+        doctorView.start(user);
+    }
+
 
     private void navigateToAdministratorPage(User user) {
     // Create the necessary services for Administrator

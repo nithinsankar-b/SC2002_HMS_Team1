@@ -16,7 +16,7 @@ public class UserService implements IUserService {
     // There is already a database in the CSV file
     public UserService() {
         users = new HashMap<>();
-        loadUsersFromCSV( "data\\User.csv"); // Adjusted for relative path
+        loadUsersFromCSV( "data/User.csv"); // Adjusted for relative path
     }
 
     // Load users from CSV

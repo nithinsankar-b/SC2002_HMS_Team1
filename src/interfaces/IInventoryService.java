@@ -1,5 +1,4 @@
 package interfaces;
-
 import models.Inventory;
 import java.util.List;
 
