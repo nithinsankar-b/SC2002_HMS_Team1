@@ -87,12 +87,19 @@ public class AppointmentService implements IAppointmentService {
         }
     }
     
-    public void updateMedicationStatus(String appointmentId) {
+    public boolean updateMedicationStatus(String appointmentId) {
         Appointment appointment = getAppointment(appointmentId);
         if (appointment != null) {
+        	if(appointment.getMedicationStatus()==MedicationStatus.DISPENSED)
+        	{
+        		System.out.println("Medicine already dispensed");
+        		return false;
+        	}
             appointment.setMedicationStatus(MedicationStatus.DISPENSED);
             saveAppointmentsToCSV();
+            
         }
+        return true;
     }
 
     @Override

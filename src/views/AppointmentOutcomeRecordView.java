@@ -8,13 +8,11 @@ public class AppointmentOutcomeRecordView {
     private final String csvFilePath = "data/appointment.csv"; // Adjust path as needed
 
     public void loadAndPrintAppointments() {
-        System.out.println("Loading appointments from: " + csvFilePath);
+        
         
         try (BufferedReader br = new BufferedReader(new FileReader(csvFilePath))) {
             String line = br.readLine(); // Read the header line
-            if (line != null) {
-                System.out.println("Headers: " + line); // Print headers for reference
-            }
+
             
             while ((line = br.readLine()) != null) {
                 String[] fields = line.split(",");

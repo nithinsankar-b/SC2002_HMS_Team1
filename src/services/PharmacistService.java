@@ -135,15 +135,14 @@ public class PharmacistService {
  // Method to update prescription status and inventory
     public boolean updatePrescriptionStatus(String appointmentID) {
         Appointment appointment = appointmentService.getAppointmentById(appointmentID);
-        System.out.println(appointment);// Assuming a method exists to get Appointment by ID
         if (appointment != null) {
             // Update the medication status in the appointment
-            appointmentService.updateMedicationStatus(appointmentID);
+            boolean update = appointmentService.updateMedicationStatus(appointmentID);
             
             // Get medication and quantity from appointment
             String medication = appointment.getMedication();
             int quantity = appointment.getQuantity();
-
+            if(update)
             // Update inventory stock
             inventoryService.updateStock(medication, quantity);
 

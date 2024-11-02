@@ -1,7 +1,9 @@
 package controllers;
 import models.InventoryDisplay;
 
+
 import models.Patient;
+import models.Pharmacist;
 import models.User;
 import services.PharmacistService;
 import services.UserService;
@@ -24,6 +26,7 @@ public class PharmacistController {
 	    private final InventoryService inventoryService;
 	    private final AppointmentService appointmentService;
 	    private final MedicalInventoryView medicalInventoryView;
+	    private final UserService userService;
 	    
 	    private final AppointmentOutcomeRecordView appointmentOutcomeRecordView;
 
@@ -40,6 +43,7 @@ public class PharmacistController {
 	        this.medicalInventoryView = new MedicalInventoryView(inventoryService);
 	        
 	        this.appointmentOutcomeRecordView = new AppointmentOutcomeRecordView();
+	        this.userService = new UserService();
 	    }
 
 	    // Method to view medication inventory
@@ -73,7 +77,15 @@ public class PharmacistController {
 	    public void viewAppointmentOutcomeRecords() {
 	    	appointmentOutcomeRecordView.loadAndPrintAppointments();
 	    }
-	}
+	    
+	    public void changePassword(String hospitalID, String oldPassword, String newPassword)
+	    {
+	    	
+	    	userService.changePassword(hospitalID, oldPassword, newPassword);
+	    }
+	    
+}
+
 
 
 

@@ -6,6 +6,7 @@ import interfaces.IUserService;
 
 import java.io.BufferedReader;
 import java.io.FileReader;
+import java.io.FileWriter;
 import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
@@ -40,6 +41,20 @@ public class UserService implements IUserService {
             System.out.println("Error reading CSV file: " + e.getMessage());
         }
     }
+    
+ // Save users to CSV
+    public void saveToCSV() {
+        try (FileWriter writer = new FileWriter("data/User.csv")) {
+            writer.write("hospitalID,password,role\n"); // CSV header
+            for (User user : users.values()) {
+                writer.write(user.getHospitalID() + "," + user.getPassword() + "," + user.getRole() + "\n");
+            }
+            System.out.println("Users saved to CSV successfully.");
+        } catch (IOException e) {
+            System.out.println("Error writing to CSV file: " + e.getMessage());
+        }
+    }
+
 
     // Login method
     @Override
@@ -54,6 +69,8 @@ public class UserService implements IUserService {
         User user = users.get(hospitalID);
         if (user != null && user.getPassword().equals(oldPassword)) {
             user.setPassword(newPassword);
+            saveToCSV();
+            loadUsersFromCSV("data/User.csv");
             return true;
         }
         return false;
@@ -74,6 +91,7 @@ public class UserService implements IUserService {
     public boolean updateUser(User user) {
         if (users.containsKey(user.getHospitalID())) {
             users.put(user.getHospitalID(), user);
+            saveToCSV();
             return true;
         }
         return false;

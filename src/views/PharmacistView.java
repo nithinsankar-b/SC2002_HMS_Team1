@@ -52,8 +52,9 @@ public class PharmacistView {
                 
                 case 2 -> pharmacistController.submitReplenishmentRequest();
                 case 3 -> updatePrescriptionStatus(); 
-                case 4 -> viewAppointmentOutcomeRecords(); // New option
-                case 5 -> {
+                case 4 -> viewAppointmentOutcomeRecords(); 
+                case 5 -> changePassword();
+                case 6 -> {
                     System.out.println("Logging out...");
                     isRunning = false;
                 }
@@ -112,7 +113,8 @@ public class PharmacistView {
         System.out.println("2. Submit Replenishment Request");
         System.out.println("3. Update Prescription Status");
         System.out.println("4. View Appointment Outcome Record"); // New menu option
-        System.out.println("5. Log Out");
+        System.out.println("5. Change Password");
+        System.out.println("6. Log Out");
     }
 
     // Get user input with error checking
@@ -125,4 +127,20 @@ public class PharmacistView {
         }
         return choice;
     }
-}
+    
+    private void changePassword()
+    {
+    	Scanner sc=new Scanner(System.in);
+    	System.out.println("Enter Hospital ID");
+    	String id = sc.nextLine();
+    	
+    	System.out.println("Enter old password");
+    	String oldPassword = sc.nextLine();
+    	
+    	System.out.println("Enter new password");
+    	String newPassword = sc.nextLine();
+    	
+    	pharmacistController.changePassword(id, oldPassword, newPassword);
+    }
+    }
+
