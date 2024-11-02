@@ -67,28 +67,27 @@ public class DoctorView {
             case 9 -> doctorController.newPatientDiagnosis();
             case 10 -> doctorController.newPatientPrescription();
             case 11 -> doctorController.appointmentOutcomeRecord();
+            case 12 -> changePassword();
+            case 13 -> {
+                System.out.println("Logging out...");
+                isRunning = false; // Exit the loop to log out
+            }
             default -> System.out.println("ERROR: Invalid choice, please try again.");
         }
 
             // Only prompt to continue if the user has not chosen to log out
             if (isRunning) {
-            	Scanner sc=new Scanner(System.in);
-            
-            	
-                System.out.println("\nDo you want to continue (Y/N): ");
-                
-                String continueInput = sc.nextLine().trim().toUpperCase();
-
+                Scanner sc=new Scanner(System.in);            
+                                System.out.println("\nDo you want to continue (Y/N): ");
+                                String continueInput = sc.nextLine().trim().toUpperCase();
                 if (continueInput.equals("N")) {
-                    isRunning = false;
-                } else if (!continueInput.equals("Y")) {
-                    System.out.println("Invalid input. Please enter Y or N.");
-                } else {
+                    isRunning = false;                } else if (!continueInput.equals("Y")) {
+                    System.out.println("Invalid input. Please enter Y or N.");                } else {
                     System.out.println("==============================\n");
                 }
             }
         }
-        // Do not close the scanner here as it's used in the main UserView
+        // Do not close thescanner here as it's used in the main UserView
     }
 
     // Implementing the display method to show the main menu
@@ -99,12 +98,14 @@ public class DoctorView {
         System.out.println("3. View Upcoming Appointments");
         System.out.println("4. View Pending Appointment Requests");
         System.out.println("5. Set Date to Available");
-        System.out.println("6. Block Out Date");
+        System.out.println("6. Set Date to Unavailable");
         System.out.println("7. Accept Appointment Request");
         System.out.println("8. Decline Appointment Request");
         System.out.println("9. Add New Diagnosis for Patient");
         System.out.println("10. Add New Prescription for Patient");
         System.out.println("11. Record Appointment Outcome");
+        System.out.println("12. Change Password");
+        System.out.println("13. Log out");
     }
 
     // Get user input with error checking
@@ -127,6 +128,18 @@ public class DoctorView {
     public void showErrorMessage(String message) {
         System.out.println("ERROR: " + message);
     }
+    private void changePassword()
+    {
+      Scanner sc=new Scanner(System.in);
+      System.out.println("Enter Hospital ID");
+      String id = sc.nextLine();
+      
+      System.out.println("Enter old password");
+      String oldPassword = sc.nextLine();
+      
+      System.out.println("Enter new password");
+      String newPassword = sc.nextLine();
+      
+      doctorController.changePassword(id, oldPassword, newPassword);
+    }
 }
-
-
