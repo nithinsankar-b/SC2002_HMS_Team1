@@ -10,6 +10,7 @@ import models.Appointment;
 import models.Inventory;
 import models.Staff;
 import java.util.List;
+import services.UserService;
 
 public class AdministratorController {
 
@@ -17,10 +18,13 @@ public class AdministratorController {
     private final AppointmentService appointmentService;
     private final AdminView adminView;
     private final InventoryService inventoryService;  // Add this field
+    private final UserService userService;  // Add UserService
+    private String loggedInHospitalID; // Store the logged-in hospital ID
 
-    public AdministratorController(AppointmentService appointmentService, ProjectAdminService adminService) {
+    public AdministratorController(AppointmentService appointmentService, ProjectAdminService adminService, UserService userService) {
         this.appointmentService = appointmentService;
         this.adminService = adminService;
+        this.userService = userService;  // Initialize UserService
 
         // Initialize InventoryService
         InventoryDataStore inventoryDataStore = new InventoryDataStore();
@@ -30,13 +34,13 @@ public class AdministratorController {
     }
 
 
-    public void start() {
+    public void start(String loggedInHospitalID) {
         boolean exit = false;
-
+    
         while (!exit) {
             adminView.displayMenu();
             int choice = adminView.getMenuChoice();
-
+    
             switch (choice) {
                 case 1:
                     manageHospitalStaff();
@@ -47,7 +51,11 @@ public class AdministratorController {
                 case 3:
                     manageAppointments();
                     break;
-                case 4:
+                    case 4:
+                    // Call the change password method
+                    adminView.displayChangePassword(loggedInHospitalID); // Ensure this variable is accessible here
+                    break;
+                case 5:
                     exit = true;
                     System.out.println("Exiting Administrator session...");
                     break;
@@ -182,6 +190,13 @@ public class AdministratorController {
         List<Appointment> appointments = appointmentService.viewScheduledAppointments();
         adminView.displayAppointments(appointments);
     }
+
+    // Change password method
+public boolean changePassword(String hospitalID, String oldPassword, String newPassword) {
+    return userService.changePassword(hospitalID, oldPassword, newPassword); // Call the UserService
+}
+
+
 }
 
 

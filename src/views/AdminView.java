@@ -26,7 +26,8 @@ public class AdminView implements IAdministratorView {
         System.out.println("1. Manage Hospital Staff");
         System.out.println("2. Manage Inventory");
         System.out.println("3. View Appointments");
-        System.out.println("4. Exit");
+        System.out.println("4. Change Password"); // Add this option
+        System.out.println("5. Exit");
         System.out.print("Enter your choice: ");
     }
 
@@ -149,6 +150,23 @@ public class AdminView implements IAdministratorView {
         System.out.print("Enter the new low stock alert level: ");
         return scanner.nextInt();
     }
+ // Method to gather old and new passwords for changing password
+ public void displayChangePassword(String hospitalID) {
+    System.out.print("Enter Current Password: ");
+    String oldPassword = scanner.nextLine();
+    
+    System.out.print("Enter New Password: ");
+    String newPassword = scanner.nextLine();
+    
+    // Call the controller to change the password
+    boolean isSuccess = adminController.changePassword(hospitalID, oldPassword, newPassword);
+    if (isSuccess) {
+        System.out.println("Password changed successfully!");
+    } else {
+        System.out.println("Failed to change password. Please check your current password.");
+    }
+}
+
 }
 
 

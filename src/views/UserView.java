@@ -268,23 +268,20 @@ public class UserView {
 
 
     private void navigateToAdministratorPage(User user) {
-    // Create the necessary services for Administrator
-    InventoryDataStore inventoryDataStore = new InventoryDataStore();
-    InventoryService inventoryService = new InventoryService(inventoryDataStore);
-    ProjectAdminService adminService = new ProjectAdminService(new Administrator(user.getHospitalID(), user.getPassword(), null), inventoryService);
-    AppointmentService appointmentService = new AppointmentService();
-
-    // Instantiate AdministratorController
-    AdministratorController adminController = new AdministratorController(appointmentService, adminService);
-
-    // Instantiate AdminView
-    AdminView adminView = new AdminView(adminController, adminService);
-
-    // Start the administrator operations (menu)
-    System.out.println("Navigating to Administrator view...");
-    System.out.println(SEPARATOR);
-    adminController.start();
-}
+        // Create necessary services for Administrator
+        InventoryDataStore inventoryDataStore = new InventoryDataStore();
+        InventoryService inventoryService = new InventoryService(inventoryDataStore);
+        ProjectAdminService adminService = new ProjectAdminService(new Administrator(user.getHospitalID(), user.getPassword(), null), inventoryService);
+        AppointmentService appointmentService = new AppointmentService();
+    
+        // Instantiate AdministratorController
+        AdministratorController adminController = new AdministratorController(appointmentService, adminService, userService);
+    
+        // Start the administrator operations (menu), passing in the logged-in hospital ID
+        System.out.println("Navigating to Administrator view...");
+        System.out.println(SEPARATOR);
+        adminController.start(user.getHospitalID());
+    }
 
 
     /**
