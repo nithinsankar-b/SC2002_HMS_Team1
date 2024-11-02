@@ -1,0 +1,4 @@
+RequestID,DoctorID,PatientID,RequestedDate,RequestedTimeSlot,Status
+R001,D001,P1001,2024-10-30,11:00,Pending
+R002,D001,P1002,2024-10-30,11:30,Pending
+R003,D002,P1003,2024-10-30,16:00,Pending
