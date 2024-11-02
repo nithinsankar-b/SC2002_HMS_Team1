@@ -12,27 +12,17 @@ import services.InventoryService;
 import services.PatientService;
 import services.ProjectAdminService;
 import models.Administrator;
-=======
 import services.PharmacistService;
 import services.DoctorService;
 import services.ScheduleService;
 import services.AppointmentRequestService;
 import services.MedicalRecordService;
-<<<<<<< HEAD
-
 import views.DoctorView;
 import controllers.DoctorController;
 import views.PharmacistView;
-import views.PatientView;
-
-=======
 import stores.InventoryDataStore;
->>>>>>> ee6f697cf201639e22c2a6c58d16a1d20404f9ef
 import models.User;
 import views.PatientView;
-import views.DoctorView;
-import views.PharmacistView;
-
 import java.util.Scanner;
 
 /**
@@ -216,7 +206,6 @@ public class UserView {
         }
     }
 
-<<<<<<< HEAD
     private void navigateToPatientPage(User user) {
         // Create the AppointmentService and PatientService instances
         AppointmentService appointmentService = new AppointmentService();
@@ -298,13 +287,11 @@ public class UserView {
 }
 
 
-=======
     /**
      * Displays the change password interface for the logged-in user.
      * It prompts for the old password and the new password, and attempts
      * to change the password using the UserService.
      */
->>>>>>> ee6f697cf201639e22c2a6c58d16a1d20404f9ef
     public void displayChangePassword() {
         try (Scanner scanner = new Scanner(System.in)) {
             // No need to ask for Hospital ID again
