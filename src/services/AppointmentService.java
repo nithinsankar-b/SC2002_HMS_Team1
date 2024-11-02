@@ -13,16 +13,32 @@ import java.time.LocalTime;
 import java.util.ArrayList;
 import java.util.List;
 
+/**
+ * Service class for managing appointments in a hospital management system.
+ * This class provides functionality to schedule, cancel, reschedule,
+ * and view appointments, as well as to record outcomes and manage
+ * medication statuses.
+ */
 public class AppointmentService implements IAppointmentService {
     private static final String APPOINTMENT_FILE = "data/appointment.csv";
     private List<Appointment> appointments;
 
+    /**
+     * Constructor that initializes the AppointmentService and loads
+     * existing appointments from a CSV file.
+     */
     public AppointmentService() {
         this.appointments = new ArrayList<>();
         createCSVIfNotExists();
         loadAppointmentsFromCSV();
     }
 
+    /**
+     * Schedules a new appointment.
+     *
+     * @param appointment The appointment to be scheduled.
+     * @return true if the appointment was successfully scheduled, false otherwise.
+     */
     @Override
     public boolean scheduleAppointment(Appointment appointment) {
         boolean success = appointments.add(appointment);
@@ -32,6 +48,12 @@ public class AppointmentService implements IAppointmentService {
         return success;
     }
 
+    /**
+     * Cancels an existing appointment.
+     *
+     * @param appointmentId The ID of the appointment to be canceled.
+     * @return true if the appointment was successfully canceled, false otherwise.
+     */
     @Override
     public boolean cancelAppointment(String appointmentId) {
         boolean success = appointments.removeIf(appointment -> appointment.getAppointmentId().equals(appointmentId));
@@ -41,6 +63,13 @@ public class AppointmentService implements IAppointmentService {
         return success;
     }
 
+    /**
+     * Reschedules an existing appointment.
+     *
+     * @param appointmentId The ID of the appointment to be rescheduled.
+     * @param newAppointment The new appointment details.
+     * @return true if the appointment was successfully rescheduled, false otherwise.
+     */
     @Override
     public boolean rescheduleAppointment(String appointmentId, Appointment newAppointment) {
         for (int i = 0; i < appointments.size(); i++) {
@@ -53,11 +82,22 @@ public class AppointmentService implements IAppointmentService {
         return false;
     }
 
+    /**
+     * Views all scheduled appointments.
+     *
+     * @return A list of all scheduled appointments.
+     */
     @Override
     public List<Appointment> viewScheduledAppointments() {
         return new ArrayList<>(appointments); // Return a copy to avoid modification from outside
     }
 
+    /**
+     * Retrieves an appointment by its ID.
+     *
+     * @param appointmentId The ID of the appointment to retrieve.
+     * @return The appointment if found, null otherwise.
+     */
     @Override
     public Appointment getAppointment(String appointmentId) {
         return appointments.stream()
@@ -65,13 +105,27 @@ public class AppointmentService implements IAppointmentService {
                 .findFirst()
                 .orElse(null);
     }
-    
+
+    /**
+     * Retrieves an appointment by its ID. This method reuses the getAppointment method.
+     *
+     * @param appointmentId The ID of the appointment to retrieve.
+     * @return The appointment if found, null otherwise.
+     */
     @Override
     public Appointment getAppointmentById(String appointmentId) {
         return getAppointment(appointmentId); // Reuse existing method
     }
 
-
+    /**
+     * Records the outcome of an appointment, including services provided
+     * and prescribed medications.
+     *
+     * @param appointmentId The ID of the appointment to record the outcome for.
+     * @param serviceProvided The services provided during the appointment.
+     * @param prescribedMedications The list of medications prescribed during the appointment.
+     * @param consultationNotes Additional notes from the consultation.
+     */
     @Override
     public void recordAppointmentOutcome(String appointmentId, String serviceProvided, List<Medication> prescribedMedications, String consultationNotes) {
         Appointment appointment = getAppointment(appointmentId);
@@ -86,7 +140,12 @@ public class AppointmentService implements IAppointmentService {
             saveAppointmentsToCSV();
         }
     }
-    
+
+    /**
+     * Updates the medication status for a given appointment to DISPENSED.
+     *
+     * @param appointmentId The ID of the appointment for which to update the medication status.
+     */
     public void updateMedicationStatus(String appointmentId) {
         Appointment appointment = getAppointment(appointmentId);
         if (appointment != null) {
@@ -95,6 +154,13 @@ public class AppointmentService implements IAppointmentService {
         }
     }
 
+    /**
+     * Retrieves available appointment slots for a specific doctor on a specific date.
+     *
+     * @param doctorId The ID of the doctor.
+     * @param date The date for which to find available slots.
+     * @return A list of available LocalDateTime slots for the specified doctor and date.
+     */
     @Override
     public List<LocalDateTime> getAvailableSlots(String doctorId, LocalDate date) {
         List<LocalDateTime> availableSlots = new ArrayList<>();
