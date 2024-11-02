@@ -33,6 +33,10 @@ public class InventoryService implements IInventoryService {
             bw.write("Medicine Name,Current Stock,Low Level Alert,Replenishment Status");
             bw.newLine();
             for (Inventory item : inventoryDataStore.getInventoryList()) {
+              // Use a default enum value when replenishmentStatus is null
+            String replenishmentStatus = item.getReplenishmentStatus() != null 
+            ? item.getReplenishmentStatus().toString() 
+            : ReplenishmentStatus.REPLENISHED.toString(); // Replace DEFAULT_STATUS with your desired enum
                 String line = String.join(DELIMITER,
                         item.getMedicineName(),
                         String.valueOf(item.getCurrentStock()),

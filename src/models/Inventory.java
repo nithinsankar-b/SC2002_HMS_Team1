@@ -16,7 +16,7 @@ public class Inventory {
         this.currentStock = currentStock;
         this.lowLevelAlert = lowLevelAlert;
         this.replenishmentStatus = replenishmentStatus;
-        this.inventoryStatus = inventoryStatus;
+        this.replenishmentStatus = replenishmentStatus != null ? replenishmentStatus : ReplenishmentStatus.REPLENISHED; // Set default if null
     }
 
     // Getters and setters
