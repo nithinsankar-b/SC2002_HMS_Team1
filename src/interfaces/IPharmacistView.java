@@ -1,25 +1,42 @@
 package interfaces;
 
 import models.Appointment;
-
 import models.Pharmacist;
 import enums.MedicationStatus;
 import models.Patient;
 import java.util.List;
 
+/**
+ * Interface for pharmacist view operations.
+ * This interface defines methods for displaying various information related to patients and appointments.
+ */
+public interface IPharmacistView {
 
-
-public interface IPharmacistView{
-    
-    // Method to display patient details
+    /**
+     * Displays the details of a specified patient.
+     *
+     * @param patient The patient whose details are to be displayed.
+     */
     public void showPatientDetails(Patient patient);
 
-    // Method to display a success message
+    /**
+     * Displays a success message to the user.
+     *
+     * @param message The success message to be displayed.
+     */
     public void showSuccessMessage(String message);
 
-    // Method to display an error message
+    /**
+     * Displays an error message to the user.
+     *
+     * @param message The error message to be displayed.
+     */
     public void showErrorMessage(String message);
 
-    // Method to display the main content of the view (Appointment/AppointmentHistory/MedicalRecord)
+    /**
+     * Displays the main content of the view based on the provided patient ID.
+     *
+     * @param PatientID The ID of the patient for whom the main content is to be displayed.
+     */
     public void display(String PatientID);
 }

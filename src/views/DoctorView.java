@@ -1,6 +1,5 @@
 package views;
 
-
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.util.Scanner;
@@ -14,33 +13,51 @@ import services.MedicalRecordService;
 import services.ScheduleService;
 import services.UserService;
 
+/**
+ * The {@code DoctorView} class provides a user interface for doctors to manage their operations.
+ * It allows doctors to view medical records, manage schedules, handle appointments, and more.
+ */
 public class DoctorView {
-    private final Scanner scanner;
-    private final DoctorController doctorController;
-    private final UserService userService;
-    private final AppointmentRequestService appointmentRequestService;
-    private final ScheduleService scheduleService;
-    private final MedicalRecordService medicalRecordService;
-    private final AppointmentService appointmentService;
-    private final DoctorService doctorService;
-    
+    private final Scanner scanner; // Scanner for user input
+    private final DoctorController doctorController; // Controller for doctor operations
+    private final UserService userService; // Service to manage user details
+    private final AppointmentRequestService appointmentRequestService; // Service for appointment requests
+    private final ScheduleService scheduleService; // Service for managing schedules
+    private final MedicalRecordService medicalRecordService; // Service for managing medical records
+    private final AppointmentService appointmentService; // Service for managing appointments
+    private final DoctorService doctorService; // Service for managing doctor details
 
-    public DoctorView(DoctorController doctorController, DoctorService doctorService, UserService userService,ScheduleService scheduleService,MedicalRecordService medicalRecordService, AppointmentService appointmentService) {
-        this.scanner = new Scanner(System.in); // Do not close scanner here, managed centrally by UserView
+    /**
+     * Constructs a {@code DoctorView} with the specified services and controller.
+     *
+     * @param doctorController the controller for managing doctor operations
+     * @param doctorService the service for managing doctor details
+     * @param userService the service for managing user details
+     * @param scheduleService the service for managing schedules
+     * @param medicalRecordService the service for managing medical records
+     * @param appointmentService the service for managing appointments
+     */
+    public DoctorView(DoctorController doctorController, DoctorService doctorService,
+                      UserService userService, ScheduleService scheduleService,
+                      MedicalRecordService medicalRecordService, AppointmentService appointmentService) {
+        this.scanner = new Scanner(System.in); // Initialize scanner for user input
         this.doctorController = doctorController;
         this.userService = userService;
         this.appointmentService = appointmentService;
-        this.medicalRecordService = medicalRecordService ;
+        this.medicalRecordService = medicalRecordService;
         this.doctorService = doctorService;
         this.scheduleService = scheduleService;
         this.appointmentRequestService = new AppointmentRequestService(scheduleService, appointmentService);
-        
     }
 
-    // Main method to handle different doctor operations
+    /**
+     * Starts the doctor operations, allowing the doctor to interact with the system.
+     *
+     * @param user the user object containing doctor's details
+     */
     public void start(User user) {
         Doctor doctor = doctorService.getDoctorById(user.getHospitalID());
-       // Load doctor details from the User object
+        // Load doctor details from the User object
         if (doctor == null) {
             System.out.println("Doctor record not found for user: " + user.getHospitalID());
             return; // Exit if no doctor record is found
@@ -53,6 +70,35 @@ public class DoctorView {
             int choice = getUserInput();
 
             switch (choice) {
+<<<<<<< HEAD
+                case 1 -> {
+                    System.out.println("Enter Patient ID:");
+                    String p = scanner.nextLine();
+                    doctorController.medicalRecordsView(p);
+                }
+                case 2 -> doctorController.personalScheduleView(doctor);
+                case 3 -> doctorController.upcomingAppointmentsView(doctor);
+                case 4 -> doctorController.pendingAppointmentsView(doctor);
+                case 5 -> doctorController.setToAvailable(doctor);
+                case 6 -> doctorController.setToUnavailable(doctor);
+                case 7 -> doctorController.acceptAppointmentRequest();
+                case 8 -> doctorController.declineAppointmentRequest();
+                case 9 -> doctorController.newPatientDiagnosis();
+                case 10 -> doctorController.newPatientPrescription();
+                case 11 -> doctorController.appointmentOutcomeRecord();
+                case 12 -> changePassword();
+                case 13 -> {
+                    System.out.println("Logging out...");
+                    isRunning = false; // Exit the loop to log out
+                }
+                default -> System.out.println("ERROR: Invalid choice, please try again.");
+            }
+
+            // Only prompt to continue if the user has not chosen to log out
+            if (isRunning) {
+                System.out.println("\nDo you want to continue (Y/N): ");
+                String continueInput = scanner.nextLine().trim().toUpperCase();
+=======
             case 1 ->{ Scanner sc = new Scanner(System.in);
             System.out.println("Enter PatientID");
             String p=sc.nextLine();
@@ -67,30 +113,34 @@ public class DoctorView {
             case 9 -> doctorController.newPatientDiagnosis();
             case 10 -> doctorController.newPatientPrescription();
             case 11 -> doctorController.appointmentOutcomeRecord();
-            case 12 -> changePassword();
-            case 13 -> {
-                System.out.println("Logging out...");
-                isRunning = false; // Exit the loop to log out
-            }
             default -> System.out.println("ERROR: Invalid choice, please try again.");
         }
 
             // Only prompt to continue if the user has not chosen to log out
             if (isRunning) {
-                Scanner sc=new Scanner(System.in);            
-                                System.out.println("\nDo you want to continue (Y/N): ");
-                                String continueInput = sc.nextLine().trim().toUpperCase();
+            	Scanner sc=new Scanner(System.in);
+            
+            	
+                System.out.println("\nDo you want to continue (Y/N): ");
+                
+                String continueInput = sc.nextLine().trim().toUpperCase();
+
+>>>>>>> parent of a4ef980 (Merge pull request #26 from nithinsankar-b/pharma)
                 if (continueInput.equals("N")) {
-                    isRunning = false;                } else if (!continueInput.equals("Y")) {
-                    System.out.println("Invalid input. Please enter Y or N.");                } else {
+                    isRunning = false;
+                } else if (!continueInput.equals("Y")) {
+                    System.out.println("Invalid input. Please enter Y or N.");
+                } else {
                     System.out.println("==============================\n");
                 }
             }
         }
-        // Do not close thescanner here as it's used in the main UserView
+        // Do not close the scanner here as it's used in the main UserView
     }
 
-    // Implementing the display method to show the main menu
+    /**
+     * Displays the menu options for doctor operations.
+     */
     private void displayMenu() {
         System.out.println("Please choose an option:");
         System.out.println("1. View Medical Records");
@@ -98,48 +148,66 @@ public class DoctorView {
         System.out.println("3. View Upcoming Appointments");
         System.out.println("4. View Pending Appointment Requests");
         System.out.println("5. Set Date to Available");
-        System.out.println("6. Set Date to Unavailable");
+        System.out.println("6. Block Out Date");
         System.out.println("7. Accept Appointment Request");
         System.out.println("8. Decline Appointment Request");
         System.out.println("9. Add New Diagnosis for Patient");
         System.out.println("10. Add New Prescription for Patient");
         System.out.println("11. Record Appointment Outcome");
-        System.out.println("12. Change Password");
-        System.out.println("13. Log out");
     }
 
-    // Get user input with error checking
+    /**
+     * Gets user input with error checking.
+     *
+     * @return the choice selected by the user
+     */
     private int getUserInput() {
         int choice = -1;
         try {
             choice = Integer.parseInt(scanner.nextLine());
         } catch (NumberFormatException e) {
-            showErrorMessage("Invalid input. Please enter a number between 1 and 10.");
+            showErrorMessage("Invalid input. Please enter a number between 1 and 13.");
         }
         return choice;
     }
 
-   
+    /**
+     * Displays a success message to the user.
+     *
+     * @param message the message to be displayed
+     */
     public void showSuccessMessage(String message) {
         System.out.println("SUCCESS: " + message);
     }
 
-   
+    /**
+     * Displays an error message to the user.
+     *
+     * @param message the message to be displayed
+     */
     public void showErrorMessage(String message) {
         System.out.println("ERROR: " + message);
     }
-    private void changePassword()
-    {
-      Scanner sc=new Scanner(System.in);
-      System.out.println("Enter Hospital ID");
-      String id = sc.nextLine();
-      
-      System.out.println("Enter old password");
-      String oldPassword = sc.nextLine();
-      
-      System.out.println("Enter new password");
-      String newPassword = sc.nextLine();
-      
-      doctorController.changePassword(id, oldPassword, newPassword);
+<<<<<<< HEAD
+
+    /**
+     * Prompts the user to change their password.
+     */
+    private void changePassword() {
+        System.out.println("Enter Hospital ID:");
+        String id = scanner.nextLine();
+        
+        System.out.println("Enter old password:");
+        String oldPassword = scanner.nextLine();
+        
+        System.out.println("Enter new password:");
+        String newPassword = scanner.nextLine();
+        
+        doctorController.changePassword(id, oldPassword, newPassword);
     }
 }
+=======
+}
+
+
+>>>>>>> parent of a4ef980 (Merge pull request #26 from nithinsankar-b/pharma)
