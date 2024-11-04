@@ -1,4 +1,5 @@
 package controllers;
+
 import views.AdminView;
 import services.AppointmentService;
 import services.InventoryService;
@@ -12,28 +13,42 @@ import models.Staff;
 import java.util.List;
 import services.UserService;
 
+/**
+ * The AdministratorController class handles the core functionalities
+ * for the administrator, including managing staff, inventory, and appointments.
+ */
 public class AdministratorController {
 
     private final ProjectAdminService adminService;
     private final AppointmentService appointmentService;
     private final AdminView adminView;
-    private final InventoryService inventoryService;  // Add this field
-    private final UserService userService;  // Add UserService
-    private String loggedInHospitalID; // Store the logged-in hospital ID
+    private final InventoryService inventoryService;
+    private final UserService userService;
+    private String loggedInHospitalID;
 
+    /**
+     * Constructor for AdministratorController.
+     *
+     * @param appointmentService  Service to manage appointments.
+     * @param adminService        Service to manage administrative tasks.
+     * @param userService         Service to handle user-related operations.
+     */
     public AdministratorController(AppointmentService appointmentService, ProjectAdminService adminService, UserService userService) {
         this.appointmentService = appointmentService;
         this.adminService = adminService;
-        this.userService = userService;  // Initialize UserService
+        this.userService = userService;
 
-        // Initialize InventoryService
         InventoryDataStore inventoryDataStore = new InventoryDataStore();
         this.inventoryService = new InventoryService(inventoryDataStore);
 
-        this.adminView = new AdminView(this, adminService);  // Pass `this` and `adminService` to AdminView
+        this.adminView = new AdminView(this, adminService);
     }
 
-
+    /**
+     * Starts the administrator session and displays the main menu.
+     *
+     * @param loggedInHospitalID The hospital ID of the logged-in administrator.
+     */
     public void start(String loggedInHospitalID) {
         boolean exit = false;
     
@@ -51,9 +66,8 @@ public class AdministratorController {
                 case 3:
                     manageAppointments();
                     break;
-                    case 4:
-                    // Call the change password method
-                    adminView.displayChangePassword(loggedInHospitalID); // Ensure this variable is accessible here
+                case 4:
+                    adminView.displayChangePassword(loggedInHospitalID);
                     break;
                 case 5:
                     exit = true;
@@ -65,6 +79,9 @@ public class AdministratorController {
         }
     }
 
+    /**
+     * Manages hospital staff, including adding, updating, and removing staff.
+     */
     public void manageHospitalStaff() {
         boolean exit = false;
 
@@ -101,7 +118,7 @@ public class AdministratorController {
                     break;
 
                 case 4:
-                    exit = true;  // Return to main menu
+                    exit = true;
                     break;
 
                 default:
@@ -110,6 +127,9 @@ public class AdministratorController {
         }
     }
 
+    /**
+     * Manages inventory, including adding, updating, and removing medications.
+     */
     public void manageInventory() {
         boolean exit = false;
 
@@ -173,11 +193,11 @@ public class AdministratorController {
                     break;
 
                 case 6:
-                    inventoryService.viewMedicationInventory();  // This should display the inventory
+                    inventoryService.viewMedicationInventory();
                     break;
 
                 case 7:
-                    exit = true;  // Return to main menu
+                    exit = true;
                     break;
 
                 default:
@@ -186,18 +206,27 @@ public class AdministratorController {
         }
     }
 
+    /**
+     * Manages appointments, displaying the list of scheduled appointments.
+     */
     public void manageAppointments() {
         List<Appointment> appointments = appointmentService.viewScheduledAppointments();
         adminView.displayAppointments(appointments);
     }
 
-    // Change password method
-public boolean changePassword(String hospitalID, String oldPassword, String newPassword) {
-    return userService.changePassword(hospitalID, oldPassword, newPassword); // Call the UserService
+    /**
+     * Changes the password for the administrator.
+     *
+     * @param hospitalID   The hospital ID of the administrator.
+     * @param oldPassword  The current password.
+     * @param newPassword  The new password.
+     * @return True if the password was successfully changed, false otherwise.
+     */
+    public boolean changePassword(String hospitalID, String oldPassword, String newPassword) {
+        return userService.changePassword(hospitalID, oldPassword, newPassword);
+    }
 }
 
-
-}
 
 
 

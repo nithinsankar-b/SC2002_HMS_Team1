@@ -10,17 +10,28 @@ import java.io.FileWriter;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
+
+/**
+ * The InventoryDataStore class is responsible for managing the inventory data,
+ * including loading from and writing to a CSV file.
+ */
 public class InventoryDataStore {
 
     private List<Inventory> inventoryList;
 
+    /**
+     * Constructs an InventoryDataStore and loads the inventory data from a CSV file.
+     */
     public InventoryDataStore() {
         this.inventoryList = new ArrayList<>();
         loadInventoryFromCSV();
     }
-    
+
+    /**
+     * Loads inventory data from a CSV file and populates the inventory list.
+     */
     private void loadInventoryFromCSV() {
-        String line="";
+        String line = "";
         try (BufferedReader br = new BufferedReader(new FileReader("data/inventory.csv"))) {
             boolean isFirstLine = true; // Flag to skip the header
 
@@ -31,11 +42,10 @@ public class InventoryDataStore {
                 }
 
                 String[] values = line.split(",");
-                // Ensure values have the correct length
                 if (values.length >= 4) {
-                    String medicineName = values[0].trim(); // Trim whitespace
-                    int currentStock = Integer.parseInt(values[1].trim()); // Trim whitespace
-                    int lowLevelAlert = Integer.parseInt(values[2].trim()); // Trim whitespace
+                    String medicineName = values[0].trim();
+                    int currentStock = Integer.parseInt(values[1].trim());
+                    int lowLevelAlert = Integer.parseInt(values[2].trim());
                     ReplenishmentStatus replenishmentStatus;
                     try {
                         replenishmentStatus = ReplenishmentStatus.REPLENISHED;
@@ -43,8 +53,6 @@ public class InventoryDataStore {
                         System.out.println("Invalid ReplenishmentStatus in line: " + line + ". Defaulting to PENDING.");
                         replenishmentStatus = ReplenishmentStatus.PENDING; // Default value
                     }
-
-                    
 
                     inventoryList.add(new Inventory(medicineName, currentStock, lowLevelAlert, replenishmentStatus));
                 } else {
@@ -58,20 +66,38 @@ public class InventoryDataStore {
         }
     }
 
-    // Initialize inventory list
+    /**
+     * Retrieves the list of inventory items.
+     *
+     * @return A list of Inventory objects.
+     */
     public List<Inventory> getInventoryList() {
         return inventoryList;
     }
 
+    /**
+     * Sets the list of inventory items.
+     *
+     * @param inventoryList The new list of Inventory objects.
+     */
     public void setInventoryList(List<Inventory> inventoryList) {
         this.inventoryList = inventoryList;
     }
 
-    // Add individual inventory item
+    /**
+     * Adds a single inventory item to the list.
+     *
+     * @param inventory The Inventory object to be added.
+     */
     public void addInventory(Inventory inventory) {
         inventoryList.add(inventory);
     }
 
+    /**
+     * Writes the current inventory list to a specified CSV file.
+     *
+     * @param inventoryCsvPath The path to the CSV file.
+     */
     public void writeInventoryToCSV(String inventoryCsvPath) {
         try (BufferedWriter writer = new BufferedWriter(new FileWriter(inventoryCsvPath))) {
             // Write header
@@ -91,3 +117,4 @@ public class InventoryDataStore {
         }
     }
 }
+

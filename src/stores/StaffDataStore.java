@@ -5,10 +5,20 @@ import java.io.*;
 import java.util.HashMap;
 import java.util.Map;
 
+/**
+ * The StaffDataStore class is responsible for managing staff data,
+ * including loading from and writing to a CSV file.
+ */
 public class StaffDataStore {
+
     private Map<String, Staff> staffList = new HashMap<>();
 
-    // Load staff data from CSV file
+    /**
+     * Loads staff data from a CSV file and populates the staff list.
+     *
+     * @param csvFilePath The path to the CSV file.
+     * @throws IOException If an error occurs while reading the file.
+     */
     public void loadStaffFromCSV(String csvFilePath) throws IOException {
         BufferedReader reader = new BufferedReader(new FileReader(csvFilePath));
         String line;
@@ -27,7 +37,12 @@ public class StaffDataStore {
         reader.close();
     }
 
-    // Write staff data to CSV file
+    /**
+     * Writes the current staff list to a specified CSV file.
+     *
+     * @param csvFilePath The path to the CSV file.
+     * @throws IOException If an error occurs while writing the file.
+     */
     public void writeStaffToCSV(String csvFilePath) throws IOException {
         BufferedWriter writer = new BufferedWriter(new FileWriter(csvFilePath));
         for (Staff staff : staffList.values()) {
@@ -39,22 +54,34 @@ public class StaffDataStore {
         writer.close();
     }
 
-    // Method to add or update a staff member
+    /**
+     * Adds a new staff member or updates an existing one.
+     *
+     * @param staff The Staff object to be added or updated.
+     */
     public void addOrUpdateStaff(Staff staff) {
-        // If the staff ID exists, it will be updated; otherwise, it will be added
         staffList.put(staff.getId(), staff);
     }
 
-    // Method to remove a staff member by ID
+    /**
+     * Removes a staff member from the list by their ID.
+     *
+     * @param staffId The ID of the staff member to be removed.
+     */
     public void removeStaff(String staffId) {
         staffList.remove(staffId);
     }
 
-    // Getter for staffList
+    /**
+     * Retrieves the list of all staff members.
+     *
+     * @return A map of staff IDs to Staff objects.
+     */
     public Map<String, Staff> getStaffList() {
         return staffList;
     }
 }
+
 
 
 

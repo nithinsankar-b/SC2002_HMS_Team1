@@ -10,22 +10,33 @@ import interfaces.IProjectAdmService;
 import java.io.IOException;
 import java.util.List;
 
+/**
+ * The ProjectAdminService class implements the IProjectAdmService interface
+ * and provides methods for managing both staff and inventory. It uses dependency
+ * injection for inventory management and handles the interaction with data stores.
+ */
 public class ProjectAdminService implements IProjectAdmService {
+
     private Administrator administrator;
     private StaffDataStore staffDataStore;
     private IInventoryService inventoryService;
 
     private static final String STAFF_CSV_PATH = "data/Staff_List.csv";
 
-    // Constructor for the service, initializing with an Administrator and injected InventoryService
+    /**
+     * Constructs a ProjectAdminService with the specified Administrator and IInventoryService.
+     * Loads staff data from a CSV file upon initialization.
+     *
+     * @param administrator   The administrator managing the service.
+     * @param inventoryService The inventory service to manage inventory-related operations.
+     */
     public ProjectAdminService(Administrator administrator, IInventoryService inventoryService) {
         this.administrator = administrator;
         this.staffDataStore = new StaffDataStore();
-        this.inventoryService = inventoryService;  // Dependency injection for inventoryService
+        this.inventoryService = inventoryService;
 
         try {
-            // Load CSV files for staff
-            staffDataStore.loadStaffFromCSV(STAFF_CSV_PATH);  // Load staff data from CSV
+            staffDataStore.loadStaffFromCSV(STAFF_CSV_PATH);
         } catch (IOException e) {
             System.err.println("Error loading data: " + e.getMessage());
         }
@@ -33,26 +44,37 @@ public class ProjectAdminService implements IProjectAdmService {
 
     // ---------------------- Staff Management ----------------------
 
+    /**
+     * Adds or updates a staff member in the system.
+     *
+     * @param staffMember The staff member to be added or updated.
+     */
     @Override
     public void addOrUpdateStaff(Staff staffMember) {
-        staffDataStore.addOrUpdateStaff(staffMember);  // Add or update staff
+        staffDataStore.addOrUpdateStaff(staffMember);
         try {
-            staffDataStore.writeStaffToCSV(STAFF_CSV_PATH);  // Save to CSV
+            staffDataStore.writeStaffToCSV(STAFF_CSV_PATH);
             System.out.println("Staff member added/updated: " + staffMember.getId());
         } catch (IOException e) {
             System.err.println("Error saving staff data: " + e.getMessage());
         }
     }
 
+    /**
+     * Removes a staff member from the system by their ID.
+     *
+     * @param staffId The ID of the staff member to be removed.
+     * @return True if the staff member was successfully removed, false otherwise.
+     */
     @Override
     public boolean removeStaff(String staffId) {
         if (!staffDataStore.getStaffList().containsKey(staffId)) {
             System.out.println("Staff not found for ID: " + staffId);
-            return false;  // Staff not found
+            return false;
         }
-        staffDataStore.removeStaff(staffId);  // Remove staff by ID
+        staffDataStore.removeStaff(staffId);
         try {
-            staffDataStore.writeStaffToCSV(STAFF_CSV_PATH);  // Save to CSV after removal
+            staffDataStore.writeStaffToCSV(STAFF_CSV_PATH);
             System.out.println("Staff member removed: " + staffId);
             return true;
         } catch (IOException e) {
@@ -61,6 +83,11 @@ public class ProjectAdminService implements IProjectAdmService {
         }
     }
 
+    /**
+     * Retrieves a list of all staff members.
+     *
+     * @return A list of all staff members.
+     */
     @Override
     public List<Staff> getAllStaff() {
         return List.copyOf(staffDataStore.getStaffList().values());
@@ -68,14 +95,21 @@ public class ProjectAdminService implements IProjectAdmService {
 
     // ---------------------- Inventory Management ----------------------
 
-    // Update stock level for a given medicine
+    /**
+     * Updates the stock level for a specific medication.
+     *
+     * @param medicineName The name of the medication.
+     * @param quantity     The new stock level.
+     * @return True if the stock level was successfully updated, false otherwise.
+     */
+    @Override
     public boolean updateStockLevel(String medicineName, int quantity) {
-        List<Inventory> inventoryList = inventoryService.getInventoryList(); // Use inventoryService
+        List<Inventory> inventoryList = inventoryService.getInventoryList();
 
         for (Inventory item : inventoryList) {
             if (item.getMedicineName().equalsIgnoreCase(medicineName)) {
                 item.setCurrentStock(quantity);
-                inventoryService.updateInventory(item);  // Update through inventoryService
+                inventoryService.updateInventory(item);
                 System.out.println("Updated stock level for " + medicineName);
                 return true;
             }
@@ -84,13 +118,20 @@ public class ProjectAdminService implements IProjectAdmService {
         return false;
     }
 
-    // Update low stock alert level for a medicine
+    /**
+     * Updates the low stock alert level for a specific medication.
+     *
+     * @param medicineName  The name of the medication.
+     * @param lowStockLevel The new low stock alert level.
+     * @return True if the low stock alert level was successfully updated, false otherwise.
+     */
+    @Override
     public boolean updateLowStockAlert(String medicineName, int lowStockLevel) {
-        List<Inventory> inventoryList = inventoryService.getInventoryList(); // Use inventoryService
+        List<Inventory> inventoryList = inventoryService.getInventoryList();
         for (Inventory item : inventoryList) {
             if (item.getMedicineName().equalsIgnoreCase(medicineName)) {
                 item.setLowLevelAlert(lowStockLevel);
-                inventoryService.updateInventory(item);  // Update through inventoryService
+                inventoryService.updateInventory(item);
                 System.out.println("Updated low stock alert for " + medicineName);
                 return true;
             }
@@ -99,13 +140,25 @@ public class ProjectAdminService implements IProjectAdmService {
         return false;
     }
 
+    /**
+     * Adds a new medication to the inventory.
+     *
+     * @param newMedication The new medication to be added.
+     */
     public void addMedication(Inventory newMedication) {
-        inventoryService.addMedication(newMedication);  // Delegate to inventoryService
+        inventoryService.addMedication(newMedication);
         System.out.println("Medication added successfully: " + newMedication.getMedicineName());
     }
 
+    /**
+     * Removes a medication from the inventory.
+     *
+     * @param medicineName The name of the medication to be removed.
+     * @return True if the medication was successfully removed, false otherwise.
+     */
+    @Override
     public boolean removeMedication(String medicineName) {
-        boolean removed = inventoryService.removeMedication(medicineName);  // Delegate to inventoryService
+        boolean removed = inventoryService.removeMedication(medicineName);
         if (removed) {
             System.out.println("Medication removed successfully: " + medicineName);
         } else {
@@ -114,15 +167,28 @@ public class ProjectAdminService implements IProjectAdmService {
         return removed;
     }
 
+    /**
+     * Retrieves a list of all inventory items.
+     *
+     * @return A list of all inventory items.
+     */
+    @Override
     public List<Inventory> getAllInventory() {
-        return inventoryService.getInventoryList();  // Delegate to inventoryService
+        return inventoryService.getInventoryList();
     }
 
+    /**
+     * Approves a replenishment request for a specific medication.
+     *
+     * @param medicineName The name of the medication.
+     * @return True if the replenishment request was successfully approved, false otherwise.
+     */
+    @Override
     public boolean approveReplenishmentRequest(String medicineName) {
-        // Call the approveReplenishmentRequest method in inventoryService
         return inventoryService.approveReplenishmentRequest(medicineName);
     }
 }
+
 
 
 

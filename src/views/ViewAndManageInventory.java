@@ -3,7 +3,6 @@ package views;
 import models.Appointment;
 import models.Inventory;
 import models.Staff;
-import models.SubmitReplenishmentRequest;
 import interfaces.IAdministratorView;
 import interfaces.IInventoryService;
 import enums.ReplenishmentStatus;
@@ -11,15 +10,29 @@ import enums.ReplenishmentStatus;
 import java.util.List;
 import java.util.Scanner;
 
+/**
+ * The ViewAndManageInventory class implements the IAdministratorView interface
+ * and provides methods for viewing and managing the inventory, including adding,
+ * removing, updating stock levels, and handling replenishment requests.
+ */
 public class ViewAndManageInventory implements IAdministratorView {
+
     private final Scanner scanner = new Scanner(System.in);
     private final IInventoryService inventoryService;
 
+    /**
+     * Constructs a ViewAndManageInventory object with the specified IInventoryService.
+     *
+     * @param inventoryService The service for managing inventory operations.
+     */
     public ViewAndManageInventory(IInventoryService inventoryService) {
         this.inventoryService = inventoryService;
     }
 
-    // Method to display the menu and get user input
+    /**
+     * Displays the Inventory Management menu.
+     */
+    @Override
     public void displayMenu() {
         System.out.println("\n-- Inventory Management --");
         System.out.println("1. Add New Medication");
@@ -32,52 +45,64 @@ public class ViewAndManageInventory implements IAdministratorView {
         System.out.print("Choose an option: ");
     }
 
-    // Method to get the user's menu choice
+    /**
+     * Retrieves the user's menu choice from the Inventory Management menu.
+     *
+     * @return The selected menu option as an integer.
+     */
+    @Override
     public int getMenuChoice() {
         int choice = scanner.nextInt();
         scanner.nextLine();  // Consume the newline character
         return choice;
     }
 
-// Method to get the details of a new medication
-public Inventory getNewMedicationDetails() {
-    System.out.print("Enter Medicine Name: ");
-    String name = scanner.nextLine();
-    
-    System.out.print("Enter Initial Stock Level: ");
-    int stock = scanner.nextInt();
-    
-    System.out.print("Enter Low Stock Alert Level: ");
-    int lowStockAlert = scanner.nextInt();
-    
-    scanner.nextLine(); // Consume the newline left-over from nextInt()
+    /**
+     * Gathers details for a new medication to be added to the inventory.
+     *
+     * @return A new Inventory object with the provided details.
+     */
+    public Inventory getNewMedicationDetails() {
+        System.out.print("Enter Medicine Name: ");
+        String name = scanner.nextLine();
 
-    // Loop until a valid replenishment status is entered or default to PENDING
-    ReplenishmentStatus replenishmentStatus = null;
-    while (replenishmentStatus == null) {
-        System.out.print("Enter Replenishment Status (e.g., REPLENISHED, PENDING): ");
-        String replenishmentStatusStr = scanner.nextLine().toUpperCase();
+        System.out.print("Enter Initial Stock Level: ");
+        int stock = scanner.nextInt();
 
-        try {
-            replenishmentStatus = ReplenishmentStatus.valueOf(replenishmentStatusStr);
-        } catch (IllegalArgumentException e) {
-            System.out.println("Invalid Replenishment Status. Defaulting to PENDING.");
-            replenishmentStatus = ReplenishmentStatus.PENDING; // Default value if input is invalid
+        System.out.print("Enter Low Stock Alert Level: ");
+        int lowStockAlert = scanner.nextInt();
+
+        scanner.nextLine(); // Consume the newline left-over from nextInt()
+
+        // Loop until a valid replenishment status is entered or default to PENDING
+        ReplenishmentStatus replenishmentStatus = null;
+        while (replenishmentStatus == null) {
+            System.out.print("Enter Replenishment Status (e.g., REPLENISHED, PENDING): ");
+            String replenishmentStatusStr = scanner.nextLine().toUpperCase();
+
+            try {
+                replenishmentStatus = ReplenishmentStatus.valueOf(replenishmentStatusStr);
+            } catch (IllegalArgumentException e) {
+                System.out.println("Invalid Replenishment Status. Defaulting to PENDING.");
+                replenishmentStatus = ReplenishmentStatus.PENDING; // Default value if input is invalid
+            }
         }
+
+        return new Inventory(name, stock, lowStockAlert, replenishmentStatus);
     }
 
-    return new Inventory(name, stock, lowStockAlert, replenishmentStatus);
-}
-
-
-    // Method to add new medication
+    /**
+     * Adds a new medication to the inventory.
+     */
     public void addNewMedication() {
         Inventory newMedication = getNewMedicationDetails();
         inventoryService.addMedication(newMedication);
         System.out.println("Medication added: " + newMedication.getMedicineName());
     }
 
-    // Method to remove a medication by name
+    /**
+     * Removes a medication from the inventory by its name.
+     */
     public void removeMedication() {
         System.out.print("Enter Medicine Name to Remove: ");
         String medicineName = scanner.nextLine();
@@ -89,7 +114,9 @@ public Inventory getNewMedicationDetails() {
         }
     }
 
-    // Method to update the stock level of a medication
+    /**
+     * Updates the stock level of a specific medication.
+     */
     public void updateStockLevel() {
         System.out.print("Enter Medicine Name: ");
         String medicineName = scanner.nextLine();
@@ -103,7 +130,9 @@ public Inventory getNewMedicationDetails() {
         }
     }
 
-    // Method to update the low stock alert level
+    /**
+     * Updates the low stock alert level for a specific medication.
+     */
     public void updateLowStockAlert() {
         System.out.print("Enter Medicine Name: ");
         String medicineName = scanner.nextLine();
@@ -117,9 +146,11 @@ public Inventory getNewMedicationDetails() {
         }
     }
 
-
-
-    // Method to display inventory details
+    /**
+     * Displays the inventory details.
+     *
+     * @param inventoryList The list of Inventory objects to be displayed.
+     */
     @Override
     public void displayInventory(List<Inventory> inventoryList) {
         System.out.println("=== Inventory ===");
@@ -135,43 +166,77 @@ public Inventory getNewMedicationDetails() {
         }
     }
 
-    // Not used in this view, but required by the interface
-
-    // Method to display all inventory items
+    /**
+     * Displays all inventory items.
+     */
     public void viewInventory() {
         List<Inventory> inventoryList = inventoryService.getInventoryList();
         displayInventory(inventoryList);
     }
 
+    // Not used in this view, but required by the interface
+
+    /**
+     * This method is not applicable for this view as it does not handle staff management.
+     *
+     * @param staffList The list of Staff objects (not used).
+     */
     @Override
     public void displayListOfStaff(List<Staff> staffList) {
-        // TODO Auto-generated method stub
         throw new UnsupportedOperationException("Unimplemented method 'displayListOfStaff'");
     }
 
+    /**
+     * This method is not applicable for this view as it does not handle appointments.
+     *
+     * @param appointments The list of Appointment objects (not used).
+     */
     @Override
     public void displayAppointments(List<Appointment> appointments) {
-        // TODO Auto-generated method stub
         throw new UnsupportedOperationException("Unimplemented method 'displayAppointments'");
     }
-        // Get the name of the medicine to remove
-        public String getMedicineNameForRemoval() {
-            System.out.print("Enter Medicine Name to Remove: ");
-            return scanner.nextLine();
-        }
-        public String getMedicineName() {
-            System.out.print("Enter Medicine Name: ");
-            return scanner.nextLine();
-        }
-        public int getMedicineQuantity() {
-            System.out.print("Enter Medicine Quantity: ");
-            return scanner.nextInt();
-        }
-        public int getLowStockAlertLevel() {
-            System.out.print("Enter the new low stock alert level: ");
-            return scanner.nextInt();
-        }
+
+    /**
+     * Prompts the user to enter a medicine name for removal.
+     *
+     * @return The medicine name entered by the user.
+     */
+    public String getMedicineNameForRemoval() {
+        System.out.print("Enter Medicine Name to Remove: ");
+        return scanner.nextLine();
+    }
+
+    /**
+     * Prompts the user to enter a medicine name.
+     *
+     * @return The medicine name entered by the user.
+     */
+    public String getMedicineName() {
+        System.out.print("Enter Medicine Name: ");
+        return scanner.nextLine();
+    }
+
+    /**
+     * Prompts the user to enter a medicine quantity.
+     *
+     * @return The quantity entered by the user.
+     */
+    public int getMedicineQuantity() {
+        System.out.print("Enter Medicine Quantity: ");
+        return scanner.nextInt();
+    }
+
+    /**
+     * Prompts the user to enter a new low stock alert level for a medication.
+     *
+     * @return The low stock alert level entered by the user.
+     */
+    public int getLowStockAlertLevel() {
+        System.out.print("Enter the new low stock alert level: ");
+        return scanner.nextInt();
+    }
 }
+
 
 
 
