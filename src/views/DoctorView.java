@@ -70,6 +70,7 @@ public class DoctorView {
             int choice = getUserInput();
 
             switch (choice) {
+<<<<<<< HEAD
                 case 1 -> {
                     System.out.println("Enter Patient ID:");
                     String p = scanner.nextLine();
@@ -97,6 +98,34 @@ public class DoctorView {
             if (isRunning) {
                 System.out.println("\nDo you want to continue (Y/N): ");
                 String continueInput = scanner.nextLine().trim().toUpperCase();
+=======
+            case 1 ->{ Scanner sc = new Scanner(System.in);
+            System.out.println("Enter PatientID");
+            String p=sc.nextLine();
+            doctorController.medicalRecordsView(p);}
+            case 2 -> doctorController.personalScheduleView(doctor);
+            case 3 -> doctorController.upcomingAppointmentsView(doctor);
+            case 4 -> doctorController.pendingAppointmentsView(doctor);
+            case 5 -> doctorController.setToAvailable(doctor);
+            case 6 -> doctorController.setToUnavailable(doctor);
+            case 7 -> doctorController.acceptAppointmentRequest();
+            case 8 -> doctorController.declineAppointmentRequest();
+            case 9 -> doctorController.newPatientDiagnosis();
+            case 10 -> doctorController.newPatientPrescription();
+            case 11 -> doctorController.appointmentOutcomeRecord();
+            default -> System.out.println("ERROR: Invalid choice, please try again.");
+        }
+
+            // Only prompt to continue if the user has not chosen to log out
+            if (isRunning) {
+            	Scanner sc=new Scanner(System.in);
+            
+            	
+                System.out.println("\nDo you want to continue (Y/N): ");
+                
+                String continueInput = sc.nextLine().trim().toUpperCase();
+
+>>>>>>> parent of a4ef980 (Merge pull request #26 from nithinsankar-b/pharma)
                 if (continueInput.equals("N")) {
                     isRunning = false;
                 } else if (!continueInput.equals("Y")) {
@@ -119,14 +148,12 @@ public class DoctorView {
         System.out.println("3. View Upcoming Appointments");
         System.out.println("4. View Pending Appointment Requests");
         System.out.println("5. Set Date to Available");
-        System.out.println("6. Set Date to Unavailable");
+        System.out.println("6. Block Out Date");
         System.out.println("7. Accept Appointment Request");
         System.out.println("8. Decline Appointment Request");
         System.out.println("9. Add New Diagnosis for Patient");
         System.out.println("10. Add New Prescription for Patient");
         System.out.println("11. Record Appointment Outcome");
-        System.out.println("12. Change Password");
-        System.out.println("13. Log out");
     }
 
     /**
@@ -161,6 +188,7 @@ public class DoctorView {
     public void showErrorMessage(String message) {
         System.out.println("ERROR: " + message);
     }
+<<<<<<< HEAD
 
     /**
      * Prompts the user to change their password.
@@ -178,3 +206,8 @@ public class DoctorView {
         doctorController.changePassword(id, oldPassword, newPassword);
     }
 }
+=======
+}
+
+
+>>>>>>> parent of a4ef980 (Merge pull request #26 from nithinsankar-b/pharma)

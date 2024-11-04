@@ -3,11 +3,6 @@ package controllers;
 import services.DoctorService;
 import services.AppointmentService;
 import services.ScheduleService;
-import services.UserService;
-import views.PatientMedicalRecordView;
-import views.PendingAppointmentRequestView;
-import views.PersonalScheduleView;
-import views.UpcomingAppointmentsView;
 import services.AppointmentRequestService;
 import services.MedicalRecordService;
 
@@ -20,6 +15,7 @@ import java.util.Scanner;
  * data related to appointments, schedules, and patient records.
  */
 public class DoctorController {
+<<<<<<< HEAD
 
     private final DoctorService doctorService;
     private final AppointmentService appointmentService;
@@ -31,6 +27,18 @@ public class DoctorController {
     private final PendingAppointmentRequestView viewPendingAppointmentRequest;
     private final PersonalScheduleView personalScheduleView;
     private final UpcomingAppointmentsView viewUpcomingAppointments;
+=======
+	private final DoctorService doctorService;
+    private final AppointmentService appointmentService;
+	private final ScheduleService scheduleService;
+	private final AppointmentRequestService appointmentRequestService;
+	private final MedicalRecordService medicalRecordService;
+    private final views.MedicalRecordsView medicalRecordsView;
+    private final views.PendingAppointmentRequestView viewPendingAppointmentRequest;
+    private final views.PersonalScheduleView personalScheduleView;
+    private final views.UpcomingAppointmentsView viewUpcomingAppointments;
+    
+>>>>>>> parent of a4ef980 (Merge pull request #26 from nithinsankar-b/pharma)
 
     /**
      * Constructs a DoctorController with the necessary services and initializes views.
@@ -46,6 +54,7 @@ public class DoctorController {
         this.medicalRecordService = medicalRecordService;
         this.scheduleService = scheduleService;
         this.appointmentRequestService = new AppointmentRequestService(scheduleService, appointmentService);
+<<<<<<< HEAD
         this.userService = new UserService();
 
         // Initialize views
@@ -53,6 +62,15 @@ public class DoctorController {
         this.viewPendingAppointmentRequest = new PendingAppointmentRequestView(scheduleService, appointmentService);
         this.personalScheduleView = new PersonalScheduleView(scheduleService);
         this.viewUpcomingAppointments = new UpcomingAppointmentsView(scheduleService);
+=======
+		
+        // the views
+        this.medicalRecordsView = new views.MedicalRecordsView(medicalRecordService);
+        this.viewPendingAppointmentRequest = new views.PendingAppointmentRequestView(scheduleService, appointmentService);
+        this.personalScheduleView = new views.PersonalScheduleView(scheduleService);
+        this.viewUpcomingAppointments = new views.UpcomingAppointmentsView(scheduleService);
+        
+>>>>>>> parent of a4ef980 (Merge pull request #26 from nithinsankar-b/pharma)
     }
 
     /**
@@ -61,7 +79,12 @@ public class DoctorController {
      * @param patientId The ID of the patient whose records are to be viewed.
      */
     public void medicalRecordsView(String patientId) {
+<<<<<<< HEAD
         medicalRecordsView.printMedicalRecords(patientId);
+=======
+    	
+    	medicalRecordsView.printMedicalRecords(patientId);
+>>>>>>> parent of a4ef980 (Merge pull request #26 from nithinsankar-b/pharma)
     }
 
     /**
@@ -70,7 +93,11 @@ public class DoctorController {
      * @param doctor The doctor whose pending appointment requests are to be viewed.
      */
     public void pendingAppointmentsView(Doctor doctor) {
+<<<<<<< HEAD
         viewPendingAppointmentRequest.displayPendingRequests(doctor);
+=======
+    	viewPendingAppointmentRequest.displayPendingRequests(doctor);
+>>>>>>> parent of a4ef980 (Merge pull request #26 from nithinsankar-b/pharma)
     }
 
     /**
@@ -79,7 +106,11 @@ public class DoctorController {
      * @param doctor The doctor whose personal schedule is to be viewed.
      */
     public void personalScheduleView(Doctor doctor) {
+<<<<<<< HEAD
         personalScheduleView.displayPersonalSchedule(doctor);
+=======
+    	personalScheduleView.displayPersonalSchedule(doctor);
+>>>>>>> parent of a4ef980 (Merge pull request #26 from nithinsankar-b/pharma)
     }
 
     /**
@@ -88,27 +119,45 @@ public class DoctorController {
      * @param doctor The doctor whose upcoming appointments are to be viewed.
      */
     public void upcomingAppointmentsView(Doctor doctor) {
+<<<<<<< HEAD
         viewUpcomingAppointments.displayUpcomingAppointments(doctor);
+=======
+    	viewUpcomingAppointments.displayUpcomingAppointments(doctor);
+>>>>>>> parent of a4ef980 (Merge pull request #26 from nithinsankar-b/pharma)
     }
 
     /**
      * Accepts an appointment request by request ID.
      */
     public void acceptAppointmentRequest() {
+<<<<<<< HEAD
         Scanner sc = new Scanner(System.in);
         System.out.println("Enter RequestID: ");
         String reqId = sc.nextLine();
         doctorService.acceptanceOfRequest(reqId);
+=======
+    	Scanner sc = new Scanner(System.in);
+    	System.out.println("Enter RequestID: ");
+    	String reqId = sc.nextLine();
+    	doctorService.acceptanceOfRequest(reqId);
+>>>>>>> parent of a4ef980 (Merge pull request #26 from nithinsankar-b/pharma)
     }
 
     /**
      * Declines an appointment request by request ID.
      */
     public void declineAppointmentRequest() {
+<<<<<<< HEAD
         Scanner sc = new Scanner(System.in);
         System.out.println("Enter RequestID: ");
         String reqId = sc.nextLine();
         doctorService.declineRequest(reqId);
+=======
+    	Scanner sc = new Scanner(System.in);
+    	System.out.println("Enter RequestID: ");
+    	String reqId = sc.nextLine();
+    	doctorService.declineRequest(reqId);
+>>>>>>> parent of a4ef980 (Merge pull request #26 from nithinsankar-b/pharma)
     }
 
     /**
@@ -117,6 +166,7 @@ public class DoctorController {
      * @param doctor The doctor setting the availability.
      */
     public void setToAvailable(Doctor doctor) {
+<<<<<<< HEAD
         Scanner sc = new Scanner(System.in);
         System.out.println("Enter Date (yyyy-MM-dd): ");
         String date = sc.nextLine();
@@ -199,4 +249,68 @@ public class DoctorController {
     public void changePassword(String hospitalID, String oldPassword, String newPassword) {
         userService.changePassword(hospitalID, oldPassword, newPassword);
     }
+=======
+   	 Scanner sc = new Scanner(System.in);
+   	 System.out.println("Enter Date (yyyy-MM-dd): ");
+   	 String date = sc.nextLine();
+   	 System.out.println("Enter Start Time (HH:mm): ");
+   	 String startTime = sc.nextLine();
+   	 boolean success = doctorService.setAvailablity(doctor, date, startTime);
+   	 if (success) {
+   		 System.out.println("Requested appointment slot has been made available.");
+   	 }
+   	 else {
+   		System.out.println("error"); 
+   	 }
+    }
+    
+ 
+     public void setToUnavailable(Doctor doctor) {
+    	 Scanner sc = new Scanner(System.in);
+    	 System.out.println("Enter Date (yyyy-MM-dd): ");
+    	 String date = sc.nextLine();
+    	 System.out.println("Enter Start Time (HH:mm): ");
+    	 String startTime = sc.nextLine();
+    	 boolean success = doctorService.setUnavailability(doctor, date, startTime);
+    	 if(success) {
+    		 System.out.println("Requested appointment slot is Blocked.");
+    	 }else {
+    		 System.out.println("error");
+    	 }
+     }
+     
+     public void newPatientDiagnosis() {
+    	 Scanner sc = new Scanner(System.in);
+    	 System.out.println("Enter PatientId): ");
+    	 String patientId = sc.nextLine();
+    	 System.out.println("Enter latest diagnosis: ");
+    	 String newDiagnosis = sc.nextLine();
+    	 doctorService.updatePatientDiagnosis(patientId, newDiagnosis);
+     }
+     
+     public void newPatientPrescription() {
+    	 Scanner sc = new Scanner(System.in);
+    	 System.out.println("Enter PatientId: ");
+    	 String patientId = sc.nextLine();
+    	 System.out.println("Enter latest Prescription: ");
+    	 String newDiagnosis = sc.nextLine();
+    	 doctorService.updatePatientPrescription(patientId, newDiagnosis);
+     }
+     
+     public void appointmentOutcomeRecord() {
+    	 Scanner sc = new Scanner(System.in);
+    	 System.out.println("Enter AppointmentID: ");
+    	 String appointmentId = sc.nextLine();
+    	 System.out.println("Enter Service Provided: ");
+    	 String serviceProvided = sc.nextLine();
+    	 System.out.println("Enter medications prescribed (if more than 1 medicine, separate by comma): ");
+    	 String medicineList = sc.nextLine();
+    	 System.out.println("Enter Consultation Notes: ");
+    	 String consultationNotes = sc.nextLine();
+    	 doctorService.recordAppointmentOutcome(appointmentId, serviceProvided, medicineList, consultationNotes);
+    	 
+     }
+     
+    
+>>>>>>> parent of a4ef980 (Merge pull request #26 from nithinsankar-b/pharma)
 }

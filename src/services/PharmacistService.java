@@ -16,14 +16,22 @@ import models.User;
 import models.Appointment;
 import models.Medication;
 import models.Patient;
+import models.Pharmacist;
 import enums.MedicationStatus;
 
+<<<<<<< HEAD
 /**
  * The {@code PharmacistService} class manages pharmacists in the system.
  * It provides functionalities to add, update, retrieve, and list pharmacists,
  * as well as to load and save pharmacist data from/to a CSV file.
  * This class also interacts with user, appointment, and inventory services.
  */
+=======
+import services.UserService;
+import services.AppointmentService;
+import services.InventoryService;
+
+>>>>>>> parent of a4ef980 (Merge pull request #26 from nithinsankar-b/pharma)
 public class PharmacistService {
     
     private final Map<String, Pharmacist> pharmacists;
@@ -117,6 +125,11 @@ public class PharmacistService {
                     String contactInformation = pharmacistData[2].trim();
                     User existingUser = userService.getUserById(pharmacistId);
                     String password = (existingUser != null) ? existingUser.getPassword() : "defaultPassword";
+<<<<<<< HEAD
+=======
+
+                    // Create a new Patient object and add it to the collection
+>>>>>>> parent of a4ef980 (Merge pull request #26 from nithinsankar-b/pharma)
                     pharmacists.put(pharmacistId, new Pharmacist(existingUser != null ? existingUser : new User(pharmacistId, password, UserRole.PATIENT), name, contactInformation));
                 }
             }
@@ -170,15 +183,39 @@ public class PharmacistService {
      */
     public boolean updatePrescriptionStatus(String appointmentID) {
         Appointment appointment = appointmentService.getAppointmentById(appointmentID);
+        System.out.println(appointment);// Assuming a method exists to get Appointment by ID
         if (appointment != null) {
+<<<<<<< HEAD
             boolean update = appointmentService.updateMedicationStatus(appointmentID);
             String medication = appointment.getMedication();
             int quantity = appointment.getQuantity();
             if (update) {
                 inventoryService.updateStock(medication, quantity);
             }
+=======
+            // Update the medication status in the appointment
+            appointmentService.updateMedicationStatus(appointmentID);
+            
+            // Get medication and quantity from appointment
+            String medication = appointment.getMedication();
+            int quantity = appointment.getQuantity();
+
+            // Update inventory stock
+            inventoryService.updateStock(medication, quantity);
+
+>>>>>>> parent of a4ef980 (Merge pull request #26 from nithinsankar-b/pharma)
             return true;
         }
         return false;
     }
+<<<<<<< HEAD
 }
+=======
+
+
+    
+
+    
+    }
+
+>>>>>>> parent of a4ef980 (Merge pull request #26 from nithinsankar-b/pharma)

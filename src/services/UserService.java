@@ -9,7 +9,6 @@ import java.io.FileReader;
 import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
-import java.io.FileWriter;
 
 /**
  * UserService is responsible for managing user-related operations
@@ -115,21 +114,8 @@ public class UserService implements IUserService {
     public boolean updateUser(User user) {
         if (users.containsKey(user.getHospitalID())) {
             users.put(user.getHospitalID(), user);
-            saveToCSV();
             return true;
         }
         return false;
-    }
-
-    public void saveToCSV() {
-        try (FileWriter writer = new FileWriter("data/User.csv")) {
-            writer.write("hospitalID,password,role\n"); // CSV header
-            for (User user : users.values()) {
-                writer.write(user.getHospitalID() + "," + user.getPassword() + "," + user.getRole() + "\n");
-            }
-            System.out.println("Users saved to CSV successfully.");
-        } catch (IOException e) {
-            System.out.println("Error writing to CSV file: " + e.getMessage());
-        }
     }
 }
