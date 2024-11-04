@@ -16,12 +16,7 @@ import models.User;
 import models.Appointment;
 import models.Medication;
 import models.Patient;
-import models.Pharmacist;
 import enums.MedicationStatus;
-
-import services.UserService;
-import services.AppointmentService;
-import services.InventoryService;
 
 public class PharmacistService {
     private final Map<String, Pharmacist> pharmacists;
@@ -96,8 +91,7 @@ public class PharmacistService {
                     // Try to find an existing user if applicable
                     User existingUser = userService.getUserById(pharmacistId);
                     String password = (existingUser != null) ? existingUser.getPassword() : "defaultPassword";
-
-                    // Create a new Patient object and add it to the collection
+// Create a new Patient object and add it to the collection
                     pharmacists.put(pharmacistId, new Pharmacist(existingUser != null ? existingUser : new User(pharmacistId, password, UserRole.PATIENT), name, contactInformation));
                 }
             }
@@ -140,15 +134,14 @@ public class PharmacistService {
  // Method to update prescription status and inventory
     public boolean updatePrescriptionStatus(String appointmentID) {
         Appointment appointment = appointmentService.getAppointmentById(appointmentID);
-        System.out.println(appointment);// Assuming a method exists to get Appointment by ID
         if (appointment != null) {
             // Update the medication status in the appointment
-            appointmentService.updateMedicationStatus(appointmentID);
+            boolean update = appointmentService.updateMedicationStatus(appointmentID);
             
             // Get medication and quantity from appointment
             String medication = appointment.getMedication();
             int quantity = appointment.getQuantity();
-
+            if(update)
             // Update inventory stock
             inventoryService.updateStock(medication, quantity);
 
@@ -162,4 +155,3 @@ public class PharmacistService {
 
     
     }
-
