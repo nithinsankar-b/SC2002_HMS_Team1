@@ -98,19 +98,4 @@ public class UserService implements IUserService {
         return false;
     }
 
-<<<<<<< HEAD
-
-=======
-    public void saveToCSV() {
-        try (FileWriter writer = new FileWriter("data/User.csv")) {
-            writer.write("hospitalID,password,role\n"); // CSV header
-            for (User user : users.values()) {
-                writer.write(user.getHospitalID() + "," + user.getPassword() + "," + user.getRole() + "\n");
-            }
-            System.out.println("Users saved to CSV successfully.");
-        } catch (IOException e) {
-            System.out.println("Error writing to CSV file: " + e.getMessage());
-        }
-    }
->>>>>>> origin/main
 }
