@@ -17,17 +17,32 @@ import java.util.List;
 import java.util.stream.Collectors;
 import java.util.ArrayList;
 
+/**
+ * The InventoryService class provides methods for managing medication inventory,
+ * including loading and saving inventory data from/to a CSV file, submitting
+ * replenishment requests, updating stock levels, and viewing current inventory.
+ */
 public class InventoryService implements IInventoryService {
     private final InventoryDataStore inventoryDataStore;
     private static final String CSV_FILE_PATH = "data/inventory.csv";
     private static final String DELIMITER = ",";
 
+    /**
+     * Constructs an InventoryService instance with the specified InventoryDataStore.
+     * Initializes the inventory data by loading it from a CSV file.
+     *
+     * @param store the InventoryDataStore to be used by this service
+     */
     public InventoryService(InventoryDataStore store) {
         this.inventoryDataStore = store;
         loadDataFromCSV(); // Load inventory data from CSV on initialization
     }
 
-    // Save inventory data to CSV
+    /**
+     * Saves the current inventory data to a CSV file.
+     * The file will include headers for medicine name, current stock,
+     * low level alert, and replenishment status.
+     */
     public void saveDataToCSV() {
         try (BufferedWriter bw = new BufferedWriter(new FileWriter(CSV_FILE_PATH))) {
             bw.write("Medicine Name,Current Stock,Low Level Alert,Replenishment Status");
@@ -47,7 +62,10 @@ public class InventoryService implements IInventoryService {
         }
     }
 
-    // Load inventory data from CSV
+    /**
+     * Loads inventory data from a CSV file and populates the InventoryDataStore.
+     * The CSV file is expected to contain headers followed by rows of inventory data.
+     */
     public void loadDataFromCSV() {
         String line;
         List<Inventory> inventoryList = new ArrayList<>();
@@ -73,6 +91,14 @@ public class InventoryService implements IInventoryService {
             System.out.println("Error reading inventory CSV file: " + e.getMessage());
         }
     }
+
+    /**
+     * Submits a replenishment request for the specified medicine.
+     * If the current stock of the medicine is below or equal to the low level alert,
+     * the replenishment status is set to PENDING and the data is saved to CSV.
+     *
+     * @param medicineName the name of the medicine to submit a replenishment request for
+     */
     @Override
     public void submitReplenishmentRequest(String medicineName) {
         List<Inventory> inventoryDataList = inventoryDataStore.getInventoryList();
@@ -92,12 +118,24 @@ public class InventoryService implements IInventoryService {
         }
     }
 
-    // Calculate how much to replenish based on the current stock and low-level alert
+    /**
+     * Calculates the amount to replenish based on the current stock and the low-level alert.
+     *
+     * @param currentStock the current stock level of the medicine
+     * @param lowLevelAlert the low level alert threshold
+     * @return the amount to replenish
+     */
     private int calculateReplenishmentAmount(int currentStock, int lowLevelAlert) {
         return (lowLevelAlert * 2) - currentStock; // Example: Double the low-level threshold
     }
 
-    // Method to update stock for a medication
+    /**
+     * Updates the stock for the specified medicine by reducing the current stock by the given quantity.
+     * If the stock falls below the low-level alert, the inventory status is updated to LOWSTOCK.
+     *
+     * @param medicineName the name of the medicine to update stock for
+     * @param quantity the quantity to deduct from the current stock
+     */
     public void updateStock(String medicineName, int quantity) {
         List<Inventory> inventoryDataList = inventoryDataStore.getInventoryList();
 
@@ -118,8 +156,10 @@ public class InventoryService implements IInventoryService {
         System.out.println("Medicine not found: " + medicineName);
     }
 
-
-    // Method to view current medication inventory
+    /**
+     * Displays the current medication inventory, listing each medicine's name, current stock,
+     * low-level alert, and replenishment status. If no medications are in inventory, a message is shown.
+     */
     public void viewMedicationInventory() {
         List<Inventory> inventoryDataList = inventoryDataStore.getInventoryList();
 
@@ -137,7 +177,12 @@ public class InventoryService implements IInventoryService {
         }
     }
 
-    // Method to fetch inventory display list
+    /**
+     * Fetches a list of InventoryDisplay objects representing the current medication inventory.
+     * Each InventoryDisplay includes the medicine name, current stock, inventory status, and replenishment status.
+     *
+     * @return a list of InventoryDisplay objects
+     */
     public List<InventoryDisplay> getInventoryDisplay() {
         List<Inventory> inventoryList = inventoryDataStore.getInventoryList();
 
@@ -151,7 +196,14 @@ public class InventoryService implements IInventoryService {
                 .collect(Collectors.toList());
     }
 
-    // Determine InventoryStatus based on stock levels
+    /**
+     * Determines the InventoryStatus based on the current stock level.
+     * If the current stock is less than or equal to the low-level alert, the status is LOWSTOCK;
+     * otherwise, it is INSTOCK.
+     *
+     * @param inventory the Inventory object to check
+     * @return the InventoryStatus for the given inventory
+     */
     private InventoryStatus determineInventoryStatus(Inventory inventory) {
         return inventory.getCurrentStock() <= inventory.getLowLevelAlert()
                 ? InventoryStatus.LOWSTOCK

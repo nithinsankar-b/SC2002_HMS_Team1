@@ -3,7 +3,12 @@ package interfaces;
 import models.AppointmentRequest;
 import java.util.List;
 
+/**
+ * Interface for appointment request service operations.
+ * This interface defines methods for managing appointment requests, including retrieving pending requests and handling acceptance or decline of requests.
+ */
 public interface IAppointmentRequestService {
+
     /**
      * Retrieves pending appointment requests for a specific doctor within the current week.
      *
@@ -16,6 +21,7 @@ public interface IAppointmentRequestService {
      * Accepts an appointment request based on its ID.
      *
      * @param requestId The ID of the appointment request to accept.
+     * @return True if the request was successfully accepted, false otherwise.
      */
     boolean acceptAppointmentRequest(String requestId);
 
@@ -23,7 +29,7 @@ public interface IAppointmentRequestService {
      * Declines an appointment request based on its ID.
      *
      * @param requestId The ID of the appointment request to decline.
+     * @return True if the request was successfully declined, false otherwise.
      */
     boolean declineAppointmentRequest(String requestId);
-  
 }

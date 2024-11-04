@@ -18,51 +18,81 @@ import models.Medication;
 import models.Patient;
 import enums.MedicationStatus;
 
+/**
+ * The {@code PharmacistService} class manages pharmacists in the system.
+ * It provides functionalities to add, update, retrieve, and list pharmacists,
+ * as well as to load and save pharmacist data from/to a CSV file.
+ * This class also interacts with user, appointment, and inventory services.
+ */
 public class PharmacistService {
+    
     private final Map<String, Pharmacist> pharmacists;
-    private final UserService userService; // Instance of UserService
-    private final AppointmentService appointmentService; // Instance of AppointmentService
-    private final InventoryService inventoryService; // Instance of InventoryService
-    private static final String CSV_FILE_PATH = "data/pharmacist.csv"; // Path to the CSV file
+    private final UserService userService;
+    private final AppointmentService appointmentService;
+    private final InventoryService inventoryService;
+    private static final String CSV_FILE_PATH = "data/pharmacist.csv";
     private static final String DELIMITER = ",";
 
-    // Constructor to initialize services and pharmacists map
+    /**
+     * Constructs a {@code PharmacistService} with the specified user, appointment, and inventory services.
+     *
+     * @param userService the user service instance for retrieving user details
+     * @param appointmentService the appointment service instance for managing appointments
+     * @param inventoryService the inventory service instance for managing medication stock
+     */
     public PharmacistService(UserService userService, AppointmentService appointmentService, InventoryService inventoryService) {
-        this.userService = userService; // UserService will provide user details
-        this.appointmentService = appointmentService; // Initialize AppointmentService
-        this.inventoryService = inventoryService; // Initialize InventoryService
+        this.userService = userService;
+        this.appointmentService = appointmentService;
+        this.inventoryService = inventoryService;
         this.pharmacists = new HashMap<>();
-        loadPharmacistsFromCSV(); // Load pharmacists from the CSV file
+        loadPharmacistsFromCSV();
     }
 
-  // Method to add a new pharmacist
+    /**
+     * Adds a new pharmacist to the system.
+     *
+     * @param pharmacist the pharmacist to add
+     */
     public void addPharmacist(Pharmacist pharmacist) {
         if (!pharmacists.containsKey(pharmacist.getHospitalID())) {
             pharmacists.put(pharmacist.getHospitalID(), pharmacist);
-            savePharmacistsToCSV(); // Save the updated pharmacist list to CSV
+            savePharmacistsToCSV();
             System.out.println("Pharmacist added successfully.");
         } else {
             System.out.println("Pharmacist already exists.");
         }
     }
 
-    // Method to retrieve a pharmacist by their hospital ID
+    /**
+     * Retrieves a pharmacist by their hospital ID.
+     *
+     * @param hospitalID the hospital ID of the pharmacist
+     * @return the pharmacist with the specified hospital ID, or {@code null} if not found
+     */
     public Pharmacist getPharmacistById(String hospitalID) {
         return pharmacists.get(hospitalID);
     }
 
-    // Method to update pharmacist contact information
+    /**
+     * Updates the contact information of a pharmacist.
+     *
+     * @param hospitalID the hospital ID of the pharmacist
+     * @param newContactInformation the new contact information to set
+     * @return {@code true} if the update was successful, {@code false} otherwise
+     */
     public boolean updatePharmacistContact(String hospitalID, String newContactInformation) {
         Pharmacist pharmacist = pharmacists.get(hospitalID);
         if (pharmacist != null) {
             pharmacist.setContactInformation(newContactInformation);
-            savePharmacistsToCSV(); // Save changes after update
+            savePharmacistsToCSV();
             return true;
         }
         return false;
     }
 
-    // Method to list all pharmacists
+    /**
+     * Lists all pharmacists in the system.
+     */
     public void listAllPharmacists() {
         pharmacists.values().forEach(pharmacist -> {
             System.out.println("Pharmacist ID: " + pharmacist.getHospitalID());
@@ -72,26 +102,21 @@ public class PharmacistService {
         });
     }
 
-    // Method to load pharmacists from a CSV file
+    /**
+     * Loads pharmacists from a CSV file.
+     */
     public void loadPharmacistsFromCSV() {
         String line;
-
         try (BufferedReader br = new BufferedReader(new FileReader(CSV_FILE_PATH))) {
-            // Skip the header line
-            br.readLine();
+            br.readLine(); // Skip the header line
             while ((line = br.readLine()) != null) {
                 String[] pharmacistData = line.split(DELIMITER);
-
-                // Assuming the CSV has 3 fields: ID, Name, Contact Information
                 if (pharmacistData.length == 3) {
                     String pharmacistId = pharmacistData[0].trim();
                     String name = pharmacistData[1].trim();
                     String contactInformation = pharmacistData[2].trim();
-                    
-                    // Try to find an existing user if applicable
                     User existingUser = userService.getUserById(pharmacistId);
                     String password = (existingUser != null) ? existingUser.getPassword() : "defaultPassword";
-// Create a new Patient object and add it to the collection
                     pharmacists.put(pharmacistId, new Pharmacist(existingUser != null ? existingUser : new User(pharmacistId, password, UserRole.PATIENT), name, contactInformation));
                 }
             }
@@ -100,7 +125,9 @@ public class PharmacistService {
         }
     }
 
-    // Method to save pharmacists back to the CSV file
+    /**
+     * Saves the current list of pharmacists to a CSV file.
+     */
     public void savePharmacistsToCSV() {
         try (BufferedWriter bw = new BufferedWriter(new FileWriter(CSV_FILE_PATH))) {
             bw.write("Pharmacist ID,Name,Contact Information");
@@ -109,7 +136,7 @@ public class PharmacistService {
                 String line = String.join(DELIMITER,
                         pharmacist.getHospitalID(),
                         pharmacist.getName(),
-                        pharmacist.getContactInformation()); // Include contact information
+                        pharmacist.getContactInformation());
                 bw.write(line);
                 bw.newLine();
             }
@@ -118,11 +145,15 @@ public class PharmacistService {
         }
     }
 
-    // Method to retrieve appointments by patient ID
+    /**
+     * Retrieves appointments for a given patient ID.
+     *
+     * @param patientId the ID of the patient
+     * @return a list of appointments for the specified patient
+     */
     private List<Appointment> getAppointmentsByPatientId(String patientId) {
-        List<Appointment> allAppointments = appointmentService.viewScheduledAppointments(); // Retrieve all appointments
+        List<Appointment> allAppointments = appointmentService.viewScheduledAppointments();
         List<Appointment> patientAppointments = new ArrayList<>();
-
         for (Appointment appointment : allAppointments) {
             if (appointment.getPatientId().equals(patientId)) {
                 patientAppointments.add(appointment);
@@ -131,27 +162,23 @@ public class PharmacistService {
         return patientAppointments;
     }
 
- // Method to update prescription status and inventory
+    /**
+     * Updates the prescription status for a given appointment and updates inventory accordingly.
+     *
+     * @param appointmentID the ID of the appointment to update
+     * @return {@code true} if the update was successful, {@code false} otherwise
+     */
     public boolean updatePrescriptionStatus(String appointmentID) {
         Appointment appointment = appointmentService.getAppointmentById(appointmentID);
         if (appointment != null) {
-            // Update the medication status in the appointment
             boolean update = appointmentService.updateMedicationStatus(appointmentID);
-            
-            // Get medication and quantity from appointment
             String medication = appointment.getMedication();
             int quantity = appointment.getQuantity();
-            if(update)
-            // Update inventory stock
-            inventoryService.updateStock(medication, quantity);
-
+            if (update) {
+                inventoryService.updateStock(medication, quantity);
+            }
             return true;
         }
         return false;
     }
-
-
-    
-
-    
-    }
+}

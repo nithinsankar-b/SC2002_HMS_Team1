@@ -10,17 +10,31 @@ import java.io.FileWriter;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
+
+/**
+ * The {@code InventoryDataStore} class is responsible for managing the inventory data.
+ * It loads inventory information from a CSV file, provides methods to manipulate inventory items,
+ * and saves updated inventory data back to a CSV file.
+ */
 public class InventoryDataStore {
 
-    private List<Inventory> inventoryList;
+    private List<Inventory> inventoryList; // List to store inventory items
 
+    /**
+     * Constructs an {@code InventoryDataStore} and initializes the inventory list by loading data from a CSV file.
+     */
     public InventoryDataStore() {
         this.inventoryList = new ArrayList<>();
-        loadInventoryFromCSV();
+        loadInventoryFromCSV(); // Load inventory data from CSV on initialization
     }
     
+    /**
+     * Loads inventory data from a CSV file into the inventory list.
+     * Each line in the file should contain the medicine name, current stock, low stock alert,
+     * and the replenishment status.
+     */
     private void loadInventoryFromCSV() {
-        String line="";
+        String line = "";
         try (BufferedReader br = new BufferedReader(new FileReader("data/inventory.csv"))) {
             boolean isFirstLine = true; // Flag to skip the header
 
@@ -37,14 +51,13 @@ public class InventoryDataStore {
                     int currentStock = Integer.parseInt(values[1].trim()); // Trim whitespace
                     int lowLevelAlert = Integer.parseInt(values[2].trim()); // Trim whitespace
                     ReplenishmentStatus replenishmentStatus;
+
                     try {
-                        replenishmentStatus = ReplenishmentStatus.REPLENISHED;
+                        replenishmentStatus = ReplenishmentStatus.valueOf(values[3].trim().toUpperCase());
                     } catch (IllegalArgumentException e) {
                         System.out.println("Invalid ReplenishmentStatus in line: " + line + ". Defaulting to PENDING.");
                         replenishmentStatus = ReplenishmentStatus.PENDING; // Default value
                     }
-
-                    
 
                     inventoryList.add(new Inventory(medicineName, currentStock, lowLevelAlert, replenishmentStatus));
                 } else {
@@ -58,29 +71,50 @@ public class InventoryDataStore {
         }
     }
 
-    // Initialize inventory list
+    /**
+     * Returns the list of inventory items.
+     *
+     * @return a list of {@code Inventory} objects
+     */
     public List<Inventory> getInventoryList() {
         return inventoryList;
     }
 
+    /**
+     * Sets the inventory list to a new list of inventory items.
+     *
+     * @param inventoryList the new list of {@code Inventory} objects
+     */
     public void setInventoryList(List<Inventory> inventoryList) {
         this.inventoryList = inventoryList;
     }
 
-    // Add individual inventory item
+    /**
+     * Adds a new inventory item to the inventory list.
+     *
+     * @param inventory the {@code Inventory} item to be added
+     */
     public void addInventory(Inventory inventory) {
         inventoryList.add(inventory);
     }
 
+    /**
+     * Writes the current inventory data to a specified CSV file.
+     *
+     * @param inventoryCsvPath the path to the CSV file where inventory data will be saved
+     */
     public void writeInventoryToCSV(String inventoryCsvPath) {
         try (BufferedWriter writer = new BufferedWriter(new FileWriter(inventoryCsvPath))) {
             // Write header
-            writer.write("MedicineName,CurrentStock,LowStockAlert");
+            writer.write("MedicineName,CurrentStock,LowStockAlert,ReplenishmentStatus");
             writer.newLine();
 
             // Write each inventory item to the CSV
             for (Inventory item : inventoryList) {
-                writer.write(item.getMedicineName() + "," + item.getCurrentStock() + "," + item.getLowLevelAlert());
+                writer.write(item.getMedicineName() + "," +
+                             item.getCurrentStock() + "," +
+                             item.getLowLevelAlert() + "," +
+                             item.getReplenishmentStatus());
                 writer.newLine();
             }
 
