@@ -1,4 +1,3 @@
-
 package services;
 
 import models.Appointment;
@@ -11,22 +10,32 @@ import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
-import services.DoctorService;
-import services.AppointmentService;
-import services.ScheduleService;
-import services.AppointmentRequestService;
-import services.MedicalRecordService;
-
+/**
+ * Service class for handling appointment requests in the healthcare system.
+ * This class provides methods to accept, decline, and process appointment requests,
+ * as well as to save and retrieve appointment request data from a CSV file.
+ */
 public class AppointmentRequestService {
-    private final ScheduleService scheduleService;
-    private final AppointmentService appointmentService;
-    private final String appointmentRequestFile = "data/appointment_request.csv"; // Update this path
+    private final ScheduleService scheduleService; // Service for managing doctor schedules
+    private final AppointmentService appointmentService; // Service for managing appointments
+    private final String appointmentRequestFile = "data/appointment_request.csv"; // Path to the CSV file
 
+    /**
+     * Constructs an AppointmentRequestService with the specified services.
+     *
+     * @param scheduleService The service for managing doctor schedules.
+     * @param appointmentService The service for managing appointments.
+     */
     public AppointmentRequestService(ScheduleService scheduleService, AppointmentService appointmentService) {
         this.scheduleService = scheduleService;
         this.appointmentService = appointmentService;
     }
 
+    /**
+     * Accepts an appointment request, updates its status, and schedules the appointment.
+     *
+     * @param request The appointment request to be accepted.
+     */
     public void acceptRequest(AppointmentRequest request) {
         // Change request status to accepted
         request.setStatus("Accepted");
@@ -40,7 +49,6 @@ public class AppointmentRequestService {
             request.getPatientId(),
             request.getDoctorId(),
             appointmentDateTime
-            
         );
 
         // Update the schedule from "Available" to PatientID
@@ -57,6 +65,11 @@ public class AppointmentRequestService {
         }
     }
 
+    /**
+     * Retrieves a list of all pending appointment requests from the CSV file.
+     *
+     * @return A list of pending appointment requests.
+     */
     public List<AppointmentRequest> getPendingRequests() {
         List<AppointmentRequest> pendingRequests = new ArrayList<>();
         try (BufferedReader reader = Files.newBufferedReader(Paths.get(appointmentRequestFile))) {
@@ -75,12 +88,17 @@ public class AppointmentRequestService {
         return pendingRequests;
     }
 
+    /**
+     * Processes and displays pending appointment requests for a specific doctor.
+     *
+     * @param doctorID The ID of the doctor whose requests are to be processed.
+     */
     public void processPendingRequests(String doctorID) {
         List<AppointmentRequest> pendingRequests = getPendingRequests();
 
         System.out.println("Pending Appointment Requests for Doctor ID: " + doctorID);
         boolean found = false; // Flag to check if there are any requests for the given doctorID
-        
+
         for (AppointmentRequest request : pendingRequests) {
             // Check if the request's doctorID matches the provided doctorID
             if (request.getDoctorId().equals(doctorID)) {
@@ -96,6 +114,11 @@ public class AppointmentRequestService {
         }
     }
 
+    /**
+     * Declines an appointment request and updates its status.
+     *
+     * @param request The appointment request to be declined.
+     */
     public void declineRequest(AppointmentRequest request) {
         // Change request status to declined
         request.setStatus("Declined");
@@ -103,7 +126,11 @@ public class AppointmentRequestService {
         System.out.println("Appointment request declined.");
     }
 
-    // Save appointment request to CSV
+    /**
+     * Saves an appointment request to the CSV file.
+     *
+     * @param request The appointment request to be saved.
+     */
     private void saveAppointmentRequest(AppointmentRequest request) {
         try {
             // Read all existing requests
@@ -132,7 +159,11 @@ public class AppointmentRequestService {
         }
     }
 
-    // Load all requests from CSV
+    /**
+     * Loads all appointment requests from the CSV file.
+     *
+     * @return A list of all appointment requests.
+     */
     private List<AppointmentRequest> getAllRequests() {
         List<AppointmentRequest> requests = new ArrayList<>();
         try (BufferedReader reader = Files.newBufferedReader(Paths.get(appointmentRequestFile))) {
@@ -151,4 +182,3 @@ public class AppointmentRequestService {
         return requests;
     }
 }
-

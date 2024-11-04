@@ -4,9 +4,8 @@ import enums.InventoryStatus;
 import enums.ReplenishmentStatus;
 
 /**
- * The InventoryDisplay class is used for displaying inventory information
- * in a user-friendly format, including the name, quantity, status, and
- * replenishment status of the medication.
+ * Represents the display information for a medicine in the inventory system.
+ * This class holds the name, quantity, inventory status, and replenishment status of a medicine.
  */
 public class InventoryDisplay {
 
@@ -16,12 +15,12 @@ public class InventoryDisplay {
     private ReplenishmentStatus replenishmentStatus;
 
     /**
-     * Constructs an InventoryDisplay object with the specified details.
+     * Constructs an InventoryDisplay object with the specified parameters.
      *
-     * @param name                The name of the medication.
-     * @param quantity            The quantity of the medication available in stock.
-     * @param status              The current inventory status of the medication.
-     * @param replenishmentStatus The current replenishment status of the medication.
+     * @param name The name of the medicine.
+     * @param quantity The quantity of the medicine available in the inventory.
+     * @param status The current inventory status of the medicine.
+     * @param replenishmentStatus The current replenishment status of the medicine.
      */
     public InventoryDisplay(String name, int quantity, InventoryStatus status, ReplenishmentStatus replenishmentStatus) {
         this.name = name;
@@ -30,26 +29,28 @@ public class InventoryDisplay {
         this.replenishmentStatus = replenishmentStatus;
     }
 
+    // Getters
+
     /**
-     * Retrieves the name of the medication.
+     * Returns the name of the medicine.
      *
-     * @return The name of the medication.
+     * @return The name of the medicine.
      */
     public String getName() {
         return name;
     }
 
     /**
-     * Retrieves the quantity of the medication available in stock.
+     * Returns the quantity of the medicine available in the inventory.
      *
-     * @return The stock quantity of the medication.
+     * @return The quantity of the medicine.
      */
     public int getQuantity() {
         return quantity;
     }
 
     /**
-     * Retrieves the current inventory status of the medication.
+     * Returns the current inventory status of the medicine.
      *
      * @return The inventory status.
      */
@@ -58,11 +59,11 @@ public class InventoryDisplay {
     }
 
     /**
-     * Retrieves the current replenishment status of the medication.
+     * Returns the current replenishment status of the medicine.
      *
      * @return The replenishment status.
      */
-    public ReplenishmentStatus getReplenishmentStatus() {
+    public ReplenishmentStatus getReplenishmentStatus() { // Getter for the new field
         return replenishmentStatus;
     }
 }

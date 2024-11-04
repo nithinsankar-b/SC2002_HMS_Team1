@@ -9,14 +9,27 @@ import services.PatientService;
 
 import java.util.Scanner;
 
+/**
+ * The {@code PharmacistView} class provides a user interface for pharmacists to interact 
+ * with the system. It allows pharmacists to manage medications, update prescription statuses, 
+ * view appointment outcomes, and change their passwords.
+ */
 public class PharmacistView {
-    private final Scanner scanner;
-    private final PharmacistController pharmacistController;
-    private final PharmacistService pharmacistService;
-    private final UserService userService;
-    private final PatientService patientService;
+    private final Scanner scanner; // Scanner for user input
+    private final PharmacistController pharmacistController; // Controller for pharmacist operations
+    private final PharmacistService pharmacistService; // Service for managing pharmacists
+    private final UserService userService; // Service for managing users
+    private final PatientService patientService; // Service for managing patients
 
-    public PharmacistView(PharmacistController pharmacistController, PharmacistService pharmacistService, 
+    /**
+     * Constructs a {@code PharmacistView} with the specified services and controller.
+     *
+     * @param pharmacistController the controller for pharmacist operations
+     * @param pharmacistService    the service for managing pharmacists
+     * @param userService          the service for managing users
+     * @param patientService       the service for managing patients
+     */
+    public PharmacistView(PharmacistController pharmacistController, PharmacistService pharmacistService,
                           UserService userService, PatientService patientService) {
         this.scanner = new Scanner(System.in); // Managed centrally, do not close here
         this.pharmacistController = pharmacistController;
@@ -25,7 +38,11 @@ public class PharmacistView {
         this.patientService = patientService;
     }
 
-    // Main method to handle different pharmacist operations
+    /**
+     * Starts the main interaction loop for the pharmacist, allowing them to perform various operations.
+     *
+     * @param user the user logged in as a pharmacist
+     */
     public void start(User user) {
         Pharmacist pharmacist = pharmacistService.getPharmacistById(user.getHospitalID());
 
@@ -49,12 +66,10 @@ public class PharmacistView {
 
             switch (choice) {
                 case 1 -> pharmacistController.viewMedicationInventory();
-                
                 case 2 -> pharmacistController.submitReplenishmentRequest();
                 case 3 -> updatePrescriptionStatus(); 
-                case 4 -> viewAppointmentOutcomeRecords(); 
-                case 5 -> changePassword();
-                case 6 -> {
+                case 4 -> viewAppointmentOutcomeRecords(); // New option
+                case 5 -> {
                     System.out.println("Logging out...");
                     isRunning = false;
                 }
@@ -76,7 +91,12 @@ public class PharmacistView {
         }
     }
 
-    // Method to register a new pharmacist if not found
+    /**
+     * Registers a new pharmacist if not found.
+     *
+     * @param user the user who is trying to register as a pharmacist
+     * @return the newly registered pharmacist
+     */
     private Pharmacist registerPharmacist(User user) {
         System.out.print("Enter Pharmacist Name: ");
         String name = scanner.nextLine().trim();
@@ -91,7 +111,9 @@ public class PharmacistView {
         return pharmacist;
     }
 
-    // Method to update prescription status
+    /**
+     * Updates the prescription status based on the appointment ID provided by the user.
+     */
     private void updatePrescriptionStatus() {
         System.out.print("Enter Appointment ID: ");
         String appointmentId = scanner.nextLine().trim();
@@ -99,24 +121,30 @@ public class PharmacistView {
         // Call the controller method to update the prescription
         pharmacistController.updatePrescription(appointmentId);
     }
-// Method to view appointment outcome records
+
+    // Method to view appointment outcome records
     private void viewAppointmentOutcomeRecords() {
         System.out.println("Viewing Appointment Outcome Records...");
         pharmacistController.viewAppointmentOutcomeRecords();
     }
 
-    // Display menu options
+    /**
+     * Displays the menu options available to the pharmacist.
+     */
     private void displayMenu() {
         System.out.println("Please choose an option:");
         System.out.println("1. View Medication Inventory");
         System.out.println("2. Submit Replenishment Request");
         System.out.println("3. Update Prescription Status");
         System.out.println("4. View Appointment Outcome Record"); // New menu option
-        System.out.println("5. Change Password");
-        System.out.println("6. Log Out");
+        System.out.println("5. Log Out");
     }
 
-    // Get user input with error checking
+    /**
+     * Gets user input for menu selection with error checking.
+     *
+     * @return the user's choice as an integer
+     */
     private int getUserInput() {
         int choice = -1;
         try {
@@ -126,19 +154,4 @@ public class PharmacistView {
         }
         return choice;
     }
-    
-    private void changePassword()
-    {
-      Scanner sc=new Scanner(System.in);
-      System.out.println("Enter Hospital ID");
-      String id = sc.nextLine();
-      
-      System.out.println("Enter old password");
-      String oldPassword = sc.nextLine();
-      
-      System.out.println("Enter new password");
-      String newPassword = sc.nextLine();
-      
-      pharmacistController.changePassword(id, oldPassword, newPassword);
-    }
-    }
+}

@@ -17,9 +17,9 @@ import java.util.stream.Collectors;
 import java.util.ArrayList;
 
 /**
- * The InventoryService class implements the IInventoryService interface
- * and provides methods for managing the hospital's inventory, including
- * loading, saving, updating, and viewing inventory data.
+ * The InventoryService class provides methods for managing medication inventory,
+ * including loading and saving inventory data from/to a CSV file, submitting
+ * replenishment requests, updating stock levels, and viewing current inventory.
  */
 public class InventoryService implements IInventoryService {
 
@@ -28,10 +28,10 @@ public class InventoryService implements IInventoryService {
     private static final String DELIMITER = ",";
 
     /**
-     * Constructs an InventoryService with the specified InventoryDataStore.
-     * Automatically loads inventory data from a CSV file upon initialization.
+     * Constructs an InventoryService instance with the specified InventoryDataStore.
+     * Initializes the inventory data by loading it from a CSV file.
      *
-     * @param store The InventoryDataStore to use for managing inventory data.
+     * @param store the InventoryDataStore to be used by this service
      */
     public InventoryService(InventoryDataStore store) {
         this.inventoryDataStore = store;
@@ -40,6 +40,8 @@ public class InventoryService implements IInventoryService {
 
     /**
      * Saves the current inventory data to a CSV file.
+     * The file will include headers for medicine name, current stock,
+     * low level alert, and replenishment status.
      */
     public void saveDataToCSV() {
         try (BufferedWriter bw = new BufferedWriter(new FileWriter(CSV_FILE_PATH))) {
@@ -64,7 +66,8 @@ public class InventoryService implements IInventoryService {
     }
 
     /**
-     * Loads inventory data from a CSV file into the InventoryDataStore.
+     * Loads inventory data from a CSV file and populates the InventoryDataStore.
+     * The CSV file is expected to contain headers followed by rows of inventory data.
      */
     public void loadDataFromCSV() {
         String line;
@@ -92,6 +95,13 @@ public class InventoryService implements IInventoryService {
         }
     }
 
+    /**
+     * Submits a replenishment request for the specified medicine.
+     * If the current stock of the medicine is below or equal to the low level alert,
+     * the replenishment status is set to PENDING and the data is saved to CSV.
+     *
+     * @param medicineName the name of the medicine to submit a replenishment request for
+     */
     @Override
     public void submitReplenishmentRequest(String medicineName) {
         List<Inventory> inventoryDataList = inventoryDataStore.getInventoryList();
@@ -111,21 +121,22 @@ public class InventoryService implements IInventoryService {
     }
 
     /**
-     * Calculates the replenishment amount based on current stock and low-level alert.
+     * Calculates the amount to replenish based on the current stock and the low-level alert.
      *
-     * @param currentStock  The current stock level.
-     * @param lowLevelAlert The low-level alert threshold.
-     * @return The calculated replenishment amount.
+     * @param currentStock the current stock level of the medicine
+     * @param lowLevelAlert the low level alert threshold
+     * @return the amount to replenish
      */
     private int calculateReplenishmentAmount(int currentStock, int lowLevelAlert) {
         return (lowLevelAlert * 2) - currentStock; // Example: Double the low-level threshold
     }
 
     /**
-     * Updates the stock level for a specified medication.
+     * Updates the stock for the specified medicine by reducing the current stock by the given quantity.
+     * If the stock falls below the low-level alert, the inventory status is updated to LOWSTOCK.
      *
-     * @param medicineName The name of the medication.
-     * @param quantity     The quantity to reduce from the current stock.
+     * @param medicineName the name of the medicine to update stock for
+     * @param quantity the quantity to deduct from the current stock
      */
     public void updateStock(String medicineName, int quantity) {
         List<Inventory> inventoryDataList = inventoryDataStore.getInventoryList();
@@ -147,7 +158,8 @@ public class InventoryService implements IInventoryService {
     }
 
     /**
-     * Displays the current medication inventory.
+     * Displays the current medication inventory, listing each medicine's name, current stock,
+     * low-level alert, and replenishment status. If no medications are in inventory, a message is shown.
      */
     public void viewMedicationInventory() {
         List<Inventory> inventoryDataList = inventoryDataStore.getInventoryList();
@@ -167,9 +179,10 @@ public class InventoryService implements IInventoryService {
     }
 
     /**
-     * Retrieves a list of inventory display items.
+     * Fetches a list of InventoryDisplay objects representing the current medication inventory.
+     * Each InventoryDisplay includes the medicine name, current stock, inventory status, and replenishment status.
      *
-     * @return A list of InventoryDisplay objects.
+     * @return a list of InventoryDisplay objects
      */
     public List<InventoryDisplay> getInventoryDisplay() {
         List<Inventory> inventoryList = inventoryDataStore.getInventoryList();
@@ -185,10 +198,12 @@ public class InventoryService implements IInventoryService {
     }
 
     /**
-     * Determines the InventoryStatus based on current stock levels.
+     * Determines the InventoryStatus based on the current stock level.
+     * If the current stock is less than or equal to the low-level alert, the status is LOWSTOCK;
+     * otherwise, it is INSTOCK.
      *
-     * @param inventory The Inventory object.
-     * @return The InventoryStatus (LOWSTOCK or INSTOCK).
+     * @param inventory the Inventory object to check
+     * @return the InventoryStatus for the given inventory
      */
     private InventoryStatus determineInventoryStatus(Inventory inventory) {
         return inventory.getCurrentStock() <= inventory.getLowLevelAlert()
