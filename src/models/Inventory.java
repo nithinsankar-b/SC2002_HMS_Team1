@@ -28,6 +28,14 @@ public class Inventory {
         this.medicineName = medicineName;
         this.currentStock = currentStock;
         this.lowLevelAlert = lowLevelAlert;
+        this.replenishmentStatus = replenishmentStatus != null ? replenishmentStatus : ReplenishmentStatus.REPLENISHED;
+        this.inventoryStatus = inventoryStatus; // Note: This might need to be initialized explicitly
+    }
+
+    /**
+     * Retrieves the name of the medication.
+     *
+     * @return The name of the medication.
         this.replenishmentStatus = replenishmentStatus;
         this.inventoryStatus = inventoryStatus; // Note: This might need to be initialized explicitly
     }
@@ -94,24 +102,25 @@ public class Inventory {
      * @return The replenishment status.
      */
     public ReplenishmentStatus getReplenishmentStatus() {
-        return replenishmentStatus;
-    }
+     return replenishmentStatus;
+ }
 
-    /**
-     * Sets the replenishment status for the medicine.
-     *
-     * @param replenishmentStatus The replenishment status to set.
-     */
-    public void setReplenishmentStatus(ReplenishmentStatus replenishmentStatus) {
-        this.replenishmentStatus = replenishmentStatus;
-    }
+ /**
+  * Sets the replenishment status for the medicine.
+  *
+  * @param replenishmentStatus The replenishment status to set.
+  */
+ public void setReplenishmentStatus(ReplenishmentStatus replenishmentStatus) {
+     this.replenishmentStatus = replenishmentStatus;
+ }
 
-    /**
-     * Sets the inventory status for the medicine.
-     *
-     * @param inventoryStatus The inventory status to set.
-     */
-    public void setInventoryStatus(InventoryStatus inventoryStatus) {
-        this.inventoryStatus = inventoryStatus;
-    }
+ /**
+  * Sets the inventory status for the medicine.
+  *
+  * @param inventoryStatus The inventory status to set.
+  */
+ public void setInventoryStatus(InventoryStatus inventoryStatus) {
+     this.inventoryStatus = inventoryStatus;
+ }
+
 }

@@ -1,5 +1,6 @@
 package views;
 
+import controllers.AdministratorController;
 import controllers.PatientController;
 import controllers.PharmacistController;
 import controllers.DoctorController;
@@ -9,17 +10,19 @@ import services.UserService;
 import services.AppointmentService;
 import services.InventoryService;
 import services.PatientService;
+import services.ProjectAdminService;
+import models.Administrator;
 import services.PharmacistService;
 import services.DoctorService;
 import services.ScheduleService;
 import services.AppointmentRequestService;
 import services.MedicalRecordService;
+import views.DoctorView;
+import controllers.DoctorController;
+import views.PharmacistView;
 import stores.InventoryDataStore;
 import models.User;
 import views.PatientView;
-import views.DoctorView;
-import views.PharmacistView;
-
 import java.util.Scanner;
 
 /**
@@ -194,8 +197,7 @@ public class UserView {
                 break;
 
             case ADMINISTRATOR:
-                System.out.println("Navigating to Administrator view...");
-                System.out.println(SEPARATOR);
+                navigateToAdministratorPage(user);
                 // Implement the AdministratorView and corresponding logic here
                 break;
 
@@ -203,6 +205,84 @@ public class UserView {
                 System.out.println("Role not recognized.");
         }
     }
+
+    private void navigateToPatientPage(User user) {
+        // Create the AppointmentService and PatientService instances
+        AppointmentService appointmentService = new AppointmentService();
+        PatientService patientService = new PatientService(userService);
+
+        // Instantiate PatientController
+        PatientController patientController = new PatientController(patientService, appointmentService);
+
+        // Instantiate PatientView
+        PatientView patientView = new PatientView(patientController, userService);
+
+        // Start the patient operations (menu)
+        System.out.println("Navigating to Patient view...");
+        System.out.println(SEPARATOR);
+        patientView.start(user);
+    }
+    
+    private void navigateToPharmacistPage(User user) {
+        // Create the AppointmentService and PatientService instances
+        AppointmentService appointmentService = new AppointmentService();
+        InventoryDataStore inventoryDataStore = new InventoryDataStore();
+        InventoryService inventoryService = new InventoryService(inventoryDataStore);
+        PharmacistService pharmacistService = new PharmacistService(userService, appointmentService, inventoryService);
+        PatientService patientService = new PatientService(userService);
+        // Instantiate PatientController
+        PharmacistController pharmacistController = new PharmacistController(pharmacistService, inventoryService,appointmentService);
+
+        // Instantiate PatientView
+        PharmacistView pharmacistView = new PharmacistView(pharmacistController, pharmacistService, userService, patientService);
+
+        // Start the patient operations (menu)
+        System.out.println("Navigating to Pharmacist view...");
+        System.out.println(SEPARATOR);
+        pharmacistView.start(user);
+    }
+
+    private void navigateToDoctorPage(User user) {
+        // Create the necessary services
+        ScheduleService scheduleService = new ScheduleService();
+
+        MedicalRecordService medicalRecordService = new MedicalRecordService();
+
+        AppointmentService appointmentService = new AppointmentService();
+
+        AppointmentRequestService appointmentRequestService = new AppointmentRequestService(scheduleService, appointmentService);
+
+        DoctorService doctorService = new DoctorService( userService,scheduleService,medicalRecordService, appointmentService);
+
+        // Instantiate DoctorController
+        DoctorController doctorController = new DoctorController(doctorService,  scheduleService,  medicalRecordService, appointmentService);
+
+        // Instantiate DoctorView
+        DoctorView doctorView = new DoctorView( doctorController, doctorService, userService, scheduleService, medicalRecordService, appointmentService);
+
+        // Start the doctor operations (menu)
+        System.out.println("Navigating to Doctor view...");
+        System.out.println(SEPARATOR);
+        doctorView.start(user);
+    }
+
+
+    private void navigateToAdministratorPage(User user) {
+        // Create necessary services for Administrator
+        InventoryDataStore inventoryDataStore = new InventoryDataStore();
+        InventoryService inventoryService = new InventoryService(inventoryDataStore);
+        ProjectAdminService adminService = new ProjectAdminService(new Administrator(user.getHospitalID(), user.getPassword(), null), inventoryService);
+        AppointmentService appointmentService = new AppointmentService();
+    
+        // Instantiate AdministratorController
+        AdministratorController adminController = new AdministratorController(appointmentService, adminService, userService);
+    
+        // Start the administrator operations (menu), passing in the logged-in hospital ID
+        System.out.println("Navigating to Administrator view...");
+        System.out.println(SEPARATOR);
+        adminController.start(user.getHospitalID());
+    }
+
 
     /**
      * Displays the change password interface for the logged-in user.

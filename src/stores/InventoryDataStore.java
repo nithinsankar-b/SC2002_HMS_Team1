@@ -45,11 +45,10 @@ public class InventoryDataStore {
                 }
 
                 String[] values = line.split(",");
-                // Ensure values have the correct length
                 if (values.length >= 4) {
-                    String medicineName = values[0].trim(); // Trim whitespace
-                    int currentStock = Integer.parseInt(values[1].trim()); // Trim whitespace
-                    int lowLevelAlert = Integer.parseInt(values[2].trim()); // Trim whitespace
+                    String medicineName = values[0].trim();
+                    int currentStock = Integer.parseInt(values[1].trim());
+                    int lowLevelAlert = Integer.parseInt(values[2].trim());
                     ReplenishmentStatus replenishmentStatus;
 
                     try {
@@ -125,3 +124,4 @@ public class InventoryDataStore {
         }
     }
 }
+

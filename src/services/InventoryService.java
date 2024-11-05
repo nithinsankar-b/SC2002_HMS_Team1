@@ -5,7 +5,6 @@ import models.Inventory;
 import models.InventoryDisplay;
 import enums.ReplenishmentStatus;
 import enums.InventoryStatus;
-import enums.MedicationStatus;
 import stores.InventoryDataStore;
 
 import java.io.BufferedReader;
@@ -23,6 +22,7 @@ import java.util.ArrayList;
  * replenishment requests, updating stock levels, and viewing current inventory.
  */
 public class InventoryService implements IInventoryService {
+
     private final InventoryDataStore inventoryDataStore;
     private static final String CSV_FILE_PATH = "data/inventory.csv";
     private static final String DELIMITER = ",";
@@ -48,11 +48,14 @@ public class InventoryService implements IInventoryService {
             bw.write("Medicine Name,Current Stock,Low Level Alert,Replenishment Status");
             bw.newLine();
             for (Inventory item : inventoryDataStore.getInventoryList()) {
+                String replenishmentStatus = item.getReplenishmentStatus() != null 
+                    ? item.getReplenishmentStatus().toString() 
+                    : ReplenishmentStatus.REPLENISHED.toString();
                 String line = String.join(DELIMITER,
                         item.getMedicineName(),
                         String.valueOf(item.getCurrentStock()),
                         String.valueOf(item.getLowLevelAlert()),
-                        item.getReplenishmentStatus().toString());
+                        replenishmentStatus);
                 bw.write(line);
                 bw.newLine();
             }
@@ -106,7 +109,6 @@ public class InventoryService implements IInventoryService {
         for (Inventory data : inventoryDataList) {
             if (data.getMedicineName().equalsIgnoreCase(medicineName)) {
                 if (data.getCurrentStock() <= data.getLowLevelAlert()) {
-                    // Set the ReplenishmentStatus to PENDING
                     data.setReplenishmentStatus(ReplenishmentStatus.PENDING);
                     saveDataToCSV();
                     System.out.println("Replenishment request submitted for: " + medicineName);
@@ -144,12 +146,11 @@ public class InventoryService implements IInventoryService {
                 data.setCurrentStock(data.getCurrentStock() - quantity);
                 System.out.println("Updated stock for medicine: " + medicineName + ". New stock: " + data.getCurrentStock());
 
-                // Check if stock falls below the low-level alert and update status
                 if (data.getCurrentStock() <= data.getLowLevelAlert()) {
                     data.setInventoryStatus(InventoryStatus.LOWSTOCK);
                     System.out.println("Stock for " + medicineName + " is now LOWSTOCK.");
                 }
-                saveDataToCSV(); // Save updated data to CSV
+                saveDataToCSV();
                 return;
             }
         }
@@ -191,7 +192,7 @@ public class InventoryService implements IInventoryService {
                         inventory.getMedicineName(),
                         inventory.getCurrentStock(),
                         determineInventoryStatus(inventory),
-                        inventory.getReplenishmentStatus() // Include ReplenishmentStatus
+                        inventory.getReplenishmentStatus()
                 ))
                 .collect(Collectors.toList());
     }
@@ -208,5 +209,104 @@ public class InventoryService implements IInventoryService {
         return inventory.getCurrentStock() <= inventory.getLowLevelAlert()
                 ? InventoryStatus.LOWSTOCK
                 : InventoryStatus.INSTOCK;
+    }
+
+    @Override
+    public void updateInventory(Inventory updatedInventory) {
+        List<Inventory> inventoryDataList = inventoryDataStore.getInventoryList();
+
+        for (Inventory data : inventoryDataList) {
+            if (data.getMedicineName().equalsIgnoreCase(updatedInventory.getMedicineName())) {
+                data.setCurrentStock(updatedInventory.getCurrentStock());
+                data.setReplenishmentStatus(updatedInventory.getReplenishmentStatus());
+                saveDataToCSV();
+                System.out.println("Inventory updated for medicine: " + data.getMedicineName());
+                break;
+            }
+        }
+    }
+
+    @Override
+    public List<Inventory> getInventoryList() {
+        return inventoryDataStore.getInventoryList();
+    }
+
+    @Override
+    public void addMedication(Inventory newMedication) {
+        List<Inventory> inventoryList = inventoryDataStore.getInventoryList();
+        inventoryList.add(newMedication);
+        saveDataToCSV();
+        System.out.println("Medication added: " + newMedication.getMedicineName());
+    }
+
+    @Override
+    public boolean removeMedication(String medicineName) {
+        List<Inventory> inventoryList = inventoryDataStore.getInventoryList();
+        boolean removed = inventoryList.removeIf(item -> item.getMedicineName().equalsIgnoreCase(medicineName));
+        if (removed) {
+            saveDataToCSV();
+            System.out.println("Medication removed: " + medicineName);
+        } else {
+            System.out.println("Medication not found: " + medicineName);
+        }
+        return removed;
+    }
+
+    @Override
+    public boolean updateStockLevel(String medicineName, int quantity) {
+        List<Inventory> inventoryList = inventoryDataStore.getInventoryList();
+        for (Inventory item : inventoryList) {
+            if (item.getMedicineName().equalsIgnoreCase(medicineName)) {
+                item.setCurrentStock(quantity);
+                saveDataToCSV();
+                System.out.println("Stock level updated for: " + medicineName);
+                return true;
+            }
+        }
+        System.out.println("Medication not found: " + medicineName);
+        return false;
+    }
+
+    @Override
+    public boolean updateLowStockAlert(String medicineName, int lowStockLevel) {
+        List<Inventory> inventoryList = inventoryDataStore.getInventoryList();
+        for (Inventory item : inventoryList) {
+            if (item.getMedicineName().equalsIgnoreCase(medicineName)) {
+                item.setLowLevelAlert(lowStockLevel);
+                saveDataToCSV();
+                System.out.println("Low stock alert updated for: " + medicineName);
+                return true;
+            }
+        }
+        System.out.println("Medication not found: " + medicineName);
+        return false;
+    }
+
+    /**
+     * Approves a replenishment request for a specified medication.
+     *
+     * @param medicineName The name of the medication.
+     * @return True if the request was approved and stock updated, false otherwise.
+     */
+    public boolean approveReplenishmentRequest(String medicineName) {
+        List<Inventory> inventoryDataList = inventoryDataStore.getInventoryList();
+
+        for (Inventory item : inventoryDataList) {
+            if (item.getMedicineName().equalsIgnoreCase(medicineName) &&
+                item.getReplenishmentStatus() == ReplenishmentStatus.PENDING) {
+
+                int replenishedAmount = calculateReplenishmentAmount(item.getCurrentStock(), item.getLowLevelAlert());
+
+                item.setCurrentStock(item.getCurrentStock() + replenishedAmount);
+                item.setReplenishmentStatus(ReplenishmentStatus.REPLENISHED);
+                
+                saveDataToCSV();
+                System.out.println("Replenishment approved and completed for: " + medicineName);
+                return true;
+            }
+        }
+        
+        System.out.println("Replenishment request not found or already processed for: " + medicineName);
+        return false;
     }
 }

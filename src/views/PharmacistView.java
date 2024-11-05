@@ -67,16 +67,9 @@ public class PharmacistView {
             switch (choice) {
                 case 1 -> pharmacistController.viewMedicationInventory();
                 case 2 -> pharmacistController.submitReplenishmentRequest();
-<<<<<<< HEAD
-                case 3 -> updatePrescriptionStatus();
-                case 4 -> viewAppointmentOutcomeRecords();
-                case 5 -> changePassword();
-                case 6 -> {
-=======
                 case 3 -> updatePrescriptionStatus(); 
                 case 4 -> viewAppointmentOutcomeRecords(); // New option
                 case 5 -> {
->>>>>>> parent of a4ef980 (Merge pull request #26 from nithinsankar-b/pharma)
                     System.out.println("Logging out...");
                     isRunning = false;
                 }
@@ -129,13 +122,7 @@ public class PharmacistView {
         pharmacistController.updatePrescription(appointmentId);
     }
 
-<<<<<<< HEAD
-    /**
-     * Displays the appointment outcome records for the pharmacist.
-     */
-=======
     // Method to view appointment outcome records
->>>>>>> parent of a4ef980 (Merge pull request #26 from nithinsankar-b/pharma)
     private void viewAppointmentOutcomeRecords() {
         System.out.println("Viewing Appointment Outcome Records...");
         pharmacistController.viewAppointmentOutcomeRecords();
@@ -149,14 +136,8 @@ public class PharmacistView {
         System.out.println("1. View Medication Inventory");
         System.out.println("2. Submit Replenishment Request");
         System.out.println("3. Update Prescription Status");
-<<<<<<< HEAD
-        System.out.println("4. View Appointment Outcome Record");
-        System.out.println("5. Change Password");
-        System.out.println("6. Log Out");
-=======
         System.out.println("4. View Appointment Outcome Record"); // New menu option
         System.out.println("5. Log Out");
->>>>>>> parent of a4ef980 (Merge pull request #26 from nithinsankar-b/pharma)
     }
 
     /**
@@ -173,23 +154,4 @@ public class PharmacistView {
         }
         return choice;
     }
-<<<<<<< HEAD
-
-    /**
-     * Allows the pharmacist to change their password.
-     */
-    private void changePassword() {
-        System.out.println("Enter Hospital ID");
-        String id = scanner.nextLine();
-
-        System.out.println("Enter old password");
-        String oldPassword = scanner.nextLine();
-
-        System.out.println("Enter new password");
-        String newPassword = scanner.nextLine();
-
-        pharmacistController.changePassword(id, oldPassword, newPassword);
-    }
-=======
->>>>>>> parent of a4ef980 (Merge pull request #26 from nithinsankar-b/pharma)
 }

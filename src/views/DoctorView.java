@@ -70,35 +70,6 @@ public class DoctorView {
             int choice = getUserInput();
 
             switch (choice) {
-<<<<<<< HEAD
-                case 1 -> {
-                    System.out.println("Enter Patient ID:");
-                    String p = scanner.nextLine();
-                    doctorController.medicalRecordsView(p);
-                }
-                case 2 -> doctorController.personalScheduleView(doctor);
-                case 3 -> doctorController.upcomingAppointmentsView(doctor);
-                case 4 -> doctorController.pendingAppointmentsView(doctor);
-                case 5 -> doctorController.setToAvailable(doctor);
-                case 6 -> doctorController.setToUnavailable(doctor);
-                case 7 -> doctorController.acceptAppointmentRequest();
-                case 8 -> doctorController.declineAppointmentRequest();
-                case 9 -> doctorController.newPatientDiagnosis();
-                case 10 -> doctorController.newPatientPrescription();
-                case 11 -> doctorController.appointmentOutcomeRecord();
-                case 12 -> changePassword();
-                case 13 -> {
-                    System.out.println("Logging out...");
-                    isRunning = false; // Exit the loop to log out
-                }
-                default -> System.out.println("ERROR: Invalid choice, please try again.");
-            }
-
-            // Only prompt to continue if the user has not chosen to log out
-            if (isRunning) {
-                System.out.println("\nDo you want to continue (Y/N): ");
-                String continueInput = scanner.nextLine().trim().toUpperCase();
-=======
             case 1 ->{ Scanner sc = new Scanner(System.in);
             System.out.println("Enter PatientID");
             String p=sc.nextLine();
@@ -125,7 +96,6 @@ public class DoctorView {
                 
                 String continueInput = sc.nextLine().trim().toUpperCase();
 
->>>>>>> parent of a4ef980 (Merge pull request #26 from nithinsankar-b/pharma)
                 if (continueInput.equals("N")) {
                     isRunning = false;
                 } else if (!continueInput.equals("Y")) {
@@ -188,26 +158,6 @@ public class DoctorView {
     public void showErrorMessage(String message) {
         System.out.println("ERROR: " + message);
     }
-<<<<<<< HEAD
-
-    /**
-     * Prompts the user to change their password.
-     */
-    private void changePassword() {
-        System.out.println("Enter Hospital ID:");
-        String id = scanner.nextLine();
-        
-        System.out.println("Enter old password:");
-        String oldPassword = scanner.nextLine();
-        
-        System.out.println("Enter new password:");
-        String newPassword = scanner.nextLine();
-        
-        doctorController.changePassword(id, oldPassword, newPassword);
-    }
-}
-=======
 }
 
 
->>>>>>> parent of a4ef980 (Merge pull request #26 from nithinsankar-b/pharma)

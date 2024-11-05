@@ -8,10 +8,11 @@ import enums.ReplenishmentStatus;
  * This class holds the name, quantity, inventory status, and replenishment status of a medicine.
  */
 public class InventoryDisplay {
+
     private String name;
     private int quantity;
     private InventoryStatus status;
-    private ReplenishmentStatus replenishmentStatus; // New field for ReplenishmentStatus
+    private ReplenishmentStatus replenishmentStatus;
 
     /**
      * Constructs an InventoryDisplay object with the specified parameters.
@@ -25,7 +26,7 @@ public class InventoryDisplay {
         this.name = name;
         this.quantity = quantity;
         this.status = status;
-        this.replenishmentStatus = replenishmentStatus; // Initialize the new field
+        this.replenishmentStatus = replenishmentStatus;
     }
 
     // Getters

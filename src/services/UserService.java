@@ -6,31 +6,21 @@ import interfaces.IUserService;
 
 import java.io.BufferedReader;
 import java.io.FileReader;
+import java.io.FileWriter;
 import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
 
-/**
- * UserService is responsible for managing user-related operations
- * such as loading user data from a CSV file, authenticating users,
- * changing passwords, and retrieving user roles.
- */
 public class UserService implements IUserService {
     private final Map<String, User> users;
 
-    /**
-     * Constructs a UserService instance and loads users from the specified CSV file.
-     */
+    // There is already a database in the CSV file
     public UserService() {
         users = new HashMap<>();
-        loadUsersFromCSV("data/User.csv"); // Adjusted for relative path
+        loadUsersFromCSV( "data/User.csv"); // Adjusted for relative path
     }
 
-    /**
-     * Loads users from a CSV file into the users map.
-     *
-     * @param filePath The path to the CSV file containing user data.
-     */
+    // Load users from CSV
     private void loadUsersFromCSV(String filePath) {
         String line;
         try (BufferedReader br = new BufferedReader(new FileReader(filePath))) {
@@ -40,10 +30,10 @@ public class UserService implements IUserService {
                     String hospitalID = userData[0].trim();
                     String password = userData[1].trim();
                     String roleString = userData[2].trim();
-                    if (roleString.equals("role")) {
-                        continue; // Skip header row
-                    }
-                    UserRole role = UserRole.valueOf(roleString.trim());
+                    if(roleString.equals("role"))
+                        continue;
+                    UserRole role = UserRole.valueOf(userData[2].trim());
+                    //System.out.println(hospitalID+password+userData[2].trim());
                     users.put(hospitalID, new User(hospitalID, password, role));
                 }
             }
