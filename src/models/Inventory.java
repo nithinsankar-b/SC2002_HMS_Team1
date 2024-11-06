@@ -3,6 +3,8 @@ package models;
 import enums.InventoryStatus;
 import enums.ReplenishmentStatus;
 
+import static enums.InventoryStatus.INSTOCK;
+
 /**
  * Represents the inventory of a medicine in the healthcare system.
  * This class contains information about the medicine's stock levels, 
@@ -29,7 +31,7 @@ public class Inventory {
         this.currentStock = currentStock;
         this.lowLevelAlert = lowLevelAlert;
         this.replenishmentStatus = replenishmentStatus != null ? replenishmentStatus : ReplenishmentStatus.REPLENISHED;
-        this.inventoryStatus = inventoryStatus; // Note: This might need to be initialized explicitly
+        this.inventoryStatus = INSTOCK; // Note: This might need to be initialized explicitly
     }
 
     /**
