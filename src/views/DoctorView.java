@@ -84,6 +84,10 @@ public class DoctorView {
             case 9 -> doctorController.newPatientDiagnosis();
             case 10 -> doctorController.newPatientPrescription();
             case 11 -> doctorController.appointmentOutcomeRecord();
+            case 12 -> {
+                System.out.println("Logging out...");
+                isRunning = false;
+            }
             default -> System.out.println("ERROR: Invalid choice, please try again.");
         }
 
@@ -124,6 +128,7 @@ public class DoctorView {
         System.out.println("9. Add New Diagnosis for Patient");
         System.out.println("10. Add New Prescription for Patient");
         System.out.println("11. Record Appointment Outcome");
+        System.out.println("12. Log Out");
     }
 
     /**

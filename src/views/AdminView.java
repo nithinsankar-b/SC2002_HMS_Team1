@@ -40,7 +40,7 @@ public class AdminView implements IAdministratorView {
         System.out.println("2. Manage Inventory");
         System.out.println("3. View Appointments");
         System.out.println("4. Change Password");
-        System.out.println("5. Exit");
+        System.out.println("5. Log Out");
         System.out.print("Enter your choice: ");
     }
 
