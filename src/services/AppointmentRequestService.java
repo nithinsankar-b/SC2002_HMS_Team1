@@ -9,6 +9,8 @@ import java.nio.file.Paths;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
+import services.ScheduleService;
+import services.AppointmentService;
 
 /**
  * Service class for handling appointment requests in the healthcare system.
