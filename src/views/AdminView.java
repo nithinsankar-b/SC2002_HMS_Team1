@@ -58,11 +58,20 @@ public class AdminView implements IAdministratorView {
         }
     }
 
+    // Implementing displayAppointments from AdministratorView
     @Override
     public void displayAppointments(List<Appointment> appointments) {
-        System.out.println("Appointments List:");
-        for (Appointment appointment : appointments) {
-            System.out.println(appointment);  // Assumes Appointment has a suitable toString() method
+        if (appointments.isEmpty()) {
+            System.out.println("No appointments scheduled.");
+        } else {
+            System.out.println("Scheduled Appointments:");
+            for (Appointment appointment : appointments) {
+                System.out.println("Appointment ID: " + appointment.getAppointmentId());
+                System.out.println("Patient ID: " + appointment.getPatientId());
+                System.out.println("Doctor ID: " + appointment.getDoctorId());
+                System.out.println("Date & Time: " + appointment.getAppointmentDateTime());
+                System.out.println("-------------------------------");
+            }
         }
     }
 
