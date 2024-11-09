@@ -30,7 +30,7 @@ public class Inventory {
         this.medicineName = medicineName;
         this.currentStock = currentStock;
         this.lowLevelAlert = lowLevelAlert;
-        this.replenishmentStatus = replenishmentStatus != null ? replenishmentStatus : ReplenishmentStatus.REPLENISHED;
+        this.replenishmentStatus = replenishmentStatus != null ? replenishmentStatus : ReplenishmentStatus.APPROVED;
         this.inventoryStatus = INSTOCK; // Note: This might need to be initialized explicitly
     }
 
