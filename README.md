@@ -9,7 +9,7 @@
 ![Git](https://img.shields.io/badge/git-%23F05033.svg?style=for-the-badge&logo=git&logoColor=white)
 
 **Team:** [<img src="https://avatars.githubusercontent.com/u/119853913?v=4" height="20" width="20" /> Zhan You](https://github.com/donkey-king-kong) |
-[<img src="	https://avatars.githubusercontent.com/u/144437711?v=4" height="20" width="20" /> Nithin](https://github.com/nithinsankar-b) |
+[<img src="https://avatars.githubusercontent.com/u/144437711?v=4" height="20" width="20" /> Nithin](https://github.com/nithinsankar-b) |
 [<img src="https://avatars.githubusercontent.com/u/167533024?v=4" height="20" width="20" /> Janhavee](https://github.com/JanhaveeSingh) |
 [<img src="https://avatars.githubusercontent.com/u/164110710?v=4" height="20" width="20" /> Risha](https://github.com/RISHASUN001) |
 [<img src="https://avatars.githubusercontent.com/u/164110710?v=4" height="20" width="20" /> Chang Lin (Link & Picture not updated)](https://github.com/RISHASUN001)
