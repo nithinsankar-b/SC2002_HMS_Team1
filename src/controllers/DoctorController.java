@@ -128,11 +128,13 @@ System.out.println("Requested appointment slot is Blocked.");
        String appointmentId = sc.nextLine();
        System.out.println("Enter Service Provided: ");
        String serviceProvided = sc.nextLine();
-       System.out.println("Enter medications prescribed (if more than 1 medicine, separate by comma): ");
+       System.out.println("Enter medications prescribed (if more than 1 medicine, separate by ;): ");
        String medicineList = sc.nextLine();
+         System.out.println("Enter quantities prescribed (if more than 1 medicine, separate by ;): ");
+         String quantitiesList = sc.nextLine();
        System.out.println("Enter Consultation Notes: ");
        String consultationNotes = sc.nextLine();
-       doctorService.recordAppointmentOutcome(appointmentId, serviceProvided, medicineList, consultationNotes);
+       doctorService.recordAppointmentOutcome(appointmentId, serviceProvided, medicineList, quantitiesList, consultationNotes);
 
      }
 

@@ -454,7 +454,7 @@ public class PatientController {
                 System.out.println("Consultation Notes  : " + appointment.getConsultationNotes());
                 System.out.println("Service Provided    : " + appointment.getServiceProvided());
                 System.out.println("Medications         : " + appointment.getMedications());
-                System.out.println("Medication Quantity : " + appointment.getQuantity());
+                System.out.println("Medication Quantity : " + appointment.getQuantities());
                 System.out.println("Medication Status   : " + appointment.getMedicationStatus());
             }
         }

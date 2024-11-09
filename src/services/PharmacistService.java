@@ -171,26 +171,39 @@ public class PharmacistService {
      */
     public boolean updatePrescriptionStatus(String appointmentID) {
         Appointment appointment = appointmentService.getAppointmentById(appointmentID);
-        System.out.println(appointment);// Assuming a method exists to get Appointment by ID
+
         if (appointment != null) {
             // Update the medication status in the appointment
             appointmentService.updateMedicationStatus(appointmentID);
-            
-            // Get medication and quantity from appointment
-            String medication = appointment.getMedication();
-            int quantity = appointment.getQuantity();
 
-            // Update inventory stock
-            inventoryService.updateStock(medication, quantity);
+            // Get medications and quantities from the appointment
+            List<Medication> medications = appointment.getMedications();
+            List<Integer> quantities = appointment.getQuantities();
 
-            return true;
+            // Ensure that the number of medications and quantities match
+            if (medications.size() == quantities.size()) {
+                // Update inventory stock for each medication and quantity
+                for (int i = 0; i < medications.size(); i++) {
+                    Medication medication = medications.get(i);
+                    int quantity = quantities.get(i); // Get the corresponding quantity
+
+                    // Update the stock for the medication
+                    inventoryService.updateStock(medication.getName(), quantity);  // Assuming `getName` method for Medication class
+                }
+
+                return true;
+            } else {
+                System.out.println("Error: Medications and quantities lists do not match.");
+            }
         }
+
         return false;
     }
 
 
-    
 
-    
-    }
+
+
+
+}
 

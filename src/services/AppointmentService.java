@@ -69,7 +69,7 @@ public class AppointmentService implements IAppointmentService {
     /**
      * Reschedules an existing appointment.
      *
-     * @param appointmentId The ID of the appointment to be rescheduled.
+     * @param appointmentId  The ID of the appointment to be rescheduled.
      * @param newAppointment The new appointment details.
      * @return true if the appointment was successfully rescheduled, false otherwise.
      */
@@ -124,23 +124,36 @@ public class AppointmentService implements IAppointmentService {
      * Records the outcome of an appointment, including services provided
      * and prescribed medications.
      *
-     * @param appointmentId The ID of the appointment to record the outcome for.
-     * @param serviceProvided The services provided during the appointment.
+     * @param appointmentId         The ID of the appointment to record the outcome for.
+     * @param serviceProvided       The services provided during the appointment.
      * @param prescribedMedications The list of medications prescribed during the appointment.
-     * @param consultationNotes Additional notes from the consultation.
+     * @param consultationNotes     Additional notes from the consultation.
      */
     @Override
-    public void recordAppointmentOutcome(String appointmentId, String serviceProvided, List<Medication> prescribedMedications, String consultationNotes) {
+    public void recordAppointmentOutcome(String appointmentId, String serviceProvided, List<Medication> prescribedMedications, List<Integer> prescribedQuantities, String consultationNotes) {
         Appointment appointment = getAppointment(appointmentId);
+
+        // Check if the appointment exists and is in a PENDING state
         if (appointment != null && appointment.getStatus() == AppointmentStatus.PENDING) {
             appointment.setMedicationStatus(MedicationStatus.PENDING);
             appointment.setStatus(AppointmentStatus.COMPLETED);
             appointment.setServiceProvided(serviceProvided);
             appointment.setConsultationNotes(consultationNotes);
-            for (Medication medication : prescribedMedications) {
-                appointment.addMedication(medication);
+
+            // Iterate through the prescribed medications and quantities
+            for (int i = 0; i < prescribedMedications.size(); i++) {
+                Medication medication = prescribedMedications.get(i);
+                int quantity = prescribedQuantities.get(i);  // Get the corresponding quantity
+
+                // Update the medication quantity and add it to the appointment
+                medication.setQuantity(quantity);
+                appointment.addMedication(medication, quantity);
             }
+
+            // Save the updated appointments list to CSV
             saveAppointmentsToCSV();
+        } else {
+            System.out.println("Appointment not found or already completed.");
         }
     }
 
@@ -161,7 +174,7 @@ public class AppointmentService implements IAppointmentService {
      * Retrieves available appointment slots for a specific doctor on a specific date.
      *
      * @param doctorId The ID of the doctor.
-     * @param date The date for which to find available slots.
+     * @param date     The date for which to find available slots.
      * @return A list of available LocalDateTime slots for the specified doctor and date.
      */
     /*
@@ -182,12 +195,11 @@ public class AppointmentService implements IAppointmentService {
         return availableSlots;
     }
     */
-
     public List<LocalDateTime> getAvailableSlots(String doctorId, LocalDate date) {
         List<LocalDateTime> availableSlots = new ArrayList<>();
         LocalTime startTime = LocalTime.of(9, 0);
         LocalTime endTime = LocalTime.of(17, 0);
-        ScheduleService scheduleService=new ScheduleService();
+        ScheduleService scheduleService = new ScheduleService();
 
         // Fetch the schedule for the doctor on the given date
         Map<LocalDate, Map<LocalTime, Schedule>> doctorSchedule = scheduleService.getScheduleMap().get(doctorId);
@@ -284,4 +296,5 @@ public class AppointmentService implements IAppointmentService {
         }
         System.out.println("Appointment not found.");
     }
+
 }
