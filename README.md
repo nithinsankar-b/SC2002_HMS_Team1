@@ -6,7 +6,7 @@
 ![Java](https://img.shields.io/badge/java-%23ED8B00.svg?style=for-the-badge&logo=java&logoColor=white)
 ![Git](https://img.shields.io/badge/git-%23F05033.svg?style=for-the-badge&logo=git&logoColor=white)
 
-**Team Members:** [Zhan You](https://github.com/donkey-king-kong) | [Nithin](https://github.com/nithinsankar-b) | [Janhavee](https://github.com/JanhaveeSingh) | [Risha](https://github.com/RISHASUN001) | Chang Lin
+**Team Members:** [Zhan You](https://github.com/donkey-king-kong) | [Nithin](https://github.com/nithinsankar-b) | [Janhavee](https://github.com/JanhaveeSingh) | [Risha](https://github.com/RISHASUN001) | [Chang Lin](https://github.com/Velosion)
 
 **Documentation:** [Report](https://github.com/xJQx/sc2002-fypms/blob/main/report.pdf) | [UML Class Diagram](https://github.com/xJQx/sc2002-fypms/blob/main/uml%20class%20diagram/uml-class-diagram.jpg) | [JavaDocs](https://xjqx.github.io/sc2002-fypms/sc2002_fypms/module-summary.html)
 
