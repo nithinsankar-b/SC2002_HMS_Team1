@@ -226,4 +226,30 @@ public class AppointmentService implements IAppointmentService {
             System.err.println("Error writing appointments to CSV at path: " + APPOINTMENT_FILE + " - " + e.getMessage());
         }
     }
+
+    public Appointment findAppointment(String patientId, String doctorId, LocalDate date, LocalTime timeSlot) {
+        for (Appointment appointment : appointments) {
+            if (appointment.getPatientId().equals(patientId) &&
+                    appointment.getDoctorId().equals(doctorId) &&
+                    appointment.getAppointmentDateTime().toLocalDate().equals(date) &&
+                    appointment.getAppointmentDateTime().toLocalTime().equals(timeSlot)) {
+
+                return appointment;
+            }
+        }
+        return null; // Return null if no matching appointment is found
+    }
+
+    public void updateAppointment(Appointment updatedAppointment) {
+        for (int i = 0; i < appointments.size(); i++) {
+            Appointment appointment = appointments.get(i);
+            if (appointment.getAppointmentId().equals(updatedAppointment.getAppointmentId())) {
+                appointments.set(i, updatedAppointment);
+                System.out.println("Appointment updated successfully.");
+                saveAppointmentsToCSV();
+                return;
+            }
+        }
+        System.out.println("Appointment not found.");
+    }
 }

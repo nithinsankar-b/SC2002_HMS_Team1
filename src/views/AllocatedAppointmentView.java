@@ -1,5 +1,6 @@
 package views;
 
+import enums.AppointmentStatus;
 import interfaces.iPatientView;
 
 import java.time.format.DateTimeFormatter;
@@ -51,7 +52,8 @@ public class AllocatedAppointmentView implements iPatientView {
         boolean found = false;
         for (Appointment appointment : appointments) {
             // Check if the appointment is allocated to the patient and is pending
-            if (appointment.getPatientId().equals(patient.getHospitalID()) && appointment.getStatus() == enums.AppointmentStatus.PENDING) {
+            if (appointment.getPatientId().equals(patient.getHospitalID()) && (appointment.getStatus() == enums.AppointmentStatus.PENDING|| appointment.getStatus() == AppointmentStatus.CONFIRMED || appointment.getStatus() == AppointmentStatus.CANCELLED))
+            {
                 found = true;
                 System.out.println("Appointment ID: " + appointment.getAppointmentId());
                 System.out.println("Doctor ID: " + appointment.getDoctorId());
@@ -65,9 +67,36 @@ public class AllocatedAppointmentView implements iPatientView {
                 System.out.println("------------------------");
             }
         }
-
         if (!found) {
             System.out.println("No allocated appointments found for Patient ID: " + patient.getHospitalID());
+        }
+    }
+    public void display2(Patient patient) {
+        //System.out.println("Displaying allocated appointments for Patient ID: " + patient.getHospitalID());
+
+        // Get the list of all scheduled appointments from the AppointmentService
+        List<Appointment> appointments = appointmentService.viewScheduledAppointments();
+
+        // Define a DateTimeFormatter for a 24-hour format
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd MMM yyyy, HH:mm");
+
+        // Filter appointments allocated to this patient and display them
+        boolean found = false;
+        for (Appointment appointment : appointments) {
+            // Check if the appointment is allocated to the patient and is pending
+            if (appointment.getPatientId().equals(patient.getHospitalID()) && (appointment.getStatus() == AppointmentStatus.CONFIRMED)) {
+                found = true;
+                System.out.println("Appointment ID: " + appointment.getAppointmentId());
+                System.out.println("Doctor ID: " + appointment.getDoctorId());
+
+                // Format the appointment date and time for better readability
+                String formattedDateTime = appointment.getAppointmentDateTime().format(formatter);
+                System.out.print("Date & Time: " + formattedDateTime);
+                System.out.println(" HRS");
+
+                System.out.println("Status: " + appointment.getStatus());
+                System.out.println("------------------------");
+            }
         }
     }
 }

@@ -75,15 +75,16 @@ public class PatientView implements iPatientView {
             switch (choice) {
                 case 1 -> patientController.viewPatientDetails(patient);
                 case 2 -> patientController.viewAllocatedAppointments(patient);
-                case 3 -> patientController.viewAppointmentHistory(patient);
-                case 4 -> patientController.viewMedicalRecords(patient);
-                case 5 -> patientController.updateContactInformation(patient);
-                case 6 -> patientController.createAppointment(patient);
-                case 7 -> patientController.cancelAppointment(patient);
-                case 8 -> patientController.rescheduleAppointment(patient);
-                case 9 -> patientController.viewAvailableAppointmentSlots();
-                case 10 -> showBillingOptions(patient);
-                case 11 -> {
+                case 3 ->  patientController.viewAllocatedAppointments2(patient);
+                case 4 -> patientController.viewAppointmentHistory(patient);
+                case 5 -> patientController.viewMedicalRecords(patient);
+                case 6 -> patientController.updateContactInformation(patient);
+                case 7 -> patientController.createAppointment(patient);
+                case 8 -> patientController.cancelAppointment(patient);
+                case 9 -> patientController.rescheduleAppointment(patient);
+                case 10 -> patientController.viewAvailableAppointmentSlots();
+                case 11 -> showBillingOptions(patient);
+                case 12 -> {
                     System.out.println("Logging out...");
                     isRunning = false; // Exit the loop to log out
                 }
@@ -110,16 +111,18 @@ public class PatientView implements iPatientView {
     public void displayMenu() {
         System.out.println("Please choose an option:");
         System.out.println("1. View Medical Record");
-        System.out.println("2. View Allocated Appointments");
-        System.out.println("3. View Appointment History");
-        System.out.println("4. View Medical Records");
-        System.out.println("5. Update Contact Information");
-        System.out.println("6. Create Appointment");
-        System.out.println("7. Cancel Appointment");
-        System.out.println("8. Reschedule Appointment");
-        System.out.println("9. View Available Appointment Slots");
-        System.out.println("10. View Billing Details");
-        System.out.println("11. Log Out");
+        System.out.println("2. View your Appointment Requests");
+        System.out.println("3. View Upcoming Appointments");
+        System.out.println("4. View Appointment History");
+        System.out.println("5. View Medical Records");
+        System.out.println("6. Update Contact Information");
+        System.out.println("7. Create Appointment");
+        System.out.println("8. Cancel Appointment");
+        System.out.println("9. Reschedule Appointment");
+        System.out.println("10. View Available Appointment Slots");
+        System.out.println("11. View Billing Details");
+        //System.out.println("12. View Upcoming Appointments");
+        System.out.println("12. Log Out");
     }
 
     @Override

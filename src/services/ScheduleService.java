@@ -68,6 +68,27 @@ public class ScheduleService {
         }
     }
 
+    public boolean cancelAppointment(String doctorID, LocalDate date, LocalTime timeSlot, String patientID) {
+        Map<LocalDate, Map<LocalTime, Schedule>> doctorSchedule = scheduleMap.get(doctorID);
+        if (doctorSchedule != null) {
+            Schedule schedule = doctorSchedule.get(date).get(timeSlot);
+            if (schedule != null && patientID.equals(schedule.getStatus())) {
+                schedule.setStatus("Available"); // Reset status to "Available"
+                saveSchedule(); // Save changes to CSV
+                System.out.println("Appointment canceled and time slot is now available.");
+
+            } else {
+                System.out.println("No appointment found for the specified patient.");
+
+            }
+            return true;
+        }
+        else
+        {
+            return false;
+        }
+    }
+
     /**
      * Books an appointment for a specific doctor, date, and time slot.
      *

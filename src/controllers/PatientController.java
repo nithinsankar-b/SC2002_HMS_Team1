@@ -13,6 +13,8 @@ import models.Doctor;
 import models.Patient;
 import models.Appointment;
 import services.AppointmentService;
+import models.AppointmentRequest;
+import services.AppointmentRequestService;
 import services.MedicalRecordService;
 import services.PatientService;
 import services.ScheduleService;
@@ -65,6 +67,13 @@ public class PatientController {
     public void viewAllocatedAppointments(Patient patient) {
         if (patient != null) {
             allocatedAppointmentView.display(patient);
+        } else {
+            System.out.println("Patient not found.");
+        }
+    }
+    public void viewAllocatedAppointments2(Patient patient) {
+        if (patient != null) {
+            allocatedAppointmentView.display2(patient);
         } else {
             System.out.println("Patient not found.");
         }
@@ -136,31 +145,27 @@ public class PatientController {
 
                 System.out.println("Available Doctors:");
                 while ((line = br.readLine()) != null) {
-                    // Skip the header line
                     if (!headerSkipped && line.startsWith("HospitalID")) {
                         headerSkipped = true;
                         continue;
                     }
 
-                    // Split CSV line and get doctor ID and name
                     String[] values = line.split(",");
                     String hospitalID = values[0].trim();
                     String name = values[1].trim();
 
                     System.out.println("Doctor ID: " + hospitalID + ", Name: " + name);
                 }
-
             } catch (IOException e) {
                 System.out.println("Error reading doctor file: " + e.getMessage());
                 return;
             }
 
             // Ask for Doctor ID
-            //Scanner scanner = new Scanner(System.in);
             System.out.print("Enter Doctor ID: ");
             String doctorId = scanner.nextLine();
 
-            // Ask for the date separately by day and month
+            // Ask for the date
             System.out.print("Enter Day (1-31): ");
             int day = Integer.parseInt(scanner.nextLine());
 
@@ -177,7 +182,6 @@ public class PatientController {
                 System.out.println("No available slots for the given date.");
                 return;
             } else {
-                // Adjusted Formatter to show time in HH:mm format and include "HRS"
                 DateTimeFormatter timeFormatter = DateTimeFormatter.ofPattern("HH:mm 'HRS'");
                 System.out.println("Available time slots for " + localDate + ":");
                 availableSlots.forEach(slot -> System.out.println(slot.toLocalTime().format(timeFormatter)));
@@ -186,8 +190,6 @@ public class PatientController {
             // Ask user to pick a time
             System.out.print("Enter appointment time (24HRS format -> HH:mm): ");
             String time = scanner.nextLine();
-
-            // Parse the time and combine with date
             time = time.replaceAll("[^0-9]", "");
             if (time.length() == 4) {
                 time = time.substring(0, 2) + ":" + time.substring(2);
@@ -195,7 +197,6 @@ public class PatientController {
             LocalTime localTime = LocalTime.parse(time);
             LocalDateTime dateTime = LocalDateTime.of(localDate, localTime);
 
-            // Check if the patient already has an appointment on the same day
             List<Appointment> patientAppointments = appointmentService.viewScheduledAppointments();
             boolean hasAppointmentOnSameDay = patientAppointments.stream()
                     .anyMatch(appointment -> appointment.getPatientId().equals(patient.getHospitalID()) &&
@@ -206,7 +207,6 @@ public class PatientController {
                 return;
             }
 
-            // Check if the time slot is available
             if (availableSlots.contains(dateTime)) {
                 String appointmentId = String.valueOf(System.currentTimeMillis());
                 Appointment appointment = new Appointment(appointmentId, patient.getHospitalID(), doctorId, dateTime);
@@ -214,6 +214,22 @@ public class PatientController {
                 boolean success = appointmentService.scheduleAppointment(appointment);
                 if (success) {
                     System.out.println("Appointment created successfully.");
+
+                    // Create and save the corresponding AppointmentRequest
+                    AppointmentRequest appointmentRequest = new AppointmentRequest(
+                            appointmentId, // Use the same ID
+                            patient.getHospitalID(),
+                            doctorId,
+                            localDate,
+                            localTime,
+                            "Pending"
+                    );
+                    ScheduleService scheduleService=new ScheduleService();
+                    AppointmentRequestService appointmentRequestService=new AppointmentRequestService(scheduleService,appointmentService);
+                    // Save the appointment request to a CSV file or list
+                    appointmentRequestService.save(appointmentRequest);
+
+                    System.out.println("Appointment request created with ID: " + appointmentRequest.getRequestId());
                 } else {
                     System.out.println("Failed to create appointment.");
                 }
