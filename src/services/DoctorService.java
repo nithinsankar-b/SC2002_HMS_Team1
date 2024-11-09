@@ -272,7 +272,7 @@ public class DoctorService {
         Appointment appointment = appointmentService.getAppointment(appointmentId);
         
         // Check if the appointment exists and is in a PENDING state
-        if (appointment != null && appointment.getStatus() == AppointmentStatus.PENDING) {
+        if (appointment != null && appointment.getStatus() == AppointmentStatus.CONFIRMED) {
             // Create a list to hold Medication objects
             List<Medication> prescribedMedications = new ArrayList<>();
 
@@ -287,6 +287,8 @@ public class DoctorService {
 
             // Record the appointment outcome with the created medications
             appointmentService.recordAppointmentOutcome(appointmentId, serviceProvided, prescribedMedications, consultationNotes);
+            appointment.setStatus(AppointmentStatus.COMPLETED);
+            appointmentService.saveAppointmentsToCSV();
             System.out.println("Appointment outcome recorded successfully.");
         } else {
             System.out.println("Appointment not found or already completed.");

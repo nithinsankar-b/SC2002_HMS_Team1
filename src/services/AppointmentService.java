@@ -245,7 +245,7 @@ public class AppointmentService implements IAppointmentService {
     }
 
     // Save appointments to CSV file
-    private void saveAppointmentsToCSV() {
+    public void saveAppointmentsToCSV() {
         try (BufferedWriter writer = new BufferedWriter(new FileWriter(APPOINTMENT_FILE))) {
             // Write header to the CSV file
             writer.write("appointmentId,patientId,doctorId,appointmentDateTime,status,consultationNotes,serviceProvided,medications,quantity,medicationStatus");

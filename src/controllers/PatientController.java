@@ -6,6 +6,7 @@ import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.time.format.DateTimeFormatter;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Scanner;
 import models.Doctor;
@@ -423,6 +424,39 @@ public class PatientController {
             availableSlots.forEach(slot ->
                     System.out.println(slot.format(formatter))
             );
+        }
+    }
+    public void viewPastRecords(Patient patient) {
+        // Fetch all the appointments for this patient
+        AppointmentService appointmentService=new AppointmentService();
+        List<Appointment> allAppointments = appointmentService.viewScheduledAppointments();
+
+        // Filter out the appointments that are completed and belong to this patient
+        List<Appointment> completedAppointments = new ArrayList<>();
+        for (Appointment appointment : allAppointments) {
+            if (appointment.getPatientId().equals(patient.getHospitalID()) &&
+                    enums.AppointmentStatus.COMPLETED.equals(appointment.getStatus())) {
+                completedAppointments.add(appointment);
+            }
+        }
+
+        // If there are any completed appointments, display them
+        if (completedAppointments.isEmpty()) {
+            System.out.println("No past completed appointments found for Patient ID: " + patient.getHospitalID());
+        } else {
+            System.out.println("Displaying Past Completed Appointments for Patient: " + patient.getName() + " (ID: " + patient.getHospitalID() + ")");
+            for (Appointment appointment : completedAppointments) {
+                System.out.println("Appointment ID      : " + appointment.getAppointmentId());
+                System.out.println("Patient ID          : " + appointment.getPatientId());
+                System.out.println("Doctor ID           : " + appointment.getDoctorId());
+                System.out.println("Appointment DateTime: " + appointment.getAppointmentDateTime());
+                System.out.println("Status              : " + appointment.getStatus());
+                System.out.println("Consultation Notes  : " + appointment.getConsultationNotes());
+                System.out.println("Service Provided    : " + appointment.getServiceProvided());
+                System.out.println("Medications         : " + appointment.getMedications());
+                System.out.println("Medication Quantity : " + appointment.getQuantity());
+                System.out.println("Medication Status   : " + appointment.getMedicationStatus());
+            }
         }
     }
 }

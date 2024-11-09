@@ -44,6 +44,7 @@ public class Appointment {
     public void setStatus(AppointmentStatus status) { this.status = status; }
 
     public List<Medication> getMedications() { return medications; }
+
     public void addMedication(Medication medication) { medications.add(medication); }
 
     public String getConsultationNotes() { return consultationNotes; }
