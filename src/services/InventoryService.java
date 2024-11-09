@@ -50,7 +50,7 @@ public class InventoryService implements IInventoryService {
             for (Inventory item : inventoryDataStore.getInventoryList()) {
                 String replenishmentStatus = item.getReplenishmentStatus() != null 
                     ? item.getReplenishmentStatus().toString() 
-                    : ReplenishmentStatus.REPLENISHED.toString();
+                    : ReplenishmentStatus.APPROVED.toString();
                 String line = String.join(DELIMITER,
                         item.getMedicineName(),
                         String.valueOf(item.getCurrentStock()),
@@ -298,7 +298,7 @@ public class InventoryService implements IInventoryService {
                 int replenishedAmount = calculateReplenishmentAmount(item.getCurrentStock(), item.getLowLevelAlert());
 
                 item.setCurrentStock(item.getCurrentStock() + replenishedAmount);
-                item.setReplenishmentStatus(ReplenishmentStatus.REPLENISHED);
+                item.setReplenishmentStatus(ReplenishmentStatus.APPROVED);
                 
                 saveDataToCSV();
                 System.out.println("Replenishment approved and completed for: " + medicineName);
