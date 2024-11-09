@@ -13,11 +13,14 @@ import models.Doctor;
 import models.Patient;
 import models.Appointment;
 import services.AppointmentService;
+import services.MedicalRecordService;
 import services.PatientService;
+import services.ScheduleService;
+import services.DoctorService;
+import services.UserService;
 import views.AllocatedAppointmentView;
 import views.AppointmentHistoryView;
 import views.MedicalRecordView;
-import services.UserService;
 
 import java.io.BufferedReader;
 import java.io.FileReader;
@@ -27,6 +30,7 @@ import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.time.format.DateTimeFormatter;
+import controllers.DoctorController;
 import java.util.stream.Collectors;
 
 public class PatientController {
@@ -49,11 +53,12 @@ public class PatientController {
 
     // Method to view patient details
     public void viewPatientDetails(Patient patient) {
-        if (patient != null) {
-            allocatedAppointmentView.showPatientDetails(patient);
-        } else {
-            allocatedAppointmentView.showErrorMessage("Patient not found.");
-        }
+        UserService userService=new UserService();
+        ScheduleService scheduleService=new services.ScheduleService();
+        MedicalRecordService medicalRecordService=new MedicalRecordService();
+        DoctorService doctorService=new DoctorService(userService, scheduleService,medicalRecordService,appointmentService);
+        DoctorController doctorController=new controllers.DoctorController(doctorService,scheduleService,medicalRecordService, appointmentService);
+        doctorController.medicalRecordsView(patient.getHospitalID());
     }
 
     // Method to view allocated appointments
@@ -87,9 +92,27 @@ public class PatientController {
     public void updateContactInformation(Patient patient) {
         if (patient != null) {
             Scanner scanner = new Scanner(System.in);
-            System.out.print("Enter new contact information: ");
+            System.out.println("Which contact information would you like to update?");
+            System.out.println("1. Phone Number");
+            System.out.println("2. Email Address");
+            System.out.print("Enter your choice (1 or 2): ");
+            int choice = scanner.nextInt();
+            scanner.nextLine(); // Consume newline
+
+            String contactType = "";
+            if (choice == 1) {
+                contactType = "phone";
+            } else if (choice == 2) {
+                contactType = "email";
+            } else {
+                System.out.println("Invalid choice. Please select 1 or 2.");
+                return;
+            }
+
+            System.out.print("Enter new " + (contactType.equals("phone") ? "phone number" : "email address") + ": ");
             String newContactInfo = scanner.nextLine();
-            boolean success = patientService.updatePatientContact(patient.getHospitalID(), newContactInfo);
+
+            boolean success = patientService.updatePatientContact(patient.getHospitalID(), newContactInfo, contactType);
             if (success) {
                 System.out.println("Contact information updated successfully.\nUpdated information will be reflected upon next login.");
             } else {

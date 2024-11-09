@@ -109,7 +109,7 @@ public class PatientView implements iPatientView {
     // Implementing the display method to show the main menu
     public void displayMenu() {
         System.out.println("Please choose an option:");
-        System.out.println("1. View Patient Details");
+        System.out.println("1. View Medical Record");
         System.out.println("2. View Allocated Appointments");
         System.out.println("3. View Appointment History");
         System.out.println("4. View Medical Records");

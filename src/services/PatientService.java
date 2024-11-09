@@ -13,6 +13,8 @@ import java.util.Map;
 import enums.UserRole;
 import models.Patient;
 import models.User;
+import models.MedicalRecord;
+import services.MedicalRecordService;
 import services.UserService;
 import services.AppointmentService;
 
@@ -45,12 +47,33 @@ public class PatientService {
     }
 
     // Method to update patient contact information
-    public boolean updatePatientContact(String hospitalID, String newContactInformation) {
+    /* public boolean updatePatientContact(String hospitalID, String newContactInformation) {
         Patient patient = patients.get(hospitalID);
         if (patient != null) {
             patient.setContactInformation(newContactInformation);
             savePatientsToCSV(); // Save changes after update
 
+            return true;
+        }
+        return false;
+    } */
+
+    public boolean updatePatientContact(String hospitalID, String newContactInformation, String contactType) {
+        Patient patient = patients.get(hospitalID);
+        if (patient != null) {
+            MedicalRecordService medicalRecordService=new MedicalRecordService();
+            // Update the corresponding medical record as well
+            MedicalRecord medicalRecord = medicalRecordService.getMedicalRecord(hospitalID);
+            if (medicalRecord != null) {
+                if ("phone".equalsIgnoreCase(contactType)) {
+                    medicalRecord.setPhoneNumber(newContactInformation);
+                } else if ("email".equalsIgnoreCase(contactType)) {
+                    medicalRecord.setEmailAddress(newContactInformation);
+                }
+                medicalRecordService.saveRecordsToCSV(); // Save medical records after update
+            }
+
+            savePatientsToCSV(); // Save changes after update
             return true;
         }
         return false;
