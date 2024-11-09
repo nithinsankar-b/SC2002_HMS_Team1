@@ -54,16 +54,41 @@ Follow these instructions to clone, compile, and run the project:
 ### Login Credentials
 
 **Patients:**
-- PATIENTID: P1011, PASSWORD: patient11
-- PATIENTID: P1012, PASSWORD: patient12
-- PATIENTID: P1013, PASSWORD: patient13
+```bash
+# Patient 1
+PATIENTID: P1011
+PASSWORD: patient11
+
+# Patient 2
+PATIENTID: P1012
+PASSWORD: patient12
+
+# Patient 3
+PATIENTID: P1013
+PASSWORD: patient13
+```
 
 **Doctors:**
-- DOCTORID: D001, PASSWORD: doctor1
-- DOCTORID: D002, PASSWORD: doctor2
+```bash
+# Doctor 1
+DOCTORID: D001
+PASSWORD: doctor1
+
+# Doctor 2
+DOCTORID: D002
+PASSWORD: doctor2
+```
 
 **Pharmacists:**
-- PHARMACISTID: PH001, PASSWORD: pharmacist1
+```bash
+# Pharmacist 1
+PHARMACISTID: PH001
+PASSWORD: pharmacist1
+```
 
 **Administrator:**
-- ADMINID: A001, PASSWORD: administrator1
+```bash
+# Admininistrator (Only 1)
+ADMINID: A001
+PASSWORD: administrator1
+```
