@@ -16,7 +16,6 @@
 
 - [HMS Setup Instructions](#hms-setup-instructions)
   - [Compiling and Running the Project](#compiling-and-running-the-project)
-    - [Through the Terminal](#through-the-terminal)
 - [Usage](#usage)
   - [Login Credentials](#login-credentials)
 
