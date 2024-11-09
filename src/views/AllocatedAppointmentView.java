@@ -39,7 +39,7 @@ public class AllocatedAppointmentView implements iPatientView {
     // Display method
     @Override
     public void display(Patient patient) {
-        System.out.println("Displaying allocated appointments for Patient ID: " + patient.getHospitalID());
+        //System.out.println("Displaying allocated appointments for Patient ID: " + patient.getHospitalID());
 
         // Get the list of all scheduled appointments from the AppointmentService
         List<Appointment> appointments = appointmentService.viewScheduledAppointments();

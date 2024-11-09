@@ -50,6 +50,7 @@ public class PatientService {
         if (patient != null) {
             patient.setContactInformation(newContactInformation);
             savePatientsToCSV(); // Save changes after update
+
             return true;
         }
         return false;

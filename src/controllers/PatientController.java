@@ -1,11 +1,14 @@
 package controllers;
 
+import java.io.BufferedReader;
+import java.io.FileReader;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.time.format.DateTimeFormatter;
 import java.util.List;
 import java.util.Scanner;
+import models.Doctor;
 
 import models.Patient;
 import models.Appointment;
@@ -14,6 +17,17 @@ import services.PatientService;
 import views.AllocatedAppointmentView;
 import views.AppointmentHistoryView;
 import views.MedicalRecordView;
+import services.UserService;
+
+import java.io.BufferedReader;
+import java.io.FileReader;
+import java.io.IOException;
+import java.util.Scanner;
+import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.time.LocalTime;
+import java.time.format.DateTimeFormatter;
+import java.util.stream.Collectors;
 
 public class PatientController {
     private final PatientService patientService;
@@ -75,7 +89,6 @@ public class PatientController {
             Scanner scanner = new Scanner(System.in);
             System.out.print("Enter new contact information: ");
             String newContactInfo = scanner.nextLine();
-
             boolean success = patientService.updatePatientContact(patient.getHospitalID(), newContactInfo);
             if (success) {
                 System.out.println("Contact information updated successfully.\nUpdated information will be reflected upon next login.");
@@ -88,78 +101,129 @@ public class PatientController {
     }
 
     // Method to create an appointment for a patient
+
     public void createAppointment(Patient patient) {
         if (patient != null) {
             Scanner scanner = new Scanner(System.in);
-            System.out.print("Enter Doctor ID (Case Sensitive): ");
+
+            // Load doctors from doctor.csv file and display their ID and Name
+            try (BufferedReader br = new BufferedReader(new FileReader("data//doctor.csv"))) {
+                String line;
+                boolean headerSkipped = false;
+
+                System.out.println("Available Doctors:");
+                while ((line = br.readLine()) != null) {
+                    // Skip the header line
+                    if (!headerSkipped && line.startsWith("HospitalID")) {
+                        headerSkipped = true;
+                        continue;
+                    }
+
+                    // Split CSV line and get doctor ID and name
+                    String[] values = line.split(",");
+                    String hospitalID = values[0].trim();
+                    String name = values[1].trim();
+
+                    System.out.println("Doctor ID: " + hospitalID + ", Name: " + name);
+                }
+
+            } catch (IOException e) {
+                System.out.println("Error reading doctor file: " + e.getMessage());
+                return;
+            }
+
+            // Ask for Doctor ID
+            //Scanner scanner = new Scanner(System.in);
+            System.out.print("Enter Doctor ID: ");
             String doctorId = scanner.nextLine();
 
-            System.out.print("Enter appointment date (yyyy-MM-dd): ");
-            String date = scanner.nextLine();
+            // Ask for the date separately by day and month
+            System.out.print("Enter Day (1-31): ");
+            int day = Integer.parseInt(scanner.nextLine());
 
-            try {
-                // Parse the date
-                LocalDate localDate = LocalDate.parse(date);
+            System.out.print("Enter Month (1-12): ");
+            int month = Integer.parseInt(scanner.nextLine());
 
-                // Display available slots for the given day
-                List<LocalDateTime> availableSlots = appointmentService.getAvailableSlots(doctorId, localDate);
-                if (availableSlots.isEmpty()) {
-                    System.out.println("No available slots for the given date.");
-                    return;
+            System.out.print("Enter Year (YYYY): ");
+            int year = Integer.parseInt(scanner.nextLine());
+            LocalDate localDate = LocalDate.of(year, month, day);
+
+            // Display available slots for the given day and doctor
+            List<LocalDateTime> availableSlots = appointmentService.getAvailableSlots(doctorId, localDate);
+            if (availableSlots.isEmpty()) {
+                System.out.println("No available slots for the given date.");
+                return;
+            } else {
+                // Adjusted Formatter to show time in HH:mm format and include "HRS"
+                DateTimeFormatter timeFormatter = DateTimeFormatter.ofPattern("HH:mm 'HRS'");
+                System.out.println("Available time slots for " + localDate + ":");
+                availableSlots.forEach(slot -> System.out.println(slot.toLocalTime().format(timeFormatter)));
+            }
+
+            // Ask user to pick a time
+            System.out.print("Enter appointment time (24HRS format -> HH:mm): ");
+            String time = scanner.nextLine();
+
+            // Parse the time and combine with date
+            time = time.replaceAll("[^0-9]", "");
+            if (time.length() == 4) {
+                time = time.substring(0, 2) + ":" + time.substring(2);
+            }
+            LocalTime localTime = LocalTime.parse(time);
+            LocalDateTime dateTime = LocalDateTime.of(localDate, localTime);
+
+            // Check if the patient already has an appointment on the same day
+            List<Appointment> patientAppointments = appointmentService.viewScheduledAppointments();
+            boolean hasAppointmentOnSameDay = patientAppointments.stream()
+                    .anyMatch(appointment -> appointment.getPatientId().equals(patient.getHospitalID()) &&
+                            appointment.getAppointmentDateTime().toLocalDate().equals(localDate));
+
+            if (hasAppointmentOnSameDay) {
+                System.out.println("You already have an appointment booked on the selected day. Please choose another day.");
+                return;
+            }
+
+            // Check if the time slot is available
+            if (availableSlots.contains(dateTime)) {
+                String appointmentId = String.valueOf(System.currentTimeMillis());
+                Appointment appointment = new Appointment(appointmentId, patient.getHospitalID(), doctorId, dateTime);
+
+                boolean success = appointmentService.scheduleAppointment(appointment);
+                if (success) {
+                    System.out.println("Appointment created successfully.");
                 } else {
-                    // Adjusted Formatter to show time in HH:mm format and include "HRS"
-                    DateTimeFormatter timeFormatter = DateTimeFormatter.ofPattern("HH:mm 'HRS'");
-                    System.out.println("Available time slots:");
-                    availableSlots.forEach(slot -> System.out.println(slot.toLocalTime().format(timeFormatter)));
+                    System.out.println("Failed to create appointment.");
                 }
-
-                // Ask user to pick a time
-                System.out.print("Enter appointment time (24HRS format -> HH:mm): ");
-                String time = scanner.nextLine();
-
-                // Parse the time and combine with date
-                time = time.replaceAll("[^0-9]", "");
-                if (time.length() == 4) {
-                    time = time.substring(0, 2) + ":" + time.substring(2);
-                }
-                LocalTime localTime = LocalTime.parse(time);
-                LocalDateTime dateTime = LocalDateTime.of(localDate, localTime);
-
-                // Check if the patient already has an appointment on the same day
-                List<Appointment> patientAppointments = appointmentService.viewScheduledAppointments();
-                boolean hasAppointmentOnSameDay = patientAppointments.stream()
-                        .anyMatch(appointment -> appointment.getPatientId().equals(patient.getHospitalID()) &&
-                                appointment.getAppointmentDateTime().toLocalDate().equals(localDate));
-
-                if (hasAppointmentOnSameDay) {
-                    System.out.println("You already have an appointment booked on the selected day. Please choose another day.");
-                    return;
-                }
-
-                // Check if the time slot is available
-                if (availableSlots.contains(dateTime)) {
-                    String appointmentId = String.valueOf(System.currentTimeMillis());
-                    Appointment appointment = new Appointment(appointmentId, patient.getHospitalID(), doctorId, dateTime);
-
-                    boolean success = appointmentService.scheduleAppointment(appointment);
-                    if (success) {
-                        System.out.println("Appointment created successfully.");
-                    } else {
-                        System.out.println("Failed to create appointment.");
-                    }
-                } else {
-                    System.out.println("The selected time slot is not available. Please choose another time.");
-                }
-            } catch (Exception e) {
-                System.out.println("Invalid date or time format. Please use yyyy-MM-dd for date and HH:mm for time.");
+            } else {
+                System.out.println("The selected time slot is not available. Please choose another time.");
             }
         } else {
             System.out.println("Patient not found.");
         }
     }
 
+
     // Method to cancel an appointment for a patient
     public void cancelAppointment(Patient patient) {
+        viewAllocatedAppointments(patient);
+        if (patient == null) {
+            System.out.println("Patient not found.");
+            return; // Exit if no patient is provided
+        }
+
+        // Retrieve all scheduled appointments and filter by hospitalID
+        List<Appointment> appointments = appointmentService.viewScheduledAppointments();
+
+        // Filter the list of appointments by patient's hospitalID
+        List<Appointment> patientAppointments = appointments.stream()
+                .filter(appointment -> appointment.getPatientId().equals(patient.getHospitalID()))
+                .collect(Collectors.toList());
+
+        // Check if the filtered list of appointments is empty
+        if (patientAppointments.isEmpty()) {
+            //System.out.println("You have no appointments to reschedule.");
+            return; // Exit if no appointments found
+        }
         if (patient != null) {
             Scanner scanner = new Scanner(System.in);
             System.out.print("Enter Appointment ID: ");
@@ -178,6 +242,26 @@ public class PatientController {
 
     // Method to reschedule an existing appointment
     public void rescheduleAppointment(Patient patient) {
+        viewAllocatedAppointments(patient);
+        if (patient == null) {
+            System.out.println("Patient not found.");
+            return; // Exit if no patient is provided
+        }
+
+        // Retrieve all scheduled appointments and filter by hospitalID
+        List<Appointment> appointments = appointmentService.viewScheduledAppointments();
+
+        // Filter the list of appointments by patient's hospitalID
+        List<Appointment> patientAppointments = appointments.stream()
+                .filter(appointment -> appointment.getPatientId().equals(patient.getHospitalID()))
+                .collect(Collectors.toList());
+
+        // Check if the filtered list of appointments is empty
+        if (patientAppointments.isEmpty()) {
+            //System.out.println("You have no appointments to reschedule.");
+            return; // Exit if no appointments found
+        }
+
         if (patient != null) {
             Scanner scanner = new Scanner(System.in);
             System.out.print("Enter Appointment ID: ");
@@ -195,14 +279,15 @@ public class PatientController {
                     System.out.println("Current Appointment Slot: " + currentDateTime.format(currentFormatter));
 
                     // Ask for the new appointment date in yyyy-MM-dd format
-                    System.out.print("Enter new appointment date (yyyy-MM-dd): ");
-                    String newDateStr = scanner.nextLine();
+                    System.out.print("Enter Day (1-31): ");
+                    int day = Integer.parseInt(scanner.nextLine());
 
-                    // Define the formatter for date
-                    DateTimeFormatter dateFormatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
+                    System.out.print("Enter Month (1-12): ");
+                    int month = Integer.parseInt(scanner.nextLine());
 
-                    // Parse the date
-                    LocalDate newDate = LocalDate.parse(newDateStr, dateFormatter);
+                    System.out.print("Enter Year (YYYY): ");
+                    int year = Integer.parseInt(scanner.nextLine());
+                    LocalDate newDate = LocalDate.of(year, month, day);
 
                     // Fetch available slots for that doctor on the specified date
                     List<LocalDateTime> availableSlots = appointmentService.getAvailableSlots(doctorId, newDate);
@@ -215,7 +300,8 @@ public class PatientController {
                         DateTimeFormatter slotFormatter = DateTimeFormatter.ofPattern("HH:mm 'HRS'");
                         availableSlots.forEach(slot -> System.out.println(slot.format(slotFormatter)));
 
-                        // Ask the user to enter a new time from the available options
+
+
                         System.out.print("Enter new appointment time (e.g., 1430, 1430HRS, or 14:30): ");
                         String newTimeStr = scanner.nextLine();
 

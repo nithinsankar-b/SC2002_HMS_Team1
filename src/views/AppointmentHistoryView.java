@@ -39,7 +39,7 @@ public class AppointmentHistoryView implements iPatientView {
     // Display method with formatted date and time, including "HRS"
     @Override
     public void display(Patient patient) {
-        System.out.println("Displaying appointment history for Patient ID: " + patient.getHospitalID());
+        //System.out.println("Displaying appointment history for Patient ID: " + patient.getHospitalID());
 
         // Get the list of all scheduled appointments from AppointmentService
         List<Appointment> appointments = appointmentService.viewScheduledAppointments();

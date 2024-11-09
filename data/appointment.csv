@@ -1,3 +1,4 @@
 appointmentId,patientId,doctorId,appointmentDateTime,status,consultationNotes,serviceProvided,medications,quantity,medicationStatus
 172978546321,P1003,D003,2023-12-31T15:00,PENDING,XYZ,Rescheduled,paracetamol,10,DISPENSED
-1729780000000,P1003,D003,2023-12-31T13:30,PENDING,ABC,Rescheduled,panadol,5,PENDING
+1729780000000,P1003,D003,2023-12-31T13:30,PENDING,ABC,Rescheduled,panadol,5,DISPENSED
+1731172128507,P1001,DOO1,2024-11-10T14:00,PENDING,,,,0,PENDING
