@@ -70,6 +70,7 @@ public class AdminView implements IAdministratorView {
                 System.out.println("Patient ID: " + appointment.getPatientId());
                 System.out.println("Doctor ID: " + appointment.getDoctorId());
                 System.out.println("Date & Time: " + appointment.getAppointmentDateTime());
+                System.out.println("Status: " + appointment.getStatus()); // Added line for status
                 System.out.println("-------------------------------");
             }
         }
