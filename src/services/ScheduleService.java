@@ -34,6 +34,9 @@ public class ScheduleService {
         this.scheduleMap = new HashMap<>();
         loadSchedule(); // Load schedules from CSV on initialization
     }
+    public Map<String, Map<LocalDate, Map<LocalTime, Schedule>>> getScheduleMap() {
+        return scheduleMap;
+    }
 
     /**
      * Loads the schedule data from the CSV file into memory.

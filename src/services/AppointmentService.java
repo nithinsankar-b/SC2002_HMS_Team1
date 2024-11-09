@@ -4,6 +4,7 @@ import models.Appointment;
 import enums.AppointmentStatus;
 import enums.MedicationStatus;
 import models.Medication;
+import models.Schedule;
 
 import java.io.*;
 import interfaces.IAppointmentService;
@@ -12,6 +13,8 @@ import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
+import services.ScheduleService;
 
 /**
  * Service class for managing appointments in a hospital management system.
@@ -161,6 +164,7 @@ public class AppointmentService implements IAppointmentService {
      * @param date The date for which to find available slots.
      * @return A list of available LocalDateTime slots for the specified doctor and date.
      */
+    /*
     @Override
     public List<LocalDateTime> getAvailableSlots(String doctorId, LocalDate date) {
         List<LocalDateTime> availableSlots = new ArrayList<>();
@@ -170,11 +174,39 @@ public class AppointmentService implements IAppointmentService {
         for (LocalTime time = startTime; time.isBefore(endTime); time = time.plusMinutes(30)) {
             LocalDateTime slot = LocalDateTime.of(date, time);
             boolean isOccupied = appointments.stream()
-                    .anyMatch(appointment -> appointment.getDoctorId().equals(doctorId) && appointment.getAppointmentDateTime().equals(slot));
+                    .anyMatch(appointment -> appointment.getDoctorId().equals(doctorId) && appointment.getAppointmentDateTime().equals(slot)&&appointment);
             if (!isOccupied) {
                 availableSlots.add(slot);
             }
         }
+        return availableSlots;
+    }
+    */
+
+    public List<LocalDateTime> getAvailableSlots(String doctorId, LocalDate date) {
+        List<LocalDateTime> availableSlots = new ArrayList<>();
+        LocalTime startTime = LocalTime.of(9, 0);
+        LocalTime endTime = LocalTime.of(17, 0);
+        ScheduleService scheduleService=new ScheduleService();
+
+        // Fetch the schedule for the doctor on the given date
+        Map<LocalDate, Map<LocalTime, Schedule>> doctorSchedule = scheduleService.getScheduleMap().get(doctorId);
+        if (doctorSchedule != null) {
+            Map<LocalTime, Schedule> daySchedule = doctorSchedule.get(date);
+            if (daySchedule != null) {
+                // Iterate over all the time slots between start and end time
+                for (LocalTime time = startTime; time.isBefore(endTime); time = time.plusMinutes(30)) {
+                    LocalDateTime slot = LocalDateTime.of(date, time);
+                    Schedule schedule = daySchedule.get(time);
+
+                    // If the time slot is available (status is "Available")
+                    if (schedule != null && "Available".equals(schedule.getStatus())) {
+                        availableSlots.add(slot);  // Add to available slots
+                    }
+                }
+            }
+        }
+
         return availableSlots;
     }
 
