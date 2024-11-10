@@ -65,9 +65,14 @@ public class UserService implements IUserService {
      */
     @Override
     public boolean changePassword(String hospitalID, String oldPassword, String newPassword) {
-        User user = users.get(hospitalID);
+        User user = users.get(hospitalID); // Retrieve the user by hospitalID
         if (user != null && user.getPassword().equals(oldPassword)) {
+            // Update the password
             user.setPassword(newPassword);
+    
+            // Save the updated users map to CSV
+            writeUsersToCSV();
+    
             return true;
         }
         return false;
@@ -131,4 +136,21 @@ public class UserService implements IUserService {
             System.out.println("Error writing to CSV file: " + e.getMessage());
         }
     }
+    private void writeUsersToCSV() {
+        try (FileWriter writer = new FileWriter("data/User.csv")) {
+            // Write header, if needed
+            writer.write("hospitalID,password,role\n");
+    
+            // Write each user's details to the CSV
+            for (User user : users.values()) {
+                writer.write(user.getHospitalID() + "," + user.getPassword() + "," + user.getRole() + "\n");
+            }
+    
+            System.out.println("User data saved successfully to user.csv.");
+        } catch (IOException e) {
+            System.out.println("Error writing to CSV file: " + e.getMessage());
+        }
+    }
+    
 }
+

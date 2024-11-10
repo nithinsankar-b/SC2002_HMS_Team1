@@ -55,24 +55,52 @@ public class ProjectAdminService implements IProjectAdmService {
      *
      * @param staffMember The staff member to be added or updated.
      */
-   @Override
-    public void addOrUpdateStaff(Staff staffMember) {
-        staffDataStore.addOrUpdateStaff(staffMember);
-        
-        // Add or update in UserService
-        if ("Doctor".equalsIgnoreCase(staffMember.getRole()) || "Pharmacist".equalsIgnoreCase(staffMember.getRole()) || "Administrator".equalsIgnoreCase(staffMember.getRole())) {
-            String defaultPassword = "password"; // You may want to prompt for this or generate one
-            UserRole userRole = UserRole.valueOf(staffMember.getRole().toUpperCase());
-            userService.addUser(new User(staffMember.getId(), defaultPassword, userRole));
-        }
+    @Override
+public void addOrUpdateStaff(Staff staffMember) {
+    // Check if the staff member already exists in StaffDataStore
+    Staff existingStaff = staffDataStore.getStaffList().get(staffMember.getId());
 
-        try {
-            staffDataStore.writeStaffToCSV(STAFF_CSV_PATH);
-            System.out.println("Staff member added/updated: " + staffMember.getId());
-        } catch (IOException e) {
-            System.err.println("Error saving staff data: " + e.getMessage());
+    // Determine the role
+    String role;
+    if (existingStaff != null) {
+        // If the staff member exists, preserve the existing role
+        role = existingStaff.getRole();
+        System.out.println("Updating existing staff. Preserving role: " + role);
+    } else {
+        // For new staff, validate that the role is either Doctor or Pharmacist
+        if (!"Doctor".equalsIgnoreCase(staffMember.getRole()) && !"Pharmacist".equalsIgnoreCase(staffMember.getRole())) {
+            System.out.println("Error: Only Doctor or Pharmacist roles can be added.");
+            return; // Exit the method if an invalid role is provided for new staff
         }
+        role = staffMember.getRole(); // Use the provided role for new staff
+        System.out.println("Adding new staff with role: " + role);
     }
+
+    // Create a new Staff object with the preserved or validated role
+    Staff staffToSave = new Staff(staffMember.getId(), staffMember.getName(), role, staffMember.getGender(), staffMember.getAge());
+
+    // Add or update the staff member in StaffDataStore
+    staffDataStore.addOrUpdateStaff(staffToSave);
+
+    // Add or update the user in UserService
+    User existingUser = userService.getUserById(staffMember.getId());
+    String password = (existingUser != null) ? existingUser.getPassword() : "password"; // Default password for new users
+
+    // Set the appropriate role for UserService only if the user is new
+    UserRole userRole = UserRole.valueOf(role.toUpperCase());
+    userService.addUser(new User(staffMember.getId(), password, userRole));
+
+    // Write updated staff list to CSV
+    try {
+        staffDataStore.writeStaffToCSV(STAFF_CSV_PATH);
+        System.out.println("Staff member added/updated: " + staffMember.getId());
+    } catch (IOException e) {
+        System.err.println("Error saving staff data: " + e.getMessage());
+    }
+}
+
+    
+    
 
     /**
      * Removes a staff member from the system by their ID.
