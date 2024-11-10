@@ -133,6 +133,33 @@ public class PatientController {
         }
     }
 
+    public boolean changePassword(Patient patient) {
+        Scanner scanner = new Scanner(System.in);
+
+        // Prompt for old password
+        System.out.print("Enter old password: ");
+        String oldPassword = scanner.nextLine();
+
+        // Prompt for new password
+        System.out.print("Enter your new password: ");
+        String newPassword = scanner.nextLine();
+
+        // Get the hospitalID directly from the patient object
+        String hospitalID = patient.getHospitalID();
+
+        // Call the changePassword method in patientService
+        boolean isChanged = patientService.changePassword(hospitalID, oldPassword, newPassword);
+
+        // Inform the user of the result
+        if (isChanged) {
+            System.out.println("Password changed successfully.");
+        } else {
+            System.out.println("Password change failed. Please check old password input and try again.");
+        }
+        return isChanged;
+    }
+
+
     // Method to create an appointment for a patient
 
     public void createAppointment(Patient patient) {

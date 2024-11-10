@@ -82,9 +82,10 @@ public class PatientView implements iPatientView {
                 case 7 -> patientController.cancelAppointment(patient);
                 case 8 -> patientController.rescheduleAppointment(patient);
                 case 9 -> patientController.viewAvailableAppointmentSlots();
-                case 10 ->patientController.viewPastRecords(patient);
+                case 10 -> patientController.viewPastRecords(patient);
                 case 11 -> showBillingOptions(patient);
-                case 12 -> {
+                case 12 -> patientController.changePassword(patient); // New case for password change
+                case 13 -> {
                     System.out.println("Logging out...");
                     isRunning = false; // Exit the loop to log out
                 }
@@ -121,8 +122,9 @@ public class PatientView implements iPatientView {
         System.out.println("9. View Available Appointment Slots");
         System.out.println("10. View Past Outcome Records");
         System.out.println("11. View Billing Details");
+        System.out.println("12. Change Password");
         //System.out.println("12. View Upcoming Appointments");
-        System.out.println("12. Log Out");
+        System.out.println("13. Log Out");
     }
 
     @Override
@@ -136,7 +138,7 @@ public class PatientView implements iPatientView {
         try {
             choice = Integer.parseInt(scanner.nextLine());
         } catch (NumberFormatException e) {
-            showErrorMessage("Invalid input. Please enter a number between 1 and 10.");
+            showErrorMessage("Invalid input. Please enter a number between 1 and 13.");
         }
         return choice;
     }

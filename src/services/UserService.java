@@ -111,11 +111,22 @@ public class UserService implements IUserService {
     @Override
     public boolean changePassword(String hospitalID, String oldPassword, String newPassword) {
         User user = users.get(hospitalID);
-        if (user != null && user.getPassword().equals(oldPassword)) {
-            user.setPassword(newPassword);
-            return true;
+        if (user != null) {
+            // Hash the old password input to check against the stored hashed password
+            String hashedOldPassword = hashPassword(oldPassword);
+
+            // If authentication pass aka old password input is correct then proceed
+            if (user.getPassword().equals(hashedOldPassword)) {
+                // Hash the new password and update the user's password
+                String hashedNewPassword = hashPassword(newPassword);
+                user.setPassword(hashedNewPassword);
+
+                // Save updated users to CSV
+                saveUsersToCSV();
+                return true;
+            }
         }
-        return false;
+        return false; // Return false if user is not found or old password is incorrect
     }
 
     /**

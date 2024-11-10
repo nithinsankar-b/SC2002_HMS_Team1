@@ -41,6 +41,13 @@ public class PatientService {
         }
     }
 
+    // Add the changePassword method
+    public boolean changePassword(String hospitalID, String oldPassword, String newPassword) {
+        // Delegate password change to UserService
+        return userService.changePassword(hospitalID, oldPassword, newPassword);
+    }
+
+
     // Method to retrieve a patient by their hospital ID
     public Patient getPatientById(String hospitalID) {
         return patients.get(hospitalID);
