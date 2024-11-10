@@ -271,7 +271,7 @@ public class UserView {
         // Create necessary services for Administrator
         InventoryDataStore inventoryDataStore = new InventoryDataStore();
         InventoryService inventoryService = new InventoryService(inventoryDataStore);
-        ProjectAdminService adminService = new ProjectAdminService(new Administrator(user.getHospitalID(), user.getPassword(), null), inventoryService);
+        ProjectAdminService adminService = new ProjectAdminService(new Administrator(user.getHospitalID(), user.getPassword(), null), inventoryService,userService);
         AppointmentService appointmentService = new AppointmentService();
     
         // Instantiate AdministratorController

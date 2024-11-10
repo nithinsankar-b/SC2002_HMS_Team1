@@ -3,12 +3,16 @@ package services;
 import models.Administrator;
 import models.Inventory;
 import models.Staff;
+import models.User;
 import stores.StaffDataStore;
 import interfaces.IInventoryService;
 import interfaces.IProjectAdmService;
+import services.UserService;
 
 import java.io.IOException;
 import java.util.List;
+
+import enums.UserRole;
 
 /**
  * The ProjectAdminService class implements the IProjectAdmService interface
@@ -20,6 +24,7 @@ public class ProjectAdminService implements IProjectAdmService {
     private Administrator administrator;
     private StaffDataStore staffDataStore;
     private IInventoryService inventoryService;
+    private UserService userService;
 
     private static final String STAFF_CSV_PATH = "data/Staff_List.csv";
 
@@ -30,10 +35,11 @@ public class ProjectAdminService implements IProjectAdmService {
      * @param administrator   The administrator managing the service.
      * @param inventoryService The inventory service to manage inventory-related operations.
      */
-    public ProjectAdminService(Administrator administrator, IInventoryService inventoryService) {
+    public ProjectAdminService(Administrator administrator, IInventoryService inventoryService, UserService userService) {
         this.administrator = administrator;
         this.staffDataStore = new StaffDataStore();
         this.inventoryService = inventoryService;
+        this.userService = userService;
 
         try {
             staffDataStore.loadStaffFromCSV(STAFF_CSV_PATH);
@@ -49,9 +55,17 @@ public class ProjectAdminService implements IProjectAdmService {
      *
      * @param staffMember The staff member to be added or updated.
      */
-    @Override
+   @Override
     public void addOrUpdateStaff(Staff staffMember) {
         staffDataStore.addOrUpdateStaff(staffMember);
+        
+        // Add or update in UserService
+        if ("Doctor".equalsIgnoreCase(staffMember.getRole()) || "Pharmacist".equalsIgnoreCase(staffMember.getRole()) || "Administrator".equalsIgnoreCase(staffMember.getRole())) {
+            String defaultPassword = "password"; // You may want to prompt for this or generate one
+            UserRole userRole = UserRole.valueOf(staffMember.getRole().toUpperCase());
+            userService.addUser(new User(staffMember.getId(), defaultPassword, userRole));
+        }
+
         try {
             staffDataStore.writeStaffToCSV(STAFF_CSV_PATH);
             System.out.println("Staff member added/updated: " + staffMember.getId());
@@ -72,7 +86,10 @@ public class ProjectAdminService implements IProjectAdmService {
             System.out.println("Staff not found for ID: " + staffId);
             return false;
         }
+
         staffDataStore.removeStaff(staffId);
+        userService.removeUser(staffId); // Remove from UserService as well
+
         try {
             staffDataStore.writeStaffToCSV(STAFF_CSV_PATH);
             System.out.println("Staff member removed: " + staffId);

@@ -108,4 +108,27 @@ public class UserService implements IUserService {
         }
         return false;
     }
+
+    public void addUser(User user) {
+        users.put(user.getHospitalID(), user);
+        saveUsersToCSV();
+    }
+
+    public boolean removeUser(String hospitalID) {
+        if (users.remove(hospitalID) != null) {
+            saveUsersToCSV();
+            return true;
+        }
+        return false;
+    }
+
+    private void saveUsersToCSV() {
+        try (FileWriter writer = new FileWriter("data/User.csv")) {
+            for (User user : users.values()) {
+                writer.write(user.getHospitalID() + "," + user.getPassword() + "," + user.getRole() + "\n");
+            }
+        } catch (IOException e) {
+            System.out.println("Error writing to CSV file: " + e.getMessage());
+        }
+    }
 }
