@@ -12,7 +12,8 @@ public interface IAppointmentService {
     boolean rescheduleAppointment(String appointmentId, Appointment newAppointment);
     List<Appointment> viewScheduledAppointments();
     Appointment getAppointment(String appointmentId);
-    void recordAppointmentOutcome(String appointmentId, String serviceProvided, List<Medication> prescribedMedications, String consultationNotes);
+    //void recordAppointmentOutcome(String appointmentId, String serviceProvided, List<Medication> prescribedMedications, String consultationNotes);
     List<LocalDateTime> getAvailableSlots(String doctorId, LocalDate date);
     Appointment getAppointmentById(String appointmentId);
+    void recordAppointmentOutcome(String appointmentId, String serviceProvided, List<Medication> prescribedMedications, List<Integer> prescribedQuantities, String consultationNotes);
 }

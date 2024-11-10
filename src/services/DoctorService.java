@@ -268,25 +268,43 @@ public class DoctorService {
      * @param medicationsInput a comma-separated string of medication names to be prescribed
      * @param consultationNotes additional notes regarding the consultation
      */
-    public void recordAppointmentOutcome(String appointmentId, String serviceProvided, String medicationsInput, String consultationNotes) {
+    public void recordAppointmentOutcome(String appointmentId, String serviceProvided, String medicationsInput, String quantitiesInput, String consultationNotes) {
         Appointment appointment = appointmentService.getAppointment(appointmentId);
-        
-        // Check if the appointment exists and is in a PENDING state
-        if (appointment != null && appointment.getStatus() == AppointmentStatus.PENDING) {
-            // Create a list to hold Medication objects
-            List<Medication> prescribedMedications = new ArrayList<>();
 
-            // Split the input string by commas to get medication names
-            String[] medicationNames = medicationsInput.split(",");
+        // Check if the appointment exists and is in a CONFIRMED state
+        if (appointment != null && appointment.getStatus() == AppointmentStatus.CONFIRMED) {
+            // Split the input strings by commas to get medication names and quantities
+            String[] medicationNames = medicationsInput.split(";");
+            String[] quantityStrings = quantitiesInput.split(";");
 
-            // Create Medication objects from the medication names
-            for (String medicationName : medicationNames) {
-                // Trim whitespace and create Medication object with PENDING status
-                prescribedMedications.add(new Medication(medicationName.trim(), 1, MedicationStatus.PENDING)); // Default quantity to 1, adjust as needed
+            // Check if the number of medications matches the number of quantities
+            if (medicationNames.length != quantityStrings.length) {
+                System.out.println("Error: The number of medications does not match the number of quantities.");
+                return;
             }
 
-            // Record the appointment outcome with the created medications
-            appointmentService.recordAppointmentOutcome(appointmentId, serviceProvided, prescribedMedications, consultationNotes);
+            // Create a list to hold Medication objects
+            List<Medication> prescribedMedications = new ArrayList<>();
+            List<Integer> prescribedQuantities = new ArrayList<>();
+
+            // Create Medication objects from the medication names and quantities
+            for (int i = 0; i < medicationNames.length; i++) {
+                String medicationName = medicationNames[i].trim();
+                int quantity = Integer.parseInt(quantityStrings[i].trim());
+
+                // Add the medication and its quantity
+                prescribedMedications.add(new Medication(medicationName, quantity, MedicationStatus.PENDING));
+                prescribedQuantities.add(quantity);
+            }
+
+            // Record the appointment outcome with the created medications and quantities
+            //appointmentService.recordAppointmentOutcome(appointmentId, serviceProvided, prescribedMedications, prescribedQuantities, consultationNotes);
+            appointment.setServiceProvided(serviceProvided);
+            appointment.setConsultationNotes(consultationNotes);
+            appointment.setMedications(prescribedMedications);
+            appointment.setQuantities(prescribedQuantities);
+            appointment.setStatus(AppointmentStatus.COMPLETED);
+            appointmentService.saveAppointmentsToCSV();
             System.out.println("Appointment outcome recorded successfully.");
         } else {
             System.out.println("Appointment not found or already completed.");

@@ -34,13 +34,13 @@ public class SubmittedRequestView {
         Scanner scanner = new Scanner(System.in);
 
         System.out.println("\n=== Submit Replenishment Request ===");
-        System.out.print("Enter the name of the medicine to request replenishment: ");
-        String medicineName = scanner.nextLine().trim();
+        //System.out.print("Enter the name of the medicine to request replenishment: ");
+        //String medicineName = scanner.nextLine().trim();
 
         // Pharmacist submits the request through the view
-        pharmacistView.submitReplenishmentRequest(medicineName);
+        //pharmacistView.submitReplenishmentRequest(medicineName);
 
-        System.out.println("Replenishment request for " + medicineName + " has been submitted.");
+        System.out.println("Replenishment request for Low Stock Medicines has been submitted.");
         //scanner.close(); // Closing the scanner is handled externally
     }
 }

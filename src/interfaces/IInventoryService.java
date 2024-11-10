@@ -59,10 +59,8 @@ public interface IInventoryService {
 
     /**
      * Submits a replenishment request for a specific medication.
-     *
-     * @param medicineName The name of the medication for which the request is submitted.
      */
-    void submitReplenishmentRequest(String medicineName);
+    void submitReplenishmentRequest();
 
     /**
      * Approves a replenishment request for a specific medication.
