@@ -6,18 +6,21 @@
 ![Java](https://img.shields.io/badge/java-%23ED8B00.svg?style=for-the-badge&logo=java&logoColor=white)
 ![Git](https://img.shields.io/badge/git-%23F05033.svg?style=for-the-badge&logo=git&logoColor=white)
 
-**Team Members:** [Zhan You](https://github.com/donkey-king-kong) | [Nithin](https://github.com/nithinsankar-b) | [Janhavee](https://github.com/JanhaveeSingh) | [Risha](https://github.com/RISHASUN001) | [Chang Lin](https://github.com/Velosion)
+**Team Members:** [<img src="https://avatars.githubusercontent.com/u/119853913?v=4" height="20" width="20" /> Zhan You](https://github.com/donkey-king-kong) | [<img src="https://avatars.githubusercontent.com/u/144437711?v=4" height="20" width="20" /> Nithin](https://github.com/nithinsankar-b) | [<img src="https://avatars.githubusercontent.com/u/167533024?v=4" height="20" width="20" /> Janhavee](https://github.com/JanhaveeSingh) | [<img src="https://avatars.githubusercontent.com/u/164110710?v=4" height="20" width="20" /> Risha](https://github.com/RISHASUN001) | [<img src="https://avatars.githubusercontent.com/u/113620532?v=4" height="20" width="20" /> Chang Lin](https://github.com/Velosion)
 
-**Documentation:** [Report](https://github.com/xJQx/sc2002-fypms/blob/main/report.pdf) | [UML Class Diagram](https://github.com/xJQx/sc2002-fypms/blob/main/uml%20class%20diagram/uml-class-diagram.jpg) | [JavaDocs](https://xjqx.github.io/sc2002-fypms/sc2002_fypms/module-summary.html)
+**Documentation:** [Report (Link not updated)](https://github.com/xJQx/sc2002-fypms/blob/main/report.pdf) | [UML Class Diagram (Link not updated)](https://github.com/xJQx/sc2002-fypms/blob/main/uml%20class%20diagram/uml-class-diagram.jpg) | [JavaDocs (Link not updated)](https://xjqx.github.io/sc2002-fypms/sc2002_fypms/module-summary.html)
 
 > A Java-based application for managing a Hospital Management System for doctors, patients, pharmacists, and administrators. Features include user authentication, user management, appointment scheduling, and inventory management.
 
 ## Table of Contents
 
-- [HMS Setup Instructions](#hms-setup-instructions)
-  - [Compiling and Running the Project](#compiling-and-running-the-project)
-- [Usage](#usage)
-  - [Login Credentials](#login-credentials)
+- [Hospital Management System (HMS)](#hospital-management-system-hms)
+  - [Table of Contents](#table-of-contents)
+  - [HMS Setup Instructions](#hms-setup-instructions)
+    - [Compiling and Running the Project](#compiling-and-running-the-project)
+      - [Through the Terminal](#through-the-terminal)
+  - [Usage](#usage)
+    - [Login Credentials](#login-credentials)
 
 ---
 
