@@ -100,24 +100,27 @@ public class InventoryService implements IInventoryService {
      * If the current stock of the medicine is below or equal to the low level alert,
      * the replenishment status is set to PENDING and the data is saved to CSV.
      *
-     * @param medicineName the name of the medicine to submit a replenishment request for
+     *  the name of the medicine to submit a replenishment request for
      */
     @Override
-    public void submitReplenishmentRequest(String medicineName) {
+    public void submitReplenishmentRequest() {
         List<Inventory> inventoryDataList = inventoryDataStore.getInventoryList();
 
+        // Iterate through the inventory data list
         for (Inventory data : inventoryDataList) {
-            if (data.getMedicineName().equalsIgnoreCase(medicineName)) {
-                if (data.getCurrentStock() <= data.getLowLevelAlert()) {
-                    data.setReplenishmentStatus(ReplenishmentStatus.PENDING);
-                    saveDataToCSV();
-                    System.out.println("Replenishment request submitted for: " + medicineName);
-                } else {
-                    System.out.println("Stock level is sufficient for: " + medicineName);
-                }
-                break;
+            // Check if the current stock is less than or equal to the low-level alert
+            if (data.getCurrentStock() <= data.getLowLevelAlert()) {
+                // Set the replenishment status to PENDING
+                data.setReplenishmentStatus(ReplenishmentStatus.PENDING);
+                System.out.println("Replenishment request submitted for: " + data.getMedicineName());
+            } else {
+                // Print if stock is sufficient
+                System.out.println("Stock level is sufficient for: " + data.getMedicineName());
             }
         }
+
+        // Save the updated data to CSV after processing all inventory items
+        saveDataToCSV();
     }
 
     /**

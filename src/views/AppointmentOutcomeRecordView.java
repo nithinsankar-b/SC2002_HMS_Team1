@@ -31,7 +31,7 @@ public class AppointmentOutcomeRecordView {
                     
                     System.out.println("Medications         : " + fields[7].trim());
                     System.out.println("Quantity            : " + fields[8].trim()); // New quantity field
-                    System.out.println("Medication Status   : " + fields[9].trim());
+                    //System.out.println("Medication Status   : " + fields[9].trim());
                     
                 } else {
                     System.out.println("Warning: Skipping line due to unexpected format -> " + line);

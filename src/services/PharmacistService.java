@@ -173,8 +173,8 @@ public class PharmacistService {
         Appointment appointment = appointmentService.getAppointmentById(appointmentID);
 
         if (appointment != null) {
-            // Update the medication status in the appointment
-            appointmentService.updateMedicationStatus(appointmentID);
+            // Update the medication status in the appointment to DISPENSED
+            //appointmentService.updateMedicationStatus(appointmentID, MedicationStatus.DISPENSED);
 
             // Get medications and quantities from the appointment
             List<Medication> medications = appointment.getMedications();
@@ -189,6 +189,9 @@ public class PharmacistService {
 
                     // Update the stock for the medication
                     inventoryService.updateStock(medication.getName(), quantity);  // Assuming `getName` method for Medication class
+
+                    // Set the medication status to DISPENSED
+                    medication.setStatus(MedicationStatus.DISPENSED); // Assuming `setMedicationStatus` method in Medication class
                 }
 
                 return true;
@@ -199,6 +202,7 @@ public class PharmacistService {
 
         return false;
     }
+
 
 
 

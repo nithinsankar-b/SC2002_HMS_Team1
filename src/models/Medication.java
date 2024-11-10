@@ -94,4 +94,8 @@ public class Medication {
                 ", status=" + status +
                 '}';
     }
+
+    public void setMedicationStatus(enums.MedicationStatus medicationStatus) {
+
+    }
 }

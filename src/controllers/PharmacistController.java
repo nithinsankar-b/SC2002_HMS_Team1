@@ -58,10 +58,10 @@ public class PharmacistController {
 	    // Method to submit replenishment request
 	    public void submitReplenishmentRequest() {
 	        Scanner scanner = new Scanner(System.in);
-	        System.out.print("Enter the medicine name for replenishment: ");
-	        String medicineName = scanner.nextLine().trim();
+	        //System.out.print("Enter the medicine name for replenishment: ");
+	        //String medicineName = scanner.nextLine().trim();
 
-	        inventoryService.submitReplenishmentRequest(medicineName); // Pass the medicine name to the service
+	        inventoryService.submitReplenishmentRequest(); // Pass the medicine name to the service
 	    }
 
 	    // Method to handle updating prescription status
