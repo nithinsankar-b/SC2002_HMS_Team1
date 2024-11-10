@@ -1,8 +1,7 @@
-package src.controllers;
+package controllers;
 
-
-import src.models.Billing;
-import src.services.BillingService;
+import models.Billing;
+import services.BillingService;
 
 import java.util.List;
 

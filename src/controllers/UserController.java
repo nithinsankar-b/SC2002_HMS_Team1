@@ -1,28 +1,23 @@
 package controllers;
 
-import services.UserService;
-import src.controllers.BillingController;
-import src.services.BillingService;
-import views.UserView;
 import enums.UserRole;
+import java.util.Scanner;
 import models.User;
+import services.AppointmentRequestService;
 import services.AppointmentService;
-import stores.InventoryDataStore;
+import services.BillingService;
+import services.DoctorService;
 import services.InventoryService;
+import services.MedicalRecordService;
 import services.PatientService;
 import services.PharmacistService;
-import services.DoctorService;
 import services.ScheduleService;
-import services.AppointmentRequestService;
-import services.MedicalRecordService;
-import controllers.PatientController;
-import controllers.PharmacistController;
-import controllers.DoctorController;
-import views.PharmacistView;
-import views.PatientView;
+import services.UserService;
+import stores.InventoryDataStore;
 import views.DoctorView;
-
-import java.util.Scanner;
+import views.PatientView;
+import views.PharmacistView;
+import views.UserView;
 
 public class UserController {
     private final UserService userService;

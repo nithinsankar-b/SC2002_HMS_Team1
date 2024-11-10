@@ -13,3 +13,9 @@
 
 # Ignore any out/production folder files containing all .class files
 /out/
+
+# Ignore any .idea file created by intelliJ
+.idea/
+
+# Ignore any .iml file that contains metadata information
+src/SC2002_HMS_Team1.iml
