@@ -40,7 +40,7 @@ public class PatientView implements iPatientView {
             System.out.println("Do you want to register a new patient? (Y/N): ");
             String userInput = scanner.nextLine().trim().toUpperCase();
 
-            if (userInput.equals("Y")) {
+            if (userInput.equalsIgnoreCase("Y") || userInput.equalsIgnoreCase("yes")) {
                 // Prompt the user for patient information
                 System.out.print("Enter Patient Name: ");
                 String name = scanner.nextLine().trim();
@@ -49,7 +49,7 @@ public class PatientView implements iPatientView {
                 String dobString = scanner.nextLine().trim();
                 LocalDate dateOfBirth = LocalDate.parse(dobString, DateTimeFormatter.ISO_LOCAL_DATE);
 
-                System.out.print("Enter Gender: ");
+                System.out.print("Enter Gender (Male/Female/Others): ");
                 String gender = scanner.nextLine().trim();
 
                 System.out.print("Enter Blood Type: ");

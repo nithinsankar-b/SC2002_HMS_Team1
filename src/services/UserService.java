@@ -10,6 +10,9 @@ import java.io.FileWriter;
 import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
+import java.security.MessageDigest;
+import java.security.NoSuchAlgorithmException;
+import java.util.Base64;
 
 public class UserService implements IUserService {
     private final Map<String, User> users;
@@ -17,7 +20,49 @@ public class UserService implements IUserService {
     // There is already a database in the CSV file
     public UserService() {
         users = new HashMap<>();
-        loadUsersFromCSV( "data/User.csv"); // Adjusted for relative path
+        loadUsersFromCSV( "data/User.csv"); // Load CSV
+    }
+
+    public boolean addUser(String hospitalID, String plaintextPassword, UserRole role) {
+        if (users.containsKey(hospitalID)) {
+            System.out.println("User with this hospital ID already exists.");
+            return false; // User already exists
+        }
+
+        // Hash the password
+        String hashedPassword = hashPassword(plaintextPassword);
+
+        // Create and add the new user to the map
+        User newUser = new User(hospitalID, hashedPassword, role);
+        users.put(hospitalID, newUser);
+
+        // Save the updated users map to CSV
+        saveUsersToCSV();
+        System.out.println("User added successfully.");
+        return true;
+    }
+
+    // Hash password using SHA-256
+    public String hashPassword(String password) {
+        try {
+            MessageDigest md = MessageDigest.getInstance("SHA-256");
+            byte[] hashedBytes = md.digest(password.getBytes());
+            return Base64.getEncoder().encodeToString(hashedBytes);
+        } catch (NoSuchAlgorithmException e) {
+            throw new RuntimeException("Error hashing password", e);
+        }
+    }
+
+    // Save updated users back to CSV
+    private void saveUsersToCSV() {
+        try (FileWriter writer = new FileWriter("data/User.csv")) {
+            writer.write("hospitalID,password,role\n"); // Write header
+            for (User user : users.values()) {
+                writer.write(user.getHospitalID() + "," + user.getPassword() + "," + user.getRole() + "\n");
+            }
+        } catch (IOException e) {
+            System.out.println("Error writing to CSV file: " + e.getMessage());
+        }
     }
 
     // Load users from CSV
@@ -46,13 +91,13 @@ public class UserService implements IUserService {
      * Authenticates a user with the provided hospital ID and password.
      *
      * @param hospitalID The hospital ID of the user.
-     * @param password   The password of the user.
+     * @param hashedInputPassword   The hashed password of the user.
      * @return True if authentication is successful, false otherwise.
      */
     @Override
-    public boolean login(String hospitalID, String password) {
+    public boolean login(String hospitalID, String hashedInputPassword) {
         User user = users.get(hospitalID);
-        return user != null && user.getPassword().equals(password);
+        return user != null && user.getPassword().equals(hashedInputPassword);
     }
 
     /**

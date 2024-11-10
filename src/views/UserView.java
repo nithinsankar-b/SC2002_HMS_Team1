@@ -23,8 +23,6 @@ import models.User;
 
 import java.io.Console;
 import java.util.Scanner;
-import javax.swing.*;
-import java.awt.*;
 
 /**
  * The UserView class is responsible for handling the user interface
@@ -49,11 +47,13 @@ public class UserView {
         this.userService = userService;
     }
 
+
     /**
      * Displays the login interface for the user.
      * This method runs in a loop until the user successfully logs in
      * or chooses to exit the application.
-     */
+     **/
+
     public void displayLogin() {
         try (Scanner scanner = new Scanner(System.in)) {
             boolean running = true;
@@ -62,8 +62,83 @@ public class UserView {
                 System.out.println(WELCOME_MESSAGE);
                 System.out.println(SEPARATOR);
 
-                boolean isAuthenticated = attemptLogin();
-//                boolean isAuthenticated = attemptLogin(scanner);
+                // Display options for Login or Add User
+                System.out.println("Please select an option:");
+                System.out.println("1. Add New User");
+                System.out.println("2. Login");
+                System.out.println("3. Exit");
+                System.out.print("Enter your choice: ");
+                String choice = scanner.nextLine().trim();
+
+                switch (choice) {
+                    case "1":
+                        // Add new user option
+                        displayAddUser(scanner);
+                        break;
+                    case "2":
+                        // Login option
+                        boolean isAuthenticated = attemptLogin(scanner);
+
+                        if (!isAuthenticated) {
+                            System.out.println("Maximum attempts reached.");
+                        }
+                        // Ask if the user wants to exit or try logging in again
+                        running = promptToExitOrRetry(scanner);
+                        break;
+                    case "3":
+                        // Exit option
+                        running = false;
+                        break;
+                    default:
+                        System.out.println("Invalid choice. Please enter 1, 2, or 3.");
+                }
+            }
+        } catch (Exception e) {
+            e.printStackTrace(); // Print stack trace for better debugging
+            System.out.println("Error encountered: " + e.getMessage());
+            System.out.println("Error encountered. Please reboot HMS Application.");
+        } finally {
+            System.out.println("Thank You. Exiting HMS.");
+        }
+    }
+
+    private void displayAddUser(Scanner scanner) {
+        System.out.println("\n" + SEPARATOR);
+        System.out.println("Add New User");
+        System.out.println(SEPARATOR);
+
+        System.out.print("Enter Hospital ID: ");
+        String hospitalID = scanner.nextLine().trim();
+
+        System.out.print("Enter Password: ");
+        String password = scanner.nextLine();
+
+        System.out.print("Enter Role (PATIENT, DOCTOR, PHARMACIST, ADMINISTRATOR): ");
+        String roleInput = scanner.nextLine().trim().toUpperCase();
+        UserRole role;
+        try {
+            role = UserRole.valueOf(roleInput);
+        } catch (IllegalArgumentException e) {
+            System.out.println("Invalid role. Please enter one of the following: PATIENT, DOCTOR, PHARMACIST, ADMINISTRATOR.");
+            return; // Exit the add user process if role is invalid
+        }
+
+        // Attempt to add the new user
+        if (!userService.addUser(hospitalID, password, role)) {
+            System.out.println("Failed to add user. A user with this Hospital ID may already exist.");
+        }
+    }
+
+    /*
+    public void displayLogin() {
+        try (Scanner scanner = new Scanner(System.in)) {
+            boolean running = true;
+            while (running) {
+                System.out.println("\n" + SEPARATOR);
+                System.out.println(WELCOME_MESSAGE);
+                System.out.println(SEPARATOR);
+
+                boolean isAuthenticated = attemptLogin(scanner);
 
                 if (!isAuthenticated) {
                     System.out.println("Maximum attempts reached.");
@@ -80,73 +155,16 @@ public class UserView {
             System.out.println("Thank You. Exiting HMS.");
         }
     }
+     */
 
     /**
      * Attempts to log in the user by prompting for their Hospital ID
      * and password, allowing up to three attempts.
      *
-     * @param 'scanner' the Scanner object for user input
+     * @param scanner the Scanner object for user input
      * @return true if authentication is successful, false otherwise
      */
 
-    public boolean attemptLogin() {
-        int attempts = 3; // Maximum number of attempts allowed
-        boolean isAuthenticated = false;
-
-        // Load icon
-        ImageIcon icon = new ImageIcon("data/key.png");
-        Image scaledImage = icon.getImage().getScaledInstance(32, 32, Image.SCALE_SMOOTH);
-        ImageIcon scaledIcon = new ImageIcon(scaledImage);
-
-        while (attempts > 0 && !isAuthenticated) {
-            // Create fields for the dialog
-            JTextField hospitalIDField = new JTextField();
-            JPasswordField passwordField = new JPasswordField();
-
-            Object[] message = {
-                    "Hospital ID:", hospitalIDField,
-                    "Password:", passwordField
-            };
-
-            // Show the dialog box pop up
-            int option = JOptionPane.showConfirmDialog(
-                    null, message, "Login", JOptionPane.OK_CANCEL_OPTION, JOptionPane.PLAIN_MESSAGE, scaledIcon);
-
-            // Check if OK button was selected
-            if (option == JOptionPane.OK_OPTION) {
-                String hospitalID = hospitalIDField.getText();
-                String password = new String(passwordField.getPassword());
-
-                // Authenticate user in database
-                if (userService.login(hospitalID, password)) {
-                    loggedInHospitalID = hospitalID;
-                    JOptionPane.showMessageDialog(null, "Login successful!");
-
-                    UserRole role = userService.getUserRole(hospitalID);
-
-                    // Creating the User object
-                    User user = new User(hospitalID, password, role);
-
-                    System.out.println("Role: " + role);
-
-                    // Navigate to the appropriate role-specific view
-                    navigateToRoleSpecificPage(user, role);
-                    isAuthenticated = true;
-                } else {
-                    attempts--;
-                    JOptionPane.showMessageDialog(null, "Invalid Hospital ID or Password. You have "
-                            + attempts + " attempt(s) remaining.", "Login Failed", JOptionPane.ERROR_MESSAGE);
-                }
-            } else {
-                // Cancel option selected
-                System.out.println("Login cancelled.");
-                break;
-            }
-        }
-
-        return isAuthenticated;
-    }
-    /*
     private boolean attemptLogin(Scanner scanner) {
         int attempts = 3; // Maximum number of attempts allowed
         boolean isAuthenticated = false;
@@ -155,13 +173,16 @@ public class UserView {
             System.out.print("Enter Hospital ID (Case Sensitive): ");
             String hospitalID = scanner.nextLine();
 
-            //System.out.print("Enter Password: ");
             Console console = System.console();
+            // Secure input that hides the password
+            // Does not work for intelliJ
             char[] passwordArray = console.readPassword("Enter Password: ");
             String password = new String(passwordArray);
-            //String password = scanner.nextLine();
 
-            if (userService.login(hospitalID, password)) {
+            // Hash the input password for secure comparison
+            String hashedInputPassword = userService.hashPassword(password);
+
+            if (userService.login(hospitalID, hashedInputPassword)) {
                 loggedInHospitalID = hospitalID;
                 System.out.println("Login successful!");
                 UserRole role = userService.getUserRole(hospitalID);
@@ -186,7 +207,6 @@ public class UserView {
 
         return isAuthenticated;
     }
-    */
 
     /**
      * Prompts the user to decide whether to exit the application
