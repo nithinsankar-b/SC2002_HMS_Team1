@@ -141,7 +141,7 @@ public class Appointment {
         }
 
         // Return the formatted string with all values
-        return appointmentId + "," + patientId + "," + doctorId + "," +
+        return "\""+ appointmentId + "\"" + "," + patientId + "," + doctorId + "," +
                 appointmentDateTime + "," + status + "," +
                 consultationNotes + "," + serviceProvided + "," +
                 medicationsStr.toString() + "," + quantitiesStr.toString() + "," + medicationStatus;

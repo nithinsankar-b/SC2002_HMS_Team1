@@ -240,7 +240,7 @@ public class AppointmentService implements IAppointmentService {
     }
 
     // Load appointments from CSV file
-    private void loadAppointmentsFromCSV() {
+    public void loadAppointmentsFromCSV() {
         try (BufferedReader reader = new BufferedReader(new FileReader(APPOINTMENT_FILE))) {
             String line;
             // Skip header line

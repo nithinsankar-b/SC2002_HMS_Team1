@@ -14,5 +14,5 @@ public enum ReplenishmentStatus {
     /**
      * Indicates that the replenishment request has been fulfilled and inventory has been replenished.
      */
-    REPLENISHED
+    APPROVED
 }

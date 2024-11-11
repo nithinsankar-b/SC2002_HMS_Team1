@@ -1,6 +1,7 @@
 package views;
 
 import controllers.PharmacistController;
+import interfaces.IPharmacistView;
 import models.Pharmacist;
 import models.User;
 import services.PharmacistService;
@@ -14,7 +15,7 @@ import java.util.Scanner;
  * with the system. It allows pharmacists to manage medications, update prescription statuses, 
  * view appointment outcomes, and change their passwords.
  */
-public class PharmacistView {
+public class PharmacistView implements IPharmacistView {
     private final Scanner scanner; // Scanner for user input
     private final PharmacistController pharmacistController; // Controller for pharmacist operations
     private final PharmacistService pharmacistService; // Service for managing pharmacists
@@ -68,8 +69,9 @@ public class PharmacistView {
                 case 1 -> pharmacistController.viewMedicationInventory();
                 case 2 -> pharmacistController.submitReplenishmentRequest();
                 case 3 -> updatePrescriptionStatus(); 
-                case 4 -> viewAppointmentOutcomeRecords(); // New option
-                case 5 -> {
+                case 4 -> viewAppointmentOutcomeRecords(); 
+                case 5 -> changePassword();
+                case 6 -> {
                     System.out.println("Logging out...");
                     isRunning = false;
                 }
@@ -123,7 +125,7 @@ public class PharmacistView {
     }
 
     // Method to view appointment outcome records
-    private void viewAppointmentOutcomeRecords() {
+    public void viewAppointmentOutcomeRecords() {
         System.out.println("Viewing Appointment Outcome Records...");
         pharmacistController.viewAppointmentOutcomeRecords();
     }
@@ -131,15 +133,15 @@ public class PharmacistView {
     /**
      * Displays the menu options available to the pharmacist.
      */
-    private void displayMenu() {
+     public void displayMenu() {
         System.out.println("Please choose an option:");
         System.out.println("1. View Medication Inventory");
         System.out.println("2. Submit Replenishment Request");
         System.out.println("3. Update Prescription Status");
-        System.out.println("4. View Appointment Outcome Record"); // New menu option
-        System.out.println("5. Log Out");
+        System.out.println("4. View Appointment Outcome Record"); 
+        System.out.println("5. Change Password");
+        System.out.println("6. Log Out");
     }
-
     /**
      * Gets user input for menu selection with error checking.
      *
@@ -153,5 +155,20 @@ public class PharmacistView {
             System.out.println("ERROR: Invalid input. Please enter a number between 1 and 6.");
         }
         return choice;
+    }
+    
+    private void changePassword()
+    {
+      Scanner sc=new Scanner(System.in);
+      System.out.println("Enter Hospital ID");
+      String id = sc.nextLine();
+      
+      System.out.println("Enter old password");
+      String oldPassword = sc.nextLine();
+      
+      System.out.println("Enter new password");
+      String newPassword = sc.nextLine();
+      
+      pharmacistController.changePassword(id, oldPassword, newPassword);
     }
 }

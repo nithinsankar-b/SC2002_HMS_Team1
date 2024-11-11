@@ -17,6 +17,7 @@ import java.time.format.DateTimeParseException;
 import enums.AppointmentStatus;
 import enums.MedicationStatus;
 import enums.UserRole;
+import interfaces.IDoctorService;
 import models.Doctor;
 import models.Patient;
 import models.User;
@@ -35,7 +36,7 @@ import services.UserService;
  * Service class for managing doctors, including operations for loading, saving,
  * updating doctor information, and handling appointment requests.
  */
-public class DoctorService {
+public class DoctorService implements IDoctorService {
 
     private static final String CSV_FILE_PATH = "data/doctor.csv";
     private static final String DELIMITER = ",";
@@ -74,7 +75,6 @@ public class DoctorService {
      * @return the Doctor object associated with the given ID, or null if not found
      */
     public Doctor getDoctorById(String hospitalID) {
-        System.out.println(doctors.get(hospitalID));
         return doctors.get(hospitalID);
     }
 

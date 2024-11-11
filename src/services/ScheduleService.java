@@ -16,12 +16,14 @@ import java.util.List;
 import java.util.Map;
 import java.util.TreeMap;
 
+import interfaces.IScheduleService;
+
 /**
  * The {@code ScheduleService} class manages the scheduling of appointments for doctors.
  * It handles loading and saving schedules from/to a CSV file, booking appointments,
  * and modifying the availability status of time slots.
  */
-public class ScheduleService {
+public class ScheduleService implements IScheduleService{
     private static final String SCHEDULE_FILE = "data/schedule.csv"; // Path to the schedule CSV file
     private static final DateTimeFormatter DATE_FORMAT = DateTimeFormatter.ofPattern("yyyy-MM-dd");
     private static final DateTimeFormatter TIME_FORMAT = DateTimeFormatter.ofPattern("HH:mm");
@@ -80,9 +82,10 @@ public class ScheduleService {
                 saveSchedule(); // Save changes to CSV
                 System.out.println("Appointment canceled and time slot is now available.");
 
-            } else {
+            } else if(schedule != null && !patientID.equals(schedule.getStatus())) {
+            	
                 System.out.println("No appointment found for the specified patient.");
-
+                
             }
             return true;
         }
@@ -128,7 +131,7 @@ public class ScheduleService {
             if (schedule != null && "Blocked".equals(schedule.getStatus())) {
                 schedule.setStatus("Available"); // Change status to Available
                 saveSchedule(); // Save changes to CSV
-            } else {
+            } else if(schedule != null && "Available".equals(schedule.getStatus())){
                 System.out.println("Already available");
             }
         }
@@ -148,11 +151,11 @@ public class ScheduleService {
             if (schedule != null && "Available".equals(schedule.getStatus())) {
                 schedule.setStatus("Blocked"); // Change status to Blocked
                 saveSchedule(); // Save changes to CSV
-            } else {
+            } else if(schedule != null && "Blocked".equals(schedule.getStatus()))
                 System.out.println("Already blocked");
             }
         }
-    }
+    
 
     /**
      * Prints the schedule for a specific doctor, sorted by date and time.

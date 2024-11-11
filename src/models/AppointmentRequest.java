@@ -151,7 +151,7 @@ public class AppointmentRequest {
      * @return A CSV string containing the details of this appointment request.
      */
     public String toString() {
-        return String.join(",", requestId, doctorId, patientId, requestedDate.toString(), requestedTimeSlot.toString(), status);
+        return String.join(",", "\"" + requestId + "\"", doctorId, patientId, requestedDate.toString(), requestedTimeSlot.toString(), status);
     }
 
     /**
@@ -164,7 +164,7 @@ public class AppointmentRequest {
         String[] fields = csv.split(",");
         
         if (fields.length == 6) { // Ensure we have the correct number of fields
-            String requestId = fields[0];
+            String requestId = fields[0].replace("\"", "").trim();
             String doctorId = fields[1];
             String patientId = fields[2];
             LocalDate requestedDate = LocalDate.parse(fields[3]);

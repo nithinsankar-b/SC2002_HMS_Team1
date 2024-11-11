@@ -1,8 +1,8 @@
 package controllers;
 
 import services.UserService;
-import src.controllers.BillingController;
-import src.services.BillingService;
+import controllers.BillingController;
+import services.BillingService;
 import views.UserView;
 import enums.UserRole;
 import models.User;
