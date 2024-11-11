@@ -32,13 +32,51 @@ public class ScheduleService implements IScheduleService{
     /**
      * Constructs a {@code ScheduleService} and loads the schedule from the CSV file.
      */
+   
     public ScheduleService() {
         this.scheduleMap = new HashMap<>();
-        loadSchedule(); // Load schedules from CSV on initialization
+        
+        // Check if schedule CSV already exists; generate if not
+        if (!Files.exists(Paths.get(SCHEDULE_FILE))) {
+            generateSchedule("D001", LocalDate.of(2024, 11, 11), LocalDate.of(2024, 12, 31), "Available");
+            generateSchedule("D002", LocalDate.of(2024, 11, 11), LocalDate.of(2024, 12, 31), "Available");
+        }
+        
+        loadSchedule(); // Load the schedule data into memory
     }
+    
+    private void generateSchedule(String doctorID, LocalDate startDate, LocalDate endDate, String status) {
+        try (BufferedWriter writer = new BufferedWriter(new FileWriter(SCHEDULE_FILE, true))) {
+            if (Files.size(Paths.get(SCHEDULE_FILE)) == 0) {
+                // Write header if file is empty
+                writer.write("doctorID,date,time,status");
+                writer.newLine();
+            }
+
+            // Loop through each date
+            for (LocalDate date = startDate; !date.isAfter(endDate); date = date.plusDays(1)) {
+                LocalTime timeSlot = LocalTime.of(9, 0);
+
+                while (!timeSlot.isAfter(LocalTime.of(17, 0))) {
+                    // Write doctorID, date as string, time as string, and status
+                    writer.write(String.join(",", doctorID, date.format(DATE_FORMAT), timeSlot.format(TIME_FORMAT), status));
+                    writer.newLine();
+
+                    // Move to the next time slot
+                    timeSlot = timeSlot.plusMinutes(30);
+                }
+            }
+            System.out.println("Schedule generated for " + doctorID);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+
     public Map<String, Map<LocalDate, Map<LocalTime, Schedule>>> getScheduleMap() {
         return scheduleMap;
     }
+    
+    
 
     /**
      * Loads the schedule data from the CSV file into memory.
@@ -72,6 +110,7 @@ public class ScheduleService implements IScheduleService{
             e.printStackTrace();
         }
     }
+    
 
     public boolean cancelAppointment(String doctorID, LocalDate date, LocalTime timeSlot, String patientID) {
         Map<LocalDate, Map<LocalTime, Schedule>> doctorSchedule = scheduleMap.get(doctorID);
@@ -231,6 +270,9 @@ public class ScheduleService implements IScheduleService{
      */
     private void saveSchedule() {
         try (BufferedWriter writer = new BufferedWriter(new FileWriter(SCHEDULE_FILE))) {
+            writer.write("doctorID,date,time,status"); // CSV header line
+            writer.newLine();
+
             for (Map.Entry<String, Map<LocalDate, Map<LocalTime, Schedule>>> entry : scheduleMap.entrySet()) {
                 String doctorID = entry.getKey();
                 Map<LocalDate, Map<LocalTime, Schedule>> sortedDateSchedule = new TreeMap<>(entry.getValue());
@@ -249,4 +291,5 @@ public class ScheduleService implements IScheduleService{
             e.printStackTrace();
         }
     }
+
 }
