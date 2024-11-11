@@ -134,9 +134,8 @@ public class AppointmentService implements IAppointmentService {
         Appointment appointment = getAppointment(appointmentId);
 
         // Check if the appointment exists and is in a PENDING state
-        if (appointment != null && appointment.getStatus() == AppointmentStatus.PENDING) {
+        if (appointment != null && appointment.getStatus() == AppointmentStatus.COMPLETED) {
             appointment.setMedicationStatus(MedicationStatus.PENDING);
-            appointment.setStatus(AppointmentStatus.COMPLETED);
             appointment.setServiceProvided(serviceProvided);
             appointment.setConsultationNotes(consultationNotes);
 
