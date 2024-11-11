@@ -1,7 +1,7 @@
 package services;
 
 import interfaces.IInventoryService;
-import models.Inventory;
+import src.models.Inventory;
 import models.InventoryDisplay;
 import enums.ReplenishmentStatus;
 import enums.InventoryStatus;

@@ -8,7 +8,7 @@ import services.UserService;
 import services.InventoryService;
 import services.PatientService;
 import services.AppointmentService;
-import views.AppointmentOutcomeRecordView;
+import src.views.AppointmentOutcomeRecordView;
 import views.MedicalInventoryView;
 
 import java.util.List;
