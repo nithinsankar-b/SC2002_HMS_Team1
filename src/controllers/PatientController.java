@@ -139,15 +139,15 @@ public class PatientController {
         if (patient != null) {
             Scanner scanner = new Scanner(System.in);
 
-            // Load doctors from doctor.csv file and display their ID and Name
+            // Load doctors from doctor.csv file and display their ID and Name, skipping header
             try (BufferedReader br = new BufferedReader(new FileReader("data//doctor.csv"))) {
                 String line;
                 boolean headerSkipped = false;
 
                 System.out.println("Available Doctors:");
                 while ((line = br.readLine()) != null) {
-                    if (!headerSkipped && line.startsWith("HospitalID")) {
-                        headerSkipped = true;
+                    if (!headerSkipped) {
+                        headerSkipped = true; // Skip the header line
                         continue;
                     }
 
@@ -166,6 +166,7 @@ public class PatientController {
             System.out.print("Enter Doctor ID: ");
             String doctorId = scanner.nextLine();
 
+            System.out.println("Enter a date in the upcoming week: ");
             // Ask for the date
             System.out.print("Enter Day (1-31): ");
             int day = Integer.parseInt(scanner.nextLine());
@@ -176,6 +177,17 @@ public class PatientController {
             System.out.print("Enter Year (YYYY): ");
             int year = Integer.parseInt(scanner.nextLine());
             LocalDate localDate = LocalDate.of(year, month, day);
+
+
+            LocalDate startDate = LocalDate.of(2024, 11, 18);
+            LocalDate endDate = LocalDate.of(2024, 11, 25);
+            LocalDateTime startDateTime = LocalDateTime.of(startDate, LocalTime.of(11, 30));
+            LocalDateTime endDateTime = LocalDateTime.of(endDate, LocalTime.of(11, 0));
+
+            if (localDate.isBefore(startDate) || localDate.isAfter(endDate) || (localDate.isEqual(startDate) && localDate.atStartOfDay().isBefore(startDateTime))) {
+                System.out.println("Appointments can only be booked for one week in advance.");
+                return;
+            }
 
             // Display available slots for the given day and doctor
             List<LocalDateTime> availableSlots = appointmentService.getAvailableSlots(doctorId, localDate);
@@ -227,9 +239,7 @@ public class PatientController {
                     );
                     ScheduleService scheduleService=new ScheduleService();
                     AppointmentRequestService appointmentRequestService=new AppointmentRequestService(scheduleService,appointmentService);
-                    // Save the appointment request to a CSV file or list
                     appointmentRequestService.save(appointmentRequest);
-
                     System.out.println("Appointment request created with ID: " + appointmentRequest.getRequestId());
                 } else {
                     System.out.println("Failed to create appointment.");
@@ -318,6 +328,7 @@ public class PatientController {
                     DateTimeFormatter currentFormatter = DateTimeFormatter.ofPattern("dd MMM yyyy, HH:mm 'HRS'");
                     System.out.println("Current Appointment Slot: " + currentDateTime.format(currentFormatter));
 
+                    System.out.println("Enter a date in the upcoming week: ");
                     // Ask for the new appointment date in yyyy-MM-dd format
                     System.out.print("Enter Day (1-31): ");
                     int day = Integer.parseInt(scanner.nextLine());
@@ -329,6 +340,17 @@ public class PatientController {
                     int year = Integer.parseInt(scanner.nextLine());
                     LocalDate newDate = LocalDate.of(year, month, day);
 
+
+                    LocalDate rangeStartDate = LocalDate.of(2024, 11, 18); //
+                    LocalDate rangeEndDate = LocalDate.of(2024, 11, 25); //
+                    LocalDateTime rangeStartTime = rangeStartDate.atTime(11, 0); //
+                    LocalDateTime rangeEndTime = rangeEndDate.atTime(11, 0); //
+
+                    if (newDate.isBefore(rangeStartDate) || newDate.isAfter(rangeEndDate)) {
+                        System.out.println("Appointments can only be booked for one week in advance.");
+                        return; // Exit if the new date is outside the allowed range
+                    }
+
                     // Fetch available slots for that doctor on the specified date
                     List<LocalDateTime> availableSlots = appointmentService.getAvailableSlots(doctorId, newDate);
                     if (availableSlots.isEmpty()) {
@@ -339,8 +361,6 @@ public class PatientController {
                         System.out.println("Available slots:");
                         DateTimeFormatter slotFormatter = DateTimeFormatter.ofPattern("HH:mm 'HRS'");
                         availableSlots.forEach(slot -> System.out.println(slot.format(slotFormatter)));
-
-
 
                         System.out.print("Enter new appointment time (e.g., 1430, 1430HRS, or 14:30): ");
                         String newTimeStr = scanner.nextLine();
@@ -400,6 +420,7 @@ public class PatientController {
             System.out.println("Patient not found.");
         }
     }
+
 
     // Method to view available appointment slots
     public void viewAvailableAppointmentSlots() {
