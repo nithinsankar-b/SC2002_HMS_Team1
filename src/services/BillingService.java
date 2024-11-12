@@ -52,7 +52,7 @@ public class BillingService {
                 billing.setStatus(fields[5]);
                 billingRecords.put(billing.getAppointmentId(), billing);
             }
-            System.out.println("Billing records loaded successfully.");
+            //System.out.println("Billing records loaded successfully.");
         } catch (IOException e) {
             System.err.println("Error loading billing records: " + e.getMessage());
         }

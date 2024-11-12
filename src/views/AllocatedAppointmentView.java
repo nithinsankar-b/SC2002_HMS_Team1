@@ -7,7 +7,13 @@ import java.time.format.DateTimeFormatter;
 import java.util.List;
 import models.Appointment;
 import models.Patient;
+//import services.*;
 import services.AppointmentService;
+import services.DoctorService;
+import services.MedicalRecordService;
+import services.UserService;
+import services.ScheduleService;
+import models.Doctor;
 
 public class AllocatedAppointmentView implements iPatientView {
     private final AppointmentService appointmentService;
@@ -84,10 +90,16 @@ public class AllocatedAppointmentView implements iPatientView {
         boolean found = false;
         for (Appointment appointment : appointments) {
             // Check if the appointment is allocated to the patient and is pending
+            UserService userService=new UserService();
+            MedicalRecordService medicalRecordService=new MedicalRecordService();
+            ScheduleService scheduleService=new services.ScheduleService();
+            DoctorService doctorService=new services.DoctorService(userService, scheduleService, medicalRecordService,appointmentService);
+            Doctor doctor=doctorService.getDoctorById(appointment.getDoctorId());
             if (appointment.getPatientId().equals(patient.getHospitalID()) && (appointment.getStatus() == AppointmentStatus.CONFIRMED)) {
                 found = true;
                 System.out.println("Appointment ID: " + appointment.getAppointmentId());
                 System.out.println("Doctor ID: " + appointment.getDoctorId());
+                System.out.println("Doctor Name: "+ doctor.getName());
 
                 // Format the appointment date and time for better readability
                 String formattedDateTime = appointment.getAppointmentDateTime().format(formatter);

@@ -79,7 +79,7 @@ public class DoctorView implements IDoctorView {
             case 3 -> doctorController.upcomingAppointmentsView(doctor);
             case 4 -> doctorController.pendingAppointmentsView(doctor);
             case 5 -> manageAvailabilityMenu(doctor);
-            case 6 -> manageAppointmentRequestsMenu();
+            case 6 -> manageAppointmentRequestsMenu(doctor);
             case 7 -> managePatientRecordsMenu();
             case 8 -> doctorController.appointmentOutcomeRecord();
             case 9 -> changePassword();
@@ -148,7 +148,7 @@ public class DoctorView implements IDoctorView {
         }
     }
     
-    private void manageAppointmentRequestsMenu() {
+    private void manageAppointmentRequestsMenu(Doctor doctor) {
         boolean managingRequests = true;
         while (managingRequests) {
             System.out.println("Accept or Decline Appointment Request:");
@@ -159,8 +159,8 @@ public class DoctorView implements IDoctorView {
             int choice = getUserInput();
 
             switch (choice) {
-                case 1 -> doctorController.acceptAppointmentRequest();
-                case 2 -> doctorController.declineAppointmentRequest();
+                case 1 -> doctorController.acceptAppointmentRequest(doctor);
+                case 2 -> doctorController.declineAppointmentRequest(doctor);
                 case 3 -> managingRequests = false;
                 default -> System.out.println("ERROR: Invalid choice, please try again.");
             }

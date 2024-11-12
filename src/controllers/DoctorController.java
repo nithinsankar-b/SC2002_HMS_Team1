@@ -60,14 +60,16 @@ public class DoctorController {
       viewUpcomingAppointments.displayUpcomingAppointments(doctor);
     }
 
-    public void acceptAppointmentRequest() {
+    public void acceptAppointmentRequest(Doctor doctor) {
+        viewPendingAppointmentRequest.displayPendingRequests(doctor);
       Scanner sc = new Scanner(System.in);
       System.out.println("Enter RequestID: ");
       String reqId = sc.nextLine();
       doctorService.acceptanceOfRequest(reqId);
     }
 
-    public void declineAppointmentRequest() {
+    public void declineAppointmentRequest(Doctor doctor) {
+        viewPendingAppointmentRequest.displayPendingRequests(doctor);
       Scanner sc = new Scanner(System.in);
       System.out.println("Enter RequestID: ");
       String reqId = sc.nextLine();

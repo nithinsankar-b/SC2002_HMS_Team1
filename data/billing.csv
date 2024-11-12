@@ -1,1 +1,2 @@
-
+InvoiceID,PatientID,DoctorID,AppointmentID,Total_Amount,Status
+52ba7cc0-e6d2-4bcc-b349-a9538b11f04d,P1001,D001,7421425,0.0,UNPAID

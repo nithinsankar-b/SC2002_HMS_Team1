@@ -2,12 +2,13 @@ package services;
 
 import interfaces.IInventoryService;
 import models.Appointment;
-import models.Inventory;
+import src.models.Inventory;
 import models.InventoryDisplay;
 import enums.ReplenishmentStatus;
 import enums.InventoryStatus;
 import enums.MedicationStatus;
 import stores.InventoryDataStore;
+import services.AppointmentService;
 
 import java.io.BufferedReader;
 import java.io.BufferedWriter;

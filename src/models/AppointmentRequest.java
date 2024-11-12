@@ -2,6 +2,7 @@ package models;
 
 import java.time.LocalDate;
 import java.time.LocalTime;
+import java.time.format.DateTimeFormatter;
 
 /**
  * Represents an appointment request in the healthcare system.
@@ -167,7 +168,9 @@ public class AppointmentRequest {
             String requestId = fields[0].replace("\"", "").trim();
             String doctorId = fields[1];
             String patientId = fields[2];
-            LocalDate requestedDate = LocalDate.parse(fields[3]);
+            //LocalDate requestedDate = LocalDate.parse(fields[3]);
+            DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
+            LocalDate requestedDate = LocalDate.parse(fields[3], formatter);
             LocalTime requestedTimeSlot = LocalTime.parse(fields[4]);
             String status = fields[5];
 

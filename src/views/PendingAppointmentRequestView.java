@@ -30,7 +30,7 @@ public class PendingAppointmentRequestView {
      * @param doctor the doctor for whom the pending requests are to be displayed
      */
     public void displayPendingRequests(Doctor doctor) {
-        System.out.println("Displaying Pending Requests for Doctor: " + doctor.getName() + " (ID: " + doctor.getHospitalID() + ")");
+        //System.out.println("Displaying Pending Requests for Doctor: " + doctor.getName() + " (ID: " + doctor.getHospitalID() + ")");
         // Call processPendingRequests from AppointmentRequestService
         appointmentRequestService.processPendingRequests(doctor.getHospitalID());
     }

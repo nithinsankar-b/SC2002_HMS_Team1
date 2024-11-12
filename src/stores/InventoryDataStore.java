@@ -1,6 +1,6 @@
 package stores;
 
-import models.Inventory;
+import src.models.Inventory;
 import enums.MedicationStatus;
 import enums.ReplenishmentStatus;
 

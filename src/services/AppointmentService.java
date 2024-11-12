@@ -11,6 +11,7 @@ import interfaces.IAppointmentService;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
+import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -59,6 +60,11 @@ public class AppointmentService implements IAppointmentService {
      */
     @Override
     public boolean cancelAppointment(String appointmentId) {
+        ScheduleService scheduleService = new ScheduleService();
+        Appointment oldAppointment= getAppointmentById(appointmentId);
+        LocalDate newDate2 = oldAppointment.getAppointmentDateTime().toLocalDate(); // e.g., "2024-11-12"
+        LocalTime timeSlot2 = oldAppointment.getAppointmentDateTime().toLocalTime();
+        scheduleService.setAvailable1(oldAppointment.getDoctorId(), newDate2, timeSlot2);
         boolean success = appointments.removeIf(appointment -> appointment.getAppointmentId().equals(appointmentId));
         if (success) {
             saveAppointmentsToCSV();
@@ -75,10 +81,25 @@ public class AppointmentService implements IAppointmentService {
      */
     @Override
     public boolean rescheduleAppointment(String appointmentId, Appointment newAppointment) {
+        Appointment oldAppointment= getAppointmentById(appointmentId);
         for (int i = 0; i < appointments.size(); i++) {
             if (appointments.get(i).getAppointmentId().equals(appointmentId)) {
                 appointments.set(i, newAppointment);
                 saveAppointmentsToCSV();
+                DateTimeFormatter dateFormatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
+                DateTimeFormatter timeFormatter = DateTimeFormatter.ofPattern("HH:mm");
+
+                LocalDate newDate = newAppointment.getAppointmentDateTime().toLocalDate(); // e.g., "2024-11-12"
+                LocalTime timeSlot = newAppointment.getAppointmentDateTime().toLocalTime(); // e.g., "14:30"
+
+                ScheduleService scheduleService = new ScheduleService();
+
+                LocalDate newDate2 = oldAppointment.getAppointmentDateTime().toLocalDate(); // e.g., "2024-11-12"
+                LocalTime timeSlot2 = oldAppointment.getAppointmentDateTime().toLocalTime();
+
+
+                scheduleService.setAvailable1(newAppointment.getDoctorId(), newDate2, timeSlot2);
+                scheduleService.setUnavailable2(newAppointment.getDoctorId(), newDate, timeSlot, newAppointment.getPatientId());
                 return true;
             }
         }
@@ -288,7 +309,7 @@ public class AppointmentService implements IAppointmentService {
             Appointment appointment = appointments.get(i);
             if (appointment.getAppointmentId().equals(updatedAppointment.getAppointmentId())) {
                 appointments.set(i, updatedAppointment);
-                System.out.println("Appointment updated successfully.");
+                //System.out.println("Appointment updated successfully.");
                 saveAppointmentsToCSV();
                 return;
             }

@@ -30,7 +30,7 @@ public class AppointmentOutcomeRecordView {
                     System.out.println("Service Provided    : " + fields[6].trim());
                     
                     System.out.println("Medications         : " + fields[7].trim());
-                    System.out.println("Quantity            : " + fields[8].trim()); // New quantity field
+                    //System.out.println("Quantity            : " + fields[8].trim()); // New quantity field
                     System.out.println("Medication Status   : " + fields[9].trim());
                     
                 } else {

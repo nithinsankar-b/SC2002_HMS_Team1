@@ -224,6 +224,31 @@ public class ScheduleService implements IScheduleService{
             }
         }
     }
+    public void setAvailable1(String doctorID, LocalDate date, LocalTime timeSlot) {
+        Map<LocalDate, Map<LocalTime, Schedule>> doctorSchedule = scheduleMap.get(doctorID);
+        if (doctorSchedule != null) {
+            Schedule schedule = doctorSchedule.get(date).get(timeSlot);
+            System.out.println(schedule.getStatus());
+            if (schedule != null && schedule.getStatus().startsWith("P")){
+                schedule.setStatus("Available"); // Change status to Available
+                saveSchedule(); // Save changes to CSV
+            } else if(schedule != null && "Available".equals(schedule.getStatus())){
+                System.out.println("Already available");
+            }
+        }
+    }
+    public void setUnavailable2(String doctorID, LocalDate date, LocalTime timeSlot, String patientID) {
+        Map<LocalDate, Map<LocalTime, Schedule>> doctorSchedule = scheduleMap.get(doctorID);
+        if (doctorSchedule != null) {
+            Schedule schedule = doctorSchedule.get(date).get(timeSlot);
+            if (schedule != null && "Available".equals(schedule.getStatus())) {
+                schedule.setStatus(patientID); // Change status to Blocked
+                saveSchedule(); // Save changes to CSV
+            } else if(schedule != null && "Blocked".equals(schedule.getStatus()))
+                System.out.println("Already blocked");
+        }
+    }
+
 
     /**
      * Sets a specified time slot as unavailable (blocked) for a doctor.
