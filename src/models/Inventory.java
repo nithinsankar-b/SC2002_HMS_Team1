@@ -1,4 +1,4 @@
-package models;
+package src.models;
 
 import enums.InventoryStatus;
 import enums.ReplenishmentStatus;
