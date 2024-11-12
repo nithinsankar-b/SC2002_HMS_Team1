@@ -133,13 +133,14 @@ public class PatientView implements iPatientView {
         System.out.print("Enter Appointment ID to view bill: ");
         String appointmentId = scanner.nextLine().trim();
 
-        double billAmount = billingController.calculateBill(appointmentId);
-        if (billAmount == 0.0) {
+        //double billAmount = billingController.calculateBill(appointmentId);
+        /*if (billAmount == 0.0) {
             System.out.println("No unpaid bill found for the provided Appointment ID.");
             return;
-        }
+        }*/
+        System.out.println(billingController.calculateBill(appointmentId));
 
-        System.out.printf("Total Bill Amount: $%.2f%n", billAmount);
+        //System.out.printf("Total Bill Amount: $%.2f%n", billAmount);
         System.out.print("Do you want to pay this bill? (Y/N): ");
         String paymentConfirmation = scanner.nextLine().trim().toUpperCase();
 

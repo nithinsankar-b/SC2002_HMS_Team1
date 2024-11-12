@@ -1,17 +1,40 @@
 package models;
+import java.io.BufferedReader;
+import java.io.FileReader;
+import java.io.IOException;
+import java.util.HashMap;
+import java.util.Map;
 
 public class MedicineConsultation {
     private String medicine;
     private double medicinePriceForTen;
     private String doctorId;
     private double consultationFeePerHalfHour;
+    private static Map<String, MedicineConsultation> consultationsMap = new HashMap<>();;
 
-    public MedicineConsultation() {}
+    public MedicineConsultation() {
+        if (consultationsMap.isEmpty()) {
+            loadConsultationsFromCSV("data//Medicine_and_Consultation_Prices.csv"); // Specify the path
+        }
+    }
     public MedicineConsultation(String medicine, double medicinePriceForTen, String doctorId, double consultationFeePerHalfHour) {
         this.medicine = medicine;
         this.medicinePriceForTen = medicinePriceForTen;
         this.doctorId = doctorId;
         this.consultationFeePerHalfHour = consultationFeePerHalfHour;
+    }
+
+    private static void loadConsultationsFromCSV(String filePath) {
+        try (BufferedReader br = new BufferedReader(new FileReader(filePath))) {
+            String line;
+            while ((line = br.readLine()) != null) {
+                MedicineConsultation consultation = MedicineConsultation.fromCSV(line);
+                consultationsMap.put(consultation.getMedicine(), consultation);
+            }
+            System.out.println("Medicine consultations loaded successfully.");
+        } catch (IOException e) {
+            System.err.println("Error reading the file: " + e.getMessage());
+        }
     }
 
     // Getters and Setters

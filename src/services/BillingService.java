@@ -77,47 +77,69 @@ public class BillingService {
         }
     }
 
-    public double calculateTotalBill(String appointmentId) {
+    public String calculateAndDisplayBill(String appointmentId) {
         Billing billing = billingRecords.get(appointmentId);
         if (billing == null) {
             System.err.println("No billing record found for appointment ID: " + appointmentId);
-            return 0.0;
+            return "No billing record found.";
         }
 
-        // Call getAppointmentById to retrieve the Appointment
+        // Retrieve the appointment by ID
         Appointment appointment = Appointment.getAppointmentById(appointmentId); // Assuming this method exists
         if (appointment == null) {
             System.err.println("No appointment found for appointment ID: " + appointmentId);
-            return 0.0;
+            return "No appointment found.";
+        }
+
+        // Check if the medicationStatus of the appointment is DISPENSED
+        if (appointment.getMedicationStatus() != enums.MedicationStatus.DISPENSED) {
+            System.err.println("Medications for this appointment have not been dispensed.");
+            return "Medications for this appointment have not been dispensed.";
         }
 
         double totalBill = 0.0;
         String doctorId = appointment.getDoctorId();
+        StringBuilder billDetails = new StringBuilder("Bill Details:\n\n");
 
+        // Medication breakdown
+        billDetails.append("Medications:\n");
         for (int i = 0; i < appointment.getMedications().size(); i++) {
             Medication medication = appointment.getMedications().get(i);
             int quantity = appointment.getQuantities().get(i);
 
+            // Find the consultation details for the medication
             MedicineConsultation medCon = medicineConsultations.get(medication.getName());
-
             if (medCon != null && medCon.getDoctorId().equals(doctorId)) {
                 double medicineCost = (medCon.getMedicinePriceForTen() / 10) * quantity;
                 totalBill += medicineCost;
+
+                // Add details of the medication to the bill
+                billDetails.append(String.format("  - %s: $%.2f (Quantity: %d)\n", medication.getName(), medicineCost, quantity));
             }
         }
 
-        // Add consultation fee
+        // Consultation fee
+        double consultationFee = 0.0;
         for (MedicineConsultation medCon : medicineConsultations.values()) {
             if (medCon.getDoctorId().equals(doctorId)) {
-                totalBill += medCon.getConsultationFee();
+                consultationFee = medCon.getConsultationFee();
+                totalBill += consultationFee;
                 break;
             }
         }
+        billDetails.append(String.format("\nConsultation Fee: $%.2f\n", consultationFee));
 
+        // Final total
+        billDetails.append(String.format("\nTotal Bill Amount: $%.2f\n", totalBill));
+
+        // Update the billing record and save
         billing.setTotalAmount(totalBill);
         saveBillingRecords();
-        return totalBill;
+
+        // Return the bill details as a formatted string
+        return billDetails.toString();
     }
+
 
     public boolean payBill(String appointmentId) {
         Billing billing = billingRecords.get(appointmentId);
