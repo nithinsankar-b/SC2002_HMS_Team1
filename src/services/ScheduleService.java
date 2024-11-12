@@ -33,7 +33,7 @@ public class ScheduleService implements IScheduleService{
      * Constructs a {@code ScheduleService} and loads the schedule from the CSV file.
      */
    
-    public ScheduleService() {
+   /* public ScheduleService() {
         this.scheduleMap = new HashMap<>();
         
         // Check if schedule CSV already exists; generate if not
@@ -43,6 +43,57 @@ public class ScheduleService implements IScheduleService{
         }
         
         loadSchedule(); // Load the schedule data into memory
+    }*/
+    public ScheduleService() {
+        this.scheduleMap = new HashMap<>();
+
+        if (!Files.exists(Paths.get(SCHEDULE_FILE))) {
+            // If schedule.csv doesn't exist, generate schedule for all doctors
+            generateSchedulesForAllDoctors();
+        } else {
+            loadSchedule(); // Load any existing schedules
+            ensureSchedulesExist(); // Ensure schedules exist for all doctors
+        }
+    }
+
+    // Generates schedules for all doctors in doctors.csv
+    private void generateSchedulesForAllDoctors() {
+        List<String> doctorIds = loadDoctorIds(); // Load doctor IDs from doctors.csv
+        LocalDate today = LocalDate.now();
+        LocalDate endOfYear = LocalDate.of(today.getYear(), 12, 31);
+
+        for (String doctorID : doctorIds) {
+            generateSchedule(doctorID, today, endOfYear, "Available");
+        }
+    }
+
+    // Ensures all doctors in doctors.csv have a schedule in schedule.csv
+    private void ensureSchedulesExist() {
+        List<String> doctorIds = loadDoctorIds(); // Load doctor IDs from doctors.csv
+        LocalDate today = LocalDate.now();
+        LocalDate endOfYear = LocalDate.of(today.getYear(), 12, 31);
+
+        for (String doctorID : doctorIds) {
+            if (!scheduleMap.containsKey(doctorID)) {
+                generateSchedule(doctorID, today, endOfYear, "Available");
+            }
+        }
+    }
+
+    // Load doctor IDs from doctors.csv
+    private List<String> loadDoctorIds() {
+        List<String> doctorIds = new ArrayList<>();
+        try (BufferedReader br = new BufferedReader(new FileReader("data/doctor.csv"))) {
+            String line;
+            br.readLine(); // Skip header
+            while ((line = br.readLine()) != null) {
+                String[] parts = line.split(",");
+                doctorIds.add(parts[0]); // Assuming the doctor ID is in the first column
+            }
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        return doctorIds;
     }
     
     private void generateSchedule(String doctorID, LocalDate startDate, LocalDate endDate, String status) {
@@ -57,7 +108,7 @@ public class ScheduleService implements IScheduleService{
             for (LocalDate date = startDate; !date.isAfter(endDate); date = date.plusDays(1)) {
                 LocalTime timeSlot = LocalTime.of(9, 0);
 
-                while (!timeSlot.isAfter(LocalTime.of(17, 0))) {
+                while (!timeSlot.isAfter(LocalTime.of(16, 30))) {
                     // Write doctorID, date as string, time as string, and status
                     writer.write(String.join(",", doctorID, date.format(DATE_FORMAT), timeSlot.format(TIME_FORMAT), status));
                     writer.newLine();
@@ -75,6 +126,8 @@ public class ScheduleService implements IScheduleService{
     public Map<String, Map<LocalDate, Map<LocalTime, Schedule>>> getScheduleMap() {
         return scheduleMap;
     }
+    
+    
     
     
 
@@ -121,11 +174,7 @@ public class ScheduleService implements IScheduleService{
                 saveSchedule(); // Save changes to CSV
                 System.out.println("Appointment canceled and time slot is now available.");
 
-            } else if(schedule != null && !patientID.equals(schedule.getStatus())) {
-            	
-                System.out.println("No appointment found for the specified patient.");
-                
-            }
+            } 
             return true;
         }
         else
@@ -201,34 +250,71 @@ public class ScheduleService implements IScheduleService{
      *
      * @param doctorID the ID of the doctor whose schedule to print
      */
-    public void printSchedule(String doctorID) {
+    /*public void printSchedule(String doctorID) {
         Map<LocalDate, Map<LocalTime, Schedule>> doctorSchedule = scheduleMap.get(doctorID);
+        LocalDate currentDate = LocalDate.now();
+        
         if (doctorSchedule != null) {
             Map<LocalDate, Map<LocalTime, Schedule>> sortedSchedule = new TreeMap<>(doctorSchedule);
 
             for (Map.Entry<LocalDate, Map<LocalTime, Schedule>> dateEntry : sortedSchedule.entrySet()) {
                 LocalDate date = dateEntry.getKey();
-                System.out.println("Date: " + date);
+                
+                // Only print schedules for the current date and future dates
+                if (!date.isBefore(currentDate)) {
+                    System.out.println("Date: " + date);
 
-                Map<LocalTime, Schedule> sortedTimeSlots = new TreeMap<>(dateEntry.getValue());
-                for (Map.Entry<LocalTime, Schedule> timeEntry : sortedTimeSlots.entrySet()) {
-                    LocalTime timeSlot = timeEntry.getKey();
-                    Schedule schedule = timeEntry.getValue();
-                    System.out.println("Time: " + timeSlot + " - Status: " + schedule.getStatus());
+                    Map<LocalTime, Schedule> sortedTimeSlots = new TreeMap<>(dateEntry.getValue());
+                    for (Map.Entry<LocalTime, Schedule> timeEntry : sortedTimeSlots.entrySet()) {
+                        LocalTime timeSlot = timeEntry.getKey();
+                        Schedule schedule = timeEntry.getValue();
+                        System.out.println("Time: " + timeSlot + " - Status: " + schedule.getStatus());
+                    }
+                    System.out.println();
                 }
-                System.out.println();
+            }
+        } else {
+            System.out.println("No schedule found for Doctor ID: " + doctorID);
+        }
+    }*/
+    public void printSchedule(String doctorID) {
+        Map<LocalDate, Map<LocalTime, Schedule>> doctorSchedule = scheduleMap.get(doctorID);
+        LocalDate currentDate = LocalDate.now();
+
+        if (doctorSchedule != null) {
+            Map<LocalDate, Map<LocalTime, Schedule>> sortedSchedule = new TreeMap<>(doctorSchedule);
+
+            // Iterate through sorted schedule for this doctor
+            for (Map.Entry<LocalDate, Map<LocalTime, Schedule>> dateEntry : sortedSchedule.entrySet()) {
+                LocalDate date = dateEntry.getKey();
+
+                // Only print schedules for the current date and future dates
+                if (!date.isBefore(currentDate)) {
+                    System.out.println("Date: " + date);
+
+                    // Sort time slots for the current date
+                    Map<LocalTime, Schedule> sortedTimeSlots = new TreeMap<>(dateEntry.getValue());
+                    for (Map.Entry<LocalTime, Schedule> timeEntry : sortedTimeSlots.entrySet()) {
+                        LocalTime timeSlot = timeEntry.getKey();
+                        Schedule schedule = timeEntry.getValue();
+                        System.out.println("Time: " + timeSlot + " - Status: " + schedule.getStatus());
+                    }
+                    System.out.println();
+                }
             }
         } else {
             System.out.println("No schedule found for Doctor ID: " + doctorID);
         }
     }
 
+
+
     /**
      * Prints upcoming appointments for a specific doctor.
      *
      * @param doctorID the ID of the doctor whose upcoming appointments to print
      */
-    public void printUpcomingAppointments(String doctorID) {
+    /*public void printUpcomingAppointments(String doctorID) {
         LocalDate today = LocalDate.now();
         LocalTime currentTime = LocalTime.now();
         List<String> upcomingAppointments = new ArrayList<>();
@@ -263,7 +349,49 @@ public class ScheduleService implements IScheduleService{
                 System.out.println(appointment);
             }
         }
+    }*/
+    public void printUpcomingAppointments(String doctorID) {
+        LocalDate today = LocalDate.now();
+        LocalTime currentTime = LocalTime.now();
+        List<String> upcomingAppointments = new ArrayList<>();
+
+        Map<LocalDate, Map<LocalTime, Schedule>> doctorSchedule = scheduleMap.get(doctorID);
+
+        if (doctorSchedule != null) {
+            // Iterate through the schedule of the doctor
+            for (Map.Entry<LocalDate, Map<LocalTime, Schedule>> dateEntry : doctorSchedule.entrySet()) {
+                LocalDate date = dateEntry.getKey();
+
+                // Skip past dates
+                if (date.isAfter(today) || (date.equals(today) && !dateEntry.getValue().isEmpty())) {
+                    // Iterate through time slots for the given date
+                    for (Map.Entry<LocalTime, Schedule> timeEntry : dateEntry.getValue().entrySet()) {
+                        LocalTime timeSlot = timeEntry.getKey();
+                        Schedule schedule = timeEntry.getValue();
+                        String status = schedule.getStatus();
+
+                        // Check if appointment exists (not available or blocked)
+                        if (!"Available".equals(status) && !"Blocked".equals(status) && (date.isAfter(today) || (date.equals(today) && timeSlot.isAfter(currentTime)))) {
+                            upcomingAppointments.add("Patient ID: " + status + ", Date: " + date + ", Time Slot: " + timeSlot);
+                        }
+                    }
+                }
+            }
+        } else {
+            System.out.println("No schedule found for Doctor ID: " + doctorID);
+            return;
+        }
+
+        // Display upcoming appointments
+        if (upcomingAppointments.isEmpty()) {
+            System.out.println("No upcoming appointments found for Doctor ID: " + doctorID);
+        } else {
+            for (String appointment : upcomingAppointments) {
+                System.out.println(appointment);
+            }
+        }
     }
+
 
     /**
      * Saves the current schedule state to the CSV file.

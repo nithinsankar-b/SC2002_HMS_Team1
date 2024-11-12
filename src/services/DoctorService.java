@@ -20,6 +20,7 @@ import enums.UserRole;
 import interfaces.IDoctorService;
 import models.Doctor;
 import models.Patient;
+import models.Pharmacist;
 import models.User;
 import models.MedicalRecord;
 import models.Medication;
@@ -66,6 +67,16 @@ public class DoctorService implements IDoctorService {
         this.scheduleService = scheduleService;
         this.appointmentRequestService = new AppointmentRequestService(scheduleService, appointmentService);
         loadDoctorFromCSV();
+    }
+    //add doctor function added.
+    public void addDoctor(Doctor doctor) {
+        if (!doctors.containsKey(doctor.getHospitalID())) {
+            doctors.put(doctor.getHospitalID(), doctor);
+            saveDoctorsToCSV();
+            System.out.println("Doctor added successfully.");
+        } else {
+            System.out.println("Doctor already exists.");
+        }
     }
 
     /**
