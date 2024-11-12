@@ -185,8 +185,14 @@ public class AppointmentService implements IAppointmentService {
     public void updateMedicationStatus(String appointmentId) {
         Appointment appointment = getAppointment(appointmentId);
         if (appointment != null) {
+            if (appointment.getMedicationStatus() == MedicationStatus.DISPENSED) {
+                System.out.println("Medication already dispensed.");
+                return;
+            }
             appointment.setMedicationStatus(MedicationStatus.DISPENSED);
             saveAppointmentsToCSV();
+        } else {
+            System.out.println("Appointment not found.");
         }
     }
 
@@ -261,6 +267,7 @@ public class AppointmentService implements IAppointmentService {
 
     // Load appointments from CSV file
     public void loadAppointmentsFromCSV() {
+        appointments.clear();
         try (BufferedReader reader = new BufferedReader(new FileReader(APPOINTMENT_FILE))) {
             String line;
             // Skip header line

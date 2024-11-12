@@ -51,6 +51,7 @@ public class AppointmentOutcomeRecordView {
                             System.out.println("- Name: " + medication);
                             System.out.println("  Quantity: " + quantity);
                         }
+                        System.out.println("Medication Status   : "+fields[9].trim());
                     } else {
                         System.out.println("Medications: No medications listed");
                     }

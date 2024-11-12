@@ -557,11 +557,12 @@ public class PatientController {
                     for (Medication medication : medications) {
                         System.out.println("    - Name            : " + medication.getName());
                         System.out.println("      Quantity        : " + medication.getQuantity());
-                        System.out.println("      Status          : " + medication.getStatus());
+                        //System.out.println("      Status          : " + medication.getStatus());
                     }
                 } else {
                     System.out.println("Medications: None");
                 }
+                System.out.println("Status              : " + appointment.getMedicationStatus());
 
                 //System.out.println("Medication Status   : " + appointment.getMedicationStatus());
                 System.out.println("-------------------------------");

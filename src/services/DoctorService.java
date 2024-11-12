@@ -14,6 +14,7 @@ import java.util.Map;
 import java.util.UUID;
 import java.time.LocalTime;
 import java.time.format.DateTimeParseException;
+import java.util.stream.Collectors;
 
 import enums.AppointmentStatus;
 import enums.MedicationStatus;
@@ -33,6 +34,9 @@ import services.MedicalRecordService;
 import services.DoctorService;
 import services.AppointmentService;
 import services.UserService;
+import src.models.Inventory;
+import stores.InventoryDataStore;
+
 
 /**
  * Service class for managing doctors, including operations for loading, saving,
@@ -295,7 +299,14 @@ public class DoctorService implements IDoctorService {
                 return;
             }
 
-            // Create a list to hold Medication objects
+            // Retrieve the list of inventory items
+            InventoryDataStore inventoryDataStore=new InventoryDataStore();
+            List<Inventory> inventoryList = inventoryDataStore.getInventoryList();
+            List<String> availableMedicineNames = inventoryList.stream()
+                    .map(Inventory::getMedicineName)
+                    .collect(Collectors.toList());
+
+            // Create lists to hold Medication objects and quantities
             List<Medication> prescribedMedications = new ArrayList<>();
             List<Integer> prescribedQuantities = new ArrayList<>();
 
@@ -304,26 +315,37 @@ public class DoctorService implements IDoctorService {
                 String medicationName = medicationNames[i].trim();
                 int quantity = Integer.parseInt(quantityStrings[i].trim());
 
-                // Add the medication and its quantity
-                prescribedMedications.add(new Medication(medicationName, quantity, MedicationStatus.PENDING));
-                prescribedQuantities.add(quantity);
+                // Check if the medication is in the inventory
+                if (availableMedicineNames.contains(medicationName)) {
+                    // Add the medication and its quantity
+                    prescribedMedications.add(new Medication(medicationName, quantity, MedicationStatus.PENDING));
+                    prescribedQuantities.add(quantity);
+                } else {
+                    System.out.println("Warning: Medication '" + medicationName + "' is not in inventory and will not be recorded.");
+                }
             }
 
-            // Record the appointment outcome with the created medications and quantities
-            appointment.setServiceProvided(serviceProvided);
-            appointment.setConsultationNotes(consultationNotes);
-            appointment.setMedications(prescribedMedications);
-            appointment.setQuantities(prescribedQuantities);
-            appointment.setStatus(AppointmentStatus.COMPLETED);
-            appointmentService.saveAppointmentsToCSV();
-            System.out.println("Appointment outcome recorded successfully.");
+            // Proceed if there are valid medications to record
+            if (!prescribedMedications.isEmpty()) {
+                // Record the appointment outcome with the created medications and quantities
+                appointment.setServiceProvided(serviceProvided);
+                appointment.setConsultationNotes(consultationNotes);
+                appointment.setMedications(prescribedMedications);
+                appointment.setQuantities(prescribedQuantities);
+                appointment.setStatus(AppointmentStatus.COMPLETED);
+                appointmentService.saveAppointmentsToCSV();
+                System.out.println("Appointment outcome recorded successfully.");
 
-            // Generate and write billing entry to Billing.csv
-            writeBillingEntry(appointment);
+                // Generate and write billing entry to Billing.csv
+                writeBillingEntry(appointment);
+            } else {
+                System.out.println("Error: No valid medications found in inventory for this appointment.");
+            }
         } else {
             System.out.println("Appointment not found or already completed.");
         }
     }
+
 
     /**
      * Writes a billing entry for a completed appointment to the Billing.csv file.

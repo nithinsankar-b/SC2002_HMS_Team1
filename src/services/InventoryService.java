@@ -121,7 +121,14 @@ public class InventoryService implements IInventoryService {
         Scanner scanner = new Scanner(System.in);
 
         // Ask for medicine names input, assuming they are comma-separated
-        System.out.println("Enter the list of medicines (comma-separated) to check and submit replenishment requests:");
+        System.out.println("The Low Stock Medications are:-");
+        for (Inventory data : inventoryDataList){
+            if(data.getCurrentStock()<=data.getLowLevelAlert()) {
+                System.out.println(data.getMedicineName() + " - " + data.getCurrentStock());
+            }
+        }
+
+            System.out.println("Enter the list of medicines (comma-separated) to check and submit replenishment requests:");
         String input = scanner.nextLine();
 
         // Split the input string into individual medicine names
