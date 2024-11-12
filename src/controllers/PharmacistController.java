@@ -8,7 +8,7 @@ import services.UserService;
 import services.InventoryService;
 import services.PatientService;
 import services.AppointmentService;
-import views.AppointmentOutcomeRecordView;
+import src.views.AppointmentOutcomeRecordView;
 import views.MedicalInventoryView;
 
 import java.util.List;
@@ -29,7 +29,7 @@ public class PharmacistController {
 	    private final InventoryService inventoryService;
 	    private final AppointmentService appointmentService;
 	    private final MedicalInventoryView medicalInventoryView;
-	    
+	    private final UserService userService;
 	    private final AppointmentOutcomeRecordView appointmentOutcomeRecordView;
 
 	    // Constructor
@@ -42,6 +42,7 @@ public class PharmacistController {
 	        
 
 	        // Initialize only necessary views
+	        this.userService = new UserService();
 	        this.medicalInventoryView = new MedicalInventoryView(inventoryService);
 	        
 	        this.appointmentOutcomeRecordView = new AppointmentOutcomeRecordView();
@@ -58,10 +59,10 @@ public class PharmacistController {
 	    // Method to submit replenishment request
 	    public void submitReplenishmentRequest() {
 	        Scanner scanner = new Scanner(System.in);
-	        System.out.print("Enter the medicine name for replenishment: ");
-	        String medicineName = scanner.nextLine().trim();
+	        //System.out.print("Enter the medicine name for replenishment: ");
+	        //String medicineName = scanner.nextLine().trim();
 
-	        inventoryService.submitReplenishmentRequest(medicineName); // Pass the medicine name to the service
+	        inventoryService.submitReplenishmentRequest(); // Pass the medicine name to the service
 	    }
 
 	    // Method to handle updating prescription status
@@ -78,6 +79,11 @@ public class PharmacistController {
 	    public void viewAppointmentOutcomeRecords() {
 	    	appointmentOutcomeRecordView.loadAndPrintAppointments();
 	    }
+	    
+	    public void changePassword(String hospitalID, String oldPassword, String newPassword)
+	     {
+	       userService.changePassword(hospitalID, oldPassword, newPassword);
+	     }
 	}
 
 

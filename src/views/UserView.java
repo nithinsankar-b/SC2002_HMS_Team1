@@ -17,12 +17,16 @@ import services.DoctorService;
 import services.ScheduleService;
 import services.AppointmentRequestService;
 import services.MedicalRecordService;
+import controllers.BillingController;
+import services.BillingService;
 import views.DoctorView;
 import controllers.DoctorController;
 import views.PharmacistView;
 import stores.InventoryDataStore;
 import models.User;
 import views.PatientView;
+
+import java.io.Console;
 import java.util.Scanner;
 
 /**
@@ -94,8 +98,11 @@ public class UserView {
             System.out.print("Enter Hospital ID (Case Sensitive): ");
             String hospitalID = scanner.nextLine();
 
-            System.out.print("Enter Password: ");
-            String password = scanner.nextLine();
+            //System.out.print("Enter Password: ");
+            Console console = System.console();
+            char[] passwordArray = console.readPassword("Enter Password: ");
+            String password = new String(passwordArray);
+            //String password = scanner.nextLine();
 
             if (userService.login(hospitalID, password)) {
                 loggedInHospitalID = hospitalID;
@@ -158,8 +165,10 @@ public class UserView {
                 // Create necessary services for Patient role
                 AppointmentService appointmentService = new AppointmentService();
                 PatientService patientService = new PatientService(userService);
+                BillingService billingService=new BillingService();
+                BillingController billingController=new BillingController();
                 PatientController patientController = new PatientController(patientService, appointmentService);
-                PatientView patientView = new PatientView(patientController, userService);
+                PatientView patientView = new PatientView(patientController, userService,billingController);
 
                 System.out.println("Navigating to Patient view...");
                 System.out.println(SEPARATOR);
@@ -213,9 +222,11 @@ public class UserView {
 
         // Instantiate PatientController
         PatientController patientController = new PatientController(patientService, appointmentService);
+        BillingService billingService=new BillingService();
+        BillingController billingController=new BillingController();
 
         // Instantiate PatientView
-        PatientView patientView = new PatientView(patientController, userService);
+        PatientView patientView = new PatientView(patientController, userService, billingController);
 
         // Start the patient operations (menu)
         System.out.println("Navigating to Patient view...");

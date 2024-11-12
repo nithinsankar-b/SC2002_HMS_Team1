@@ -83,8 +83,8 @@ public class AppointmentController {
      * @param prescribedMedications  the list of medications prescribed during the appointment
      * @param consultationNotes      notes from the consultation
      */
-    public void recordAppointmentOutcome(String appointmentId, String serviceProvided, List<Medication> prescribedMedications, String consultationNotes) {
-        appointmentService.recordAppointmentOutcome(appointmentId, serviceProvided, prescribedMedications, consultationNotes);
+    public void recordAppointmentOutcome(String appointmentId, String serviceProvided, List<Medication> prescribedMedications, List<Integer> prescribedQuantities, String consultationNotes) {
+        appointmentService.recordAppointmentOutcome(appointmentId, serviceProvided, prescribedMedications, prescribedQuantities, consultationNotes);
     }
 
     /**

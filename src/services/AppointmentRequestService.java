@@ -9,6 +9,8 @@ import java.nio.file.Paths;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
+
+import interfaces.IAppointmentRequestService;
 import services.ScheduleService;
 import services.AppointmentService;
 
@@ -17,7 +19,7 @@ import services.AppointmentService;
  * This class provides methods to accept, decline, and process appointment requests,
  * as well as to save and retrieve appointment request data from a CSV file.
  */
-public class AppointmentRequestService {
+public class AppointmentRequestService implements IAppointmentRequestService {
     private final ScheduleService scheduleService; // Service for managing doctor schedules
     private final AppointmentService appointmentService; // Service for managing appointments
     private final String appointmentRequestFile = "data/appointment_request.csv"; // Path to the CSV file
@@ -38,32 +40,32 @@ public class AppointmentRequestService {
      *
      * @param request The appointment request to be accepted.
      */
+
+
     public void acceptRequest(AppointmentRequest request) {
         // Change request status to accepted
         request.setStatus("Accepted");
 
-        // Create new appointment record based on the request
-        LocalDateTime appointmentDateTime = LocalDateTime.of(request.getRequestedDate(), request.getRequestedTimeSlot());
+        // Update the status of the existing appointment record
+        Appointment existingAppointment = appointmentService.getAppointmentById(request.getRequestId());
 
-        // Create appointment object
-        Appointment appointment = new Appointment(
-            request.getRequestId(), // Assuming this will serve as the appointmentId
-            request.getPatientId(),
-            request.getDoctorId(),
-            appointmentDateTime
-        );
+        if (existingAppointment != null) {
+            existingAppointment.setStatus(enums.AppointmentStatus.CONFIRMED);
 
-        // Update the schedule from "Available" to PatientID
-        if (scheduleService.bookAppointment(request.getDoctorId(), request.getRequestedDate(), request.getRequestedTimeSlot(), request.getPatientId())) {
-            // If successfully booked, update the schedule with PatientID
-            scheduleService.setUnavailable(request.getDoctorId(), request.getRequestedDate(), request.getRequestedTimeSlot());
+            // Update the schedule from "Available" to PatientID
+            if (scheduleService.bookAppointment(request.getDoctorId(), request.getRequestedDate(), request.getRequestedTimeSlot(), request.getPatientId())) {
+                // If successfully booked, update the schedule with PatientID
+                scheduleService.setUnavailable(request.getDoctorId(), request.getRequestedDate(), request.getRequestedTimeSlot());
 
-            // Schedule the appointment
-            appointmentService.scheduleAppointment(appointment); // Save the appointment record
-            saveAppointmentRequest(request); // Save the updated request to CSV
-            System.out.println("Appointment accepted and scheduled successfully.");
+                // Save the updated appointment record
+                appointmentService.updateAppointment(existingAppointment);
+                saveAppointmentRequest(request); // Save the updated request to CSV
+                System.out.println("Appointment confirmed and scheduled successfully.");
+            } else {
+                System.out.println("Failed to confirm the appointment due to unavailability.");
+            }
         } else {
-            System.out.println("Failed to book the appointment due to unavailability.");
+            System.out.println("Appointment record not found.");
         }
     }
 
@@ -106,8 +108,8 @@ public class AppointmentRequestService {
             if (request.getDoctorId().equals(doctorID)) {
                 found = true; // Set the flag to true if a matching request is found
                 System.out.println("Request ID: " + request.getRequestId() +
-                                   ", Requested Date: " + request.getRequestedDate() +
-                                   ", Requested Time Slot: " + request.getRequestedTimeSlot());
+                        ", Requested Date: " + request.getRequestedDate() +
+                        ", Requested Time Slot: " + request.getRequestedTimeSlot());
             }
         }
 
@@ -121,19 +123,75 @@ public class AppointmentRequestService {
      *
      * @param request The appointment request to be declined.
      */
+    /*public void declineRequest(AppointmentRequest request) {
+        // Change request status to cancelled
+        request.setStatus("Cancelled");
+
+        // Update the status of the existing appointment record
+        Appointment existingAppointment = appointmentService.getAppointmentById(request.getRequestId());
+
+        if (existingAppointment != null) {
+            existingAppointment.setStatus(enums.AppointmentStatus.CANCELLED); // Set appointment status to CANCELLED
+
+            // Update the schedule from "PatientID" back to "Available"
+            if (scheduleService.cancelAppointment(request.getDoctorId(), request.getRequestedDate(), request.getRequestedTimeSlot(), request.getPatientId())) {
+                // If successfully cancelled, update the schedule with availability
+                scheduleService.setAvailable(request.getDoctorId(), request.getRequestedDate(), request.getRequestedTimeSlot());
+
+                // Save the updated appointment record
+                appointmentService.updateAppointment(existingAppointment);
+                saveAppointmentRequest(request); // Save the updated request to CSV
+                System.out.println("Appointment cancelled and schedule updated successfully.");
+            } else {
+                System.out.println("Failed to cancel the appointment due to an error in updating the schedule.");
+            }
+        } else {
+            System.out.println("Appointment record not found.");
+        }
+    }*/
+    
+    /**
+     * Declines an appointment request and updates its status.
+     *
+     * @param request The appointment request to be declined.
+     */
     public void declineRequest(AppointmentRequest request) {
-        // Change request status to declined
-        request.setStatus("Declined");
-        saveAppointmentRequest(request); // Save the updated request to CSV
-        System.out.println("Appointment request declined.");
+        // Change request status to cancelled
+        request.setStatus("Cancelled");
+
+        // Update the status of the existing appointment record
+        Appointment existingAppointment = appointmentService.getAppointmentById(request.getRequestId());
+
+        if (existingAppointment != null) {
+            existingAppointment.setStatus(enums.AppointmentStatus.CANCELLED); // Set appointment status to CANCELLED
+
+            // Update the schedule from "PatientID" back to "Available"
+            if (scheduleService.cancelAppointment(request.getDoctorId(), request.getRequestedDate(), request.getRequestedTimeSlot(), request.getPatientId())) {
+                // If successfully cancelled, update the schedule with availability
+                scheduleService.setAvailable(request.getDoctorId(), request.getRequestedDate(), request.getRequestedTimeSlot());
+
+                // Save the updated appointment record to appointment.csv
+                appointmentService.updateAppointment(existingAppointment);
+
+                // Save the updated request to appointment_request.csv
+                saveAppointmentRequest(request);
+
+                System.out.println("Appointment cancelled and schedule updated successfully.");
+            } else {
+                System.out.println("Failed to cancel the appointment due to an error in updating the schedule.");
+            }
+        } else {
+            System.out.println("Appointment record not found.");
+        }
     }
+
 
     /**
      * Saves an appointment request to the CSV file.
      *
      * @param request The appointment request to be saved.
      */
-    private void saveAppointmentRequest(AppointmentRequest request) {
+    public void saveAppointmentRequest(AppointmentRequest request) {
         try {
             // Read all existing requests
             List<AppointmentRequest> requests = getAllRequests();
@@ -160,13 +218,25 @@ public class AppointmentRequestService {
             System.err.println("Error saving appointment request: " + e.getMessage());
         }
     }
+    public void save(AppointmentRequest request) {
+        try {
+            // Create a FileWriter in append mode, so the request is added to the end of the file
+            try (BufferedWriter writer = new BufferedWriter(new FileWriter(appointmentRequestFile, true))) {
+                // Write the request to the CSV file
+                writer.write(request.toString());
+                writer.newLine(); // Add a new line after each request
+            }
+        } catch (IOException e) {
+            System.err.println("Error saving appointment request: " + e.getMessage());
+        }
+    }
 
     /**
      * Loads all appointment requests from the CSV file.
      *
      * @return A list of all appointment requests.
      */
-    private List<AppointmentRequest> getAllRequests() {
+    public List<AppointmentRequest> getAllRequests() {
         List<AppointmentRequest> requests = new ArrayList<>();
         try (BufferedReader reader = Files.newBufferedReader(Paths.get(appointmentRequestFile))) {
             String line;

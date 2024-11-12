@@ -1,7 +1,7 @@
 package views;
 
 import models.Appointment;
-import models.Inventory;
+import src.models.Inventory;
 import models.Staff;
 import interfaces.IAdministratorView;
 import interfaces.IAppointmentService;

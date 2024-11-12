@@ -11,14 +11,17 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.UUID;
 import java.time.LocalTime;
 import java.time.format.DateTimeParseException;
 
 import enums.AppointmentStatus;
 import enums.MedicationStatus;
 import enums.UserRole;
+import interfaces.IDoctorService;
 import models.Doctor;
 import models.Patient;
+import models.Pharmacist;
 import models.User;
 import models.MedicalRecord;
 import models.Medication;
@@ -35,7 +38,7 @@ import services.UserService;
  * Service class for managing doctors, including operations for loading, saving,
  * updating doctor information, and handling appointment requests.
  */
-public class DoctorService {
+public class DoctorService implements IDoctorService {
 
     private static final String CSV_FILE_PATH = "data/doctor.csv";
     private static final String DELIMITER = ",";
@@ -66,6 +69,16 @@ public class DoctorService {
         this.appointmentRequestService = new AppointmentRequestService(scheduleService, appointmentService);
         loadDoctorFromCSV();
     }
+    //add doctor function added.
+    public void addDoctor(Doctor doctor) {
+        if (!doctors.containsKey(doctor.getHospitalID())) {
+            doctors.put(doctor.getHospitalID(), doctor);
+            saveDoctorsToCSV();
+            System.out.println("Doctor added successfully.");
+        } else {
+            System.out.println("Doctor already exists.");
+        }
+    }
 
     /**
      * Retrieves a doctor by their hospital ID.
@@ -74,7 +87,6 @@ public class DoctorService {
      * @return the Doctor object associated with the given ID, or null if not found
      */
     public Doctor getDoctorById(String hospitalID) {
-        System.out.println(doctors.get(hospitalID));
         return doctors.get(hospitalID);
     }
 
@@ -268,28 +280,85 @@ public class DoctorService {
      * @param medicationsInput a comma-separated string of medication names to be prescribed
      * @param consultationNotes additional notes regarding the consultation
      */
-    public void recordAppointmentOutcome(String appointmentId, String serviceProvided, String medicationsInput, String consultationNotes) {
+    public void recordAppointmentOutcome(String appointmentId, String serviceProvided, String medicationsInput, String quantitiesInput, String consultationNotes) {
         Appointment appointment = appointmentService.getAppointment(appointmentId);
-        
-        // Check if the appointment exists and is in a PENDING state
-        if (appointment != null && appointment.getStatus() == AppointmentStatus.PENDING) {
-            // Create a list to hold Medication objects
-            List<Medication> prescribedMedications = new ArrayList<>();
 
-            // Split the input string by commas to get medication names
-            String[] medicationNames = medicationsInput.split(",");
+        // Check if the appointment exists and is in a CONFIRMED state
+        if (appointment != null && appointment.getStatus() == AppointmentStatus.CONFIRMED) {
+            // Split the input strings by commas to get medication names and quantities
+            String[] medicationNames = medicationsInput.split(";");
+            String[] quantityStrings = quantitiesInput.split(";");
 
-            // Create Medication objects from the medication names
-            for (String medicationName : medicationNames) {
-                // Trim whitespace and create Medication object with PENDING status
-                prescribedMedications.add(new Medication(medicationName.trim(), 1, MedicationStatus.PENDING)); // Default quantity to 1, adjust as needed
+            // Check if the number of medications matches the number of quantities
+            if (medicationNames.length != quantityStrings.length) {
+                System.out.println("Error: The number of medications does not match the number of quantities.");
+                return;
             }
 
-            // Record the appointment outcome with the created medications
-            appointmentService.recordAppointmentOutcome(appointmentId, serviceProvided, prescribedMedications, consultationNotes);
+            // Create a list to hold Medication objects
+            List<Medication> prescribedMedications = new ArrayList<>();
+            List<Integer> prescribedQuantities = new ArrayList<>();
+
+            // Create Medication objects from the medication names and quantities
+            for (int i = 0; i < medicationNames.length; i++) {
+                String medicationName = medicationNames[i].trim();
+                int quantity = Integer.parseInt(quantityStrings[i].trim());
+
+                // Add the medication and its quantity
+                prescribedMedications.add(new Medication(medicationName, quantity, MedicationStatus.PENDING));
+                prescribedQuantities.add(quantity);
+            }
+
+            // Record the appointment outcome with the created medications and quantities
+            appointment.setServiceProvided(serviceProvided);
+            appointment.setConsultationNotes(consultationNotes);
+            appointment.setMedications(prescribedMedications);
+            appointment.setQuantities(prescribedQuantities);
+            appointment.setStatus(AppointmentStatus.COMPLETED);
+            appointmentService.saveAppointmentsToCSV();
             System.out.println("Appointment outcome recorded successfully.");
+
+            // Generate and write billing entry to Billing.csv
+            writeBillingEntry(appointment);
         } else {
             System.out.println("Appointment not found or already completed.");
+        }
+    }
+
+    /**
+     * Writes a billing entry for a completed appointment to the Billing.csv file.
+     *
+     * @param appointment The completed appointment for which billing is recorded.
+     */
+    private void writeBillingEntry(Appointment appointment) {
+        String billingFilePath = "data/Billing.csv";
+        String invoiceID = UUID.randomUUID().toString();  // Generate a unique Invoice ID
+        String patientID = appointment.getPatientId();
+        String doctorID = appointment.getDoctorId();
+        String appointmentID = appointment.getAppointmentId();
+        double totalAmount = 0.0;
+        String status = "UNPAID";
+
+        try (BufferedWriter writer = new BufferedWriter(new FileWriter(billingFilePath, true))) {
+            // Check if Billing.csv exists and write header if file is empty
+            if (new java.io.File(billingFilePath).length() == 0) {
+                writer.write("InvoiceID,PatientID,DoctorID,AppointmentID,Total_Amount,Status");
+                writer.newLine();
+            }
+            
+            // Write the billing entry
+            String billingEntry = String.join(",",
+                invoiceID, 
+                patientID, 
+                doctorID, 
+                appointmentID, 
+                String.valueOf(totalAmount), 
+                status
+            );
+            writer.write(billingEntry);
+            writer.newLine();
+        } catch (IOException e) {
+            System.out.println("Error writing to Billing.csv: " + e.getMessage());
         }
     }
 

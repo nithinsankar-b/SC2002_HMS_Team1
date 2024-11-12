@@ -13,11 +13,13 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import interfaces.IMedicalRecordService;
+
 /**
  * The {@code MedicalRecordService} class provides services to manage medical records for patients.
  * It allows loading, saving, and updating medical records from a CSV file.
  */
-public class MedicalRecordService {
+public class MedicalRecordService implements IMedicalRecordService {
     private final Map<String, MedicalRecord> medicalRecords; // A map to store medical records indexed by patient ID
     private final String medicalRecordFile = "data/medical_record.csv"; // Specify your CSV file path
 

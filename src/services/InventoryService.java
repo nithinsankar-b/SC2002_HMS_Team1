@@ -1,10 +1,12 @@
 package services;
 
 import interfaces.IInventoryService;
+import models.Appointment;
 import models.Inventory;
 import models.InventoryDisplay;
 import enums.ReplenishmentStatus;
 import enums.InventoryStatus;
+import enums.MedicationStatus;
 import stores.InventoryDataStore;
 
 import java.io.BufferedReader;
@@ -15,7 +17,7 @@ import java.io.IOException;
 import java.util.List;
 import java.util.stream.Collectors;
 import java.util.ArrayList;
-
+import java.util.Scanner;
 /**
  * The InventoryService class provides methods for managing medication inventory,
  * including loading and saving inventory data from/to a CSV file, submitting
@@ -26,6 +28,9 @@ public class InventoryService implements IInventoryService {
     private final InventoryDataStore inventoryDataStore;
     private static final String CSV_FILE_PATH = "data/inventory.csv";
     private static final String DELIMITER = ",";
+    private final AppointmentService appointmentService;
+    
+   
 
     /**
      * Constructs an InventoryService instance with the specified InventoryDataStore.
@@ -35,7 +40,10 @@ public class InventoryService implements IInventoryService {
      */
     public InventoryService(InventoryDataStore store) {
         this.inventoryDataStore = store;
+        this.appointmentService = new AppointmentService();
         loadDataFromCSV(); // Load inventory data from CSV on initialization
+        
+        
     }
 
     /**
@@ -59,7 +67,7 @@ public class InventoryService implements IInventoryService {
                 bw.write(line);
                 bw.newLine();
             }
-            System.out.println("Inventory data saved to CSV successfully.");
+            
         } catch (IOException e) {
             System.out.println("Error saving the inventory CSV file: " + e.getMessage());
         }
@@ -89,7 +97,7 @@ public class InventoryService implements IInventoryService {
                 }
             }
             inventoryDataStore.setInventoryList(inventoryList);
-            System.out.println("Inventory data loaded from CSV successfully.");
+         
         } catch (IOException | IllegalArgumentException e) {
             System.out.println("Error reading inventory CSV file: " + e.getMessage());
         }
@@ -100,25 +108,57 @@ public class InventoryService implements IInventoryService {
      * If the current stock of the medicine is below or equal to the low level alert,
      * the replenishment status is set to PENDING and the data is saved to CSV.
      *
-     * @param medicineName the name of the medicine to submit a replenishment request for
+     *  the name of the medicine to submit a replenishment request for
      */
+
+
     @Override
-    public void submitReplenishmentRequest(String medicineName) {
+    public void submitReplenishmentRequest() {
         List<Inventory> inventoryDataList = inventoryDataStore.getInventoryList();
 
-        for (Inventory data : inventoryDataList) {
-            if (data.getMedicineName().equalsIgnoreCase(medicineName)) {
-                if (data.getCurrentStock() <= data.getLowLevelAlert()) {
-                    data.setReplenishmentStatus(ReplenishmentStatus.PENDING);
-                    saveDataToCSV();
-                    System.out.println("Replenishment request submitted for: " + medicineName);
-                } else {
-                    System.out.println("Stock level is sufficient for: " + medicineName);
+        // Create a Scanner object to accept user input for medicine names
+        Scanner scanner = new Scanner(System.in);
+
+        // Ask for medicine names input, assuming they are comma-separated
+        System.out.println("Enter the list of medicines (comma-separated) to check and submit replenishment requests:");
+        String input = scanner.nextLine();
+
+        // Split the input string into individual medicine names
+        String[] requestedMedicines = input.split(",");
+
+        // Iterate through the requested medicines
+        for (String medicineName : requestedMedicines) {
+            medicineName = medicineName.trim(); // Remove any extra spaces
+            
+            // Search for the medicine in the inventory list
+            boolean found = false;
+            for (Inventory data : inventoryDataList) {
+                if (data.getMedicineName().equalsIgnoreCase(medicineName)) {
+                    found = true;
+
+                    // Check if the current stock is less than or equal to the low-level alert
+                    if (data.getCurrentStock() <= data.getLowLevelAlert()) {
+                        // Set the replenishment status to PENDING
+                        data.setReplenishmentStatus(ReplenishmentStatus.PENDING);
+                        System.out.println("Replenishment request submitted for: " + data.getMedicineName());
+                    } else {
+                        // Print if stock is sufficient
+                        System.out.println("Stock level is sufficient for: " + data.getMedicineName());
+                    }
+                    break; // Stop searching once the medicine is found
                 }
-                break;
+            }
+
+            if (!found) {
+                // Print if the medicine is not found in the inventory list
+                System.out.println("Medicine not found in the inventory: " + medicineName);
             }
         }
+
+        // Save the updated data to CSV after processing all requested medicines
+        saveDataToCSV();
     }
+
 
     /**
      * Calculates the amount to replenish based on the current stock and the low-level alert.
@@ -138,29 +178,99 @@ public class InventoryService implements IInventoryService {
      * @param medicineName the name of the medicine to update stock for
      * @param quantity the quantity to deduct from the current stock
      */
-    public void updateStock(String medicineName, int quantity) {
+    /*public void updateStock(String medicineName, int quantity, String appointmentID) {
         List<Inventory> inventoryDataList = inventoryDataStore.getInventoryList();
+        Appointment appointment = appointmentService.getAppointmentById(appointmentID); 
 
         for (Inventory data : inventoryDataList) {
-            if (data.getMedicineName().equalsIgnoreCase(medicineName)) {
+            if (data.getMedicineName().equalsIgnoreCase(medicineName) && appointment.getMedicationStatus() == MedicationStatus.PENDING) {
+            	
+              if(data.getCurrentStock() - quantity < 0)
+              {
+                System.out.println("Not enough medicine in the inventory");
+                return;
+              }
+              else {
                 data.setCurrentStock(data.getCurrentStock() - quantity);
+                appointment.setMedicationStatus(MedicationStatus.DISPENSED);
                 System.out.println("Updated stock for medicine: " + medicineName + ". New stock: " + data.getCurrentStock());
 
+                // Check if stock falls below the low-level alert and update status
                 if (data.getCurrentStock() <= data.getLowLevelAlert()) {
                     data.setInventoryStatus(InventoryStatus.LOWSTOCK);
                     System.out.println("Stock for " + medicineName + " is now LOWSTOCK.");
                 }
                 saveDataToCSV();
+                appointmentService.saveAppointmentsToCSV();
+                appointmentService.loadAppointmentsFromCSV();
+                loadDataFromCSV();// Save updated data to CSV
                 return;
+            }
+            }
+            else {
+            	if(!data.getMedicineName().equalsIgnoreCase(medicineName)) {
+            		System.out.println("Medication does not exist.");
+            	}
+            	else {
+            		System.out.println("Medication already dispensed.");
+            	}
+            	
             }
         }
         System.out.println("Medicine not found: " + medicineName);
+    }*/
+    public void updateStock(String medicineName, int quantity, String appointmentID) {
+        List<Inventory> inventoryDataList = inventoryDataStore.getInventoryList();
+        Appointment appointment = appointmentService.getAppointmentById(appointmentID);
+        boolean medicineFound = false;
+
+        // Loop through inventory to find the specified medicine
+        for (Inventory data : inventoryDataList) {
+            if (data.getMedicineName().equalsIgnoreCase(medicineName)) {
+                medicineFound = true;
+
+                // Check if the medication has already been dispensed for this appointment
+                if (appointment.getMedicationStatus() == MedicationStatus.DISPENSED) {
+                    System.out.println("Medication " + data.getMedicineName()+ " already dispensed for appointment ID: " + appointmentID);
+                    return;
+                }
+
+                // Check for sufficient stock
+                if (data.getCurrentStock() < quantity) {
+                    System.out.println("Not enough medicine in the inventory for: " + medicineName);
+                    return;
+                }
+
+                // Update stock and set medication status to DISPENSED
+                data.setCurrentStock(data.getCurrentStock() - quantity);
+                appointment.setMedicationStatus(MedicationStatus.DISPENSED);
+                System.out.println("Updated stock for medicine: " + medicineName + ". New stock: " + data.getCurrentStock());
+
+                // Check if stock falls below the low-level alert and update status
+                if (data.getCurrentStock() <= data.getLowLevelAlert()) {
+                    data.setInventoryStatus(InventoryStatus.LOWSTOCK);
+                    System.out.println("Stock for " + medicineName + " is now LOWSTOCK.");
+                }
+
+                // Save updates to CSV files
+                saveDataToCSV();
+                appointmentService.saveAppointmentsToCSV();
+                return;
+            }
+        }
+
+        // If no matching medicine is found
+        if (!medicineFound) {
+            System.out.println("Medicine not found: " + medicineName);
+        }
     }
+
 
     /**
      * Displays the current medication inventory, listing each medicine's name, current stock,
      * low-level alert, and replenishment status. If no medications are in inventory, a message is shown.
      */
+   
     public void viewMedicationInventory() {
         List<Inventory> inventoryDataList = inventoryDataStore.getInventoryList();
 

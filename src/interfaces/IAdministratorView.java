@@ -2,7 +2,7 @@ package interfaces;
 
 import models.Staff;
 import models.Appointment;
-import models.Inventory;
+import src.models.Inventory;
 import java.util.List;
 
 /**

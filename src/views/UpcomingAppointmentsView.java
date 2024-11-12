@@ -2,6 +2,11 @@ package views;
 
 import services.ScheduleService;
 import models.Doctor;
+import models.Appointment;
+import services.AppointmentService;
+import java.util.List;
+import java.util.ArrayList;
+import enums.AppointmentStatus;
 
 /**
  * The {@code UpcomingAppointmentsView} class provides a user interface for 
@@ -27,8 +32,34 @@ public class UpcomingAppointmentsView {
      *
      * @param doctor the doctor for whom to display upcoming appointments
      */
-    public void displayUpcomingAppointments(Doctor doctor) {
+    /*public void displayUpcomingAppointments(Doctor doctor) {
         System.out.println("Displaying Upcoming Appointments for Doctor: " + doctor.getName() + " " + doctor.getHospitalID());
         scheduleService.printUpcomingAppointments(doctor.getHospitalID());
+    }*/
+    public void displayUpcomingAppointments(Doctor doctor) {
+        System.out.println("Displaying Upcoming Appointments for Doctor: " + doctor.getName() + " " + doctor.getHospitalID());
+
+        // Fetch all appointments
+        AppointmentService appointmentService=new AppointmentService();
+        List<Appointment> allAppointments = appointmentService.viewScheduledAppointments();
+
+        // Filter the appointments for the given doctor and confirmed status
+        List<Appointment> doctorAppointments = new ArrayList<>();
+        for (Appointment appointment : allAppointments) {
+            // Check if the appointment matches the doctor's ID and is confirmed
+            if (appointment.getDoctorId().equals(doctor.getHospitalID()) && AppointmentStatus.CONFIRMED.equals(appointment.getStatus())) {
+                doctorAppointments.add(appointment);
+            }
+        }
+
+        // If there are any confirmed appointments, display them
+        if (doctorAppointments.isEmpty()) {
+            System.out.println("No upcoming confirmed appointments found for Doctor: " + doctor.getName());
+        } else {
+            for (Appointment appointment : doctorAppointments) {
+                System.out.println("Appointment ID: " + appointment.getAppointmentId() + ", Patient ID: " + appointment.getPatientId() +
+                        ", DateTime: " + appointment.getAppointmentDateTime() + ", Status: " + appointment.getStatus());
+            }
+        }
     }
 }
