@@ -60,14 +60,16 @@ public class DoctorController {
       viewUpcomingAppointments.displayUpcomingAppointments(doctor);
     }
 
-    public void acceptAppointmentRequest() {
+    public void acceptAppointmentRequest(Doctor doctor) {
+        viewPendingAppointmentRequest.displayPendingRequests(doctor);
       Scanner sc = new Scanner(System.in);
       System.out.println("Enter RequestID: ");
       String reqId = sc.nextLine();
       doctorService.acceptanceOfRequest(reqId);
     }
 
-    public void declineAppointmentRequest() {
+    public void declineAppointmentRequest(Doctor doctor) {
+        viewPendingAppointmentRequest.displayPendingRequests(doctor);
       Scanner sc = new Scanner(System.in);
       System.out.println("Enter RequestID: ");
       String reqId = sc.nextLine();
@@ -128,7 +130,7 @@ System.out.println("Requested appointment slot is set to unavailable.");
        String appointmentId = sc.nextLine();
        System.out.println("Enter Service Provided: ");
        String serviceProvided = sc.nextLine();
-       System.out.println("Enter medications prescribed (if more than 1 medicine, separate by ;): ");
+       System.out.println("Enter medications prescribed  (if more than 1 medicine, separate by ;): ");
        String medicineList = sc.nextLine();
          System.out.println("Enter quantities prescribed (if more than 1 medicine, separate by ;): ");
          String quantitiesList = sc.nextLine();

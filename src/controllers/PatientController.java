@@ -6,9 +6,11 @@ import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.time.format.DateTimeFormatter;
+import java.time.format.DateTimeParseException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Scanner;
+import models.Medication;
 import models.Doctor;
 
 import models.Patient;
@@ -124,7 +126,7 @@ public class PatientController {
 
             boolean success = patientService.updatePatientContact(patient.getHospitalID(), newContactInfo, contactType);
             if (success) {
-                System.out.println("Contact information updated successfully.\nUpdated information will be reflected upon next login.");
+                System.out.println("Contact information updated successfully.");
             } else {
                 System.out.println("Failed to update contact information. Patient not found.");
             }
@@ -180,7 +182,7 @@ public class PatientController {
 
 
             LocalDate startDate = LocalDate.of(2024, 11, 18);
-            LocalDate endDate = LocalDate.of(2024, 11, 25);
+            LocalDate endDate = LocalDate.of(2024, 12, 18);
             LocalDateTime startDateTime = LocalDateTime.of(startDate, LocalTime.of(11, 30));
             LocalDateTime endDateTime = LocalDateTime.of(endDate, LocalTime.of(11, 0));
 
@@ -221,7 +223,7 @@ public class PatientController {
             }
 
             if (availableSlots.contains(dateTime)) {
-                String appointmentId = String.valueOf(System.currentTimeMillis());
+                String appointmentId = String.valueOf(System.currentTimeMillis()).substring(6);
                 Appointment appointment = new Appointment(appointmentId, patient.getHospitalID(), doctorId, dateTime);
 
                 boolean success = appointmentService.scheduleAppointment(appointment);
@@ -342,8 +344,8 @@ public class PatientController {
 
 
                     LocalDate rangeStartDate = LocalDate.of(2024, 11, 18); //
-                    LocalDate rangeEndDate = LocalDate.of(2024, 11, 25); //
-                    LocalDateTime rangeStartTime = rangeStartDate.atTime(11, 0); //
+                    LocalDate rangeEndDate = LocalDate.of(2024, 12, 18); //
+                    LocalDateTime rangeStartTime = rangeStartDate.atTime(11, 30); //
                     LocalDateTime rangeEndTime = rangeEndDate.atTime(11, 0); //
 
                     if (newDate.isBefore(rangeStartDate) || newDate.isAfter(rangeEndDate)) {
@@ -423,7 +425,7 @@ public class PatientController {
 
 
     // Method to view available appointment slots
-    public void viewAvailableAppointmentSlots() {
+    /*public void viewAvailableAppointmentSlots() {
         Scanner scanner = new Scanner(System.in);
         System.out.print("Enter Doctor ID: ");
         String doctorId = scanner.nextLine();
@@ -446,6 +448,79 @@ public class PatientController {
                     System.out.println(slot.format(formatter))
             );
         }
+    } */
+    public void viewAvailableAppointmentSlots() {
+        Scanner scanner = new Scanner(System.in);
+
+        // Display available doctors from the CSV file
+        try (BufferedReader br = new BufferedReader(new FileReader("data//doctor.csv"))) {
+            String line;
+            boolean headerSkipped = false;
+
+            System.out.println("Available Doctors:");
+            while ((line = br.readLine()) != null) {
+                if (!headerSkipped) {
+                    headerSkipped = true; // Skip the header line
+                    continue;
+                }
+
+                String[] values = line.split(",");
+                String hospitalID = values[0].trim();
+                String name = values[1].trim();
+
+                System.out.println("Doctor ID: " + hospitalID + ", Name: " + name);
+            }
+        } catch (IOException e) {
+            System.out.println("Error reading doctor file: " + e.getMessage());
+            return;
+        }
+
+        // Ask for Doctor ID
+        System.out.print("Enter Doctor ID: ");
+        String doctorId = scanner.nextLine();
+
+        // Ask for appointment date
+        System.out.print("Enter Day (1-31): ");
+        int day = Integer.parseInt(scanner.nextLine());
+
+        System.out.print("Enter Month (1-12): ");
+        int month = Integer.parseInt(scanner.nextLine());
+
+        System.out.print("Enter Year (YYYY): ");
+        int year = Integer.parseInt(scanner.nextLine());
+
+        // Parse and validate the date
+        LocalDate date;
+        try {
+            DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd-MM-yyyy");
+            date = LocalDate.parse(String.format("%02d-%02d-%04d", day, month, year), formatter);
+        } catch (DateTimeParseException e) {
+            System.out.println("Invalid date format.");
+            return;
+        }
+
+        // Define appointment booking window
+        LocalDate startDate = LocalDate.of(2024, 11, 18);
+        LocalDate endDate = LocalDate.of(2024, 12, 18);
+        LocalDateTime startDateTime = LocalDateTime.of(startDate, LocalTime.of(11, 30));
+        LocalDateTime endDateTime = LocalDateTime.of(endDate, LocalTime.of(11, 0));
+
+        if (date.isBefore(startDate) || date.isAfter(endDate) ||
+                (date.isEqual(startDate) && date.atStartOfDay().isBefore(startDateTime))) {
+            System.out.println("Appointments can only be booked for one week in advance.");
+            return;
+        }
+
+        // Get available slots from the appointment service
+        List<LocalDateTime> availableSlots = appointmentService.getAvailableSlots(doctorId, date);
+        if (availableSlots.isEmpty()) {
+            System.out.println("No available slots for the given date.");
+        } else {
+            System.out.println("Available slots:");
+
+            DateTimeFormatter displayFormatter = DateTimeFormatter.ofPattern("dd MMM yyyy, HH:mm 'HRS'");
+            availableSlots.forEach(slot -> System.out.println(slot.format(displayFormatter)));
+        }
     }
     public void viewPastRecords(Patient patient) {
         // Fetch all the appointments for this patient
@@ -467,16 +542,30 @@ public class PatientController {
         } else {
             System.out.println("Displaying Past Completed Appointments for Patient: " + patient.getName() + " (ID: " + patient.getHospitalID() + ")");
             for (Appointment appointment : completedAppointments) {
+                List<Medication> medications = appointment.getMedications();
                 System.out.println("Appointment ID      : " + appointment.getAppointmentId());
                 System.out.println("Patient ID          : " + appointment.getPatientId());
                 System.out.println("Doctor ID           : " + appointment.getDoctorId());
-                System.out.println("Appointment DateTime: " + appointment.getAppointmentDateTime());
+                System.out.println("Appointment Date and Time: " + appointment.getAppointmentDateTime());
                 System.out.println("Status              : " + appointment.getStatus());
                 System.out.println("Consultation Notes  : " + appointment.getConsultationNotes());
                 System.out.println("Service Provided    : " + appointment.getServiceProvided());
-                System.out.println("Medications         : " + appointment.getMedications());
-                System.out.println("Medication Quantity : " + appointment.getQuantities());
-                System.out.println("Medication Status   : " + appointment.getMedicationStatus());
+
+                // Printing medications neatly
+                if (medications != null && !medications.isEmpty()) {
+                    System.out.println("Medications:");
+                    for (Medication medication : medications) {
+                        System.out.println("    - Name            : " + medication.getName());
+                        System.out.println("      Quantity        : " + medication.getQuantity());
+                        //System.out.println("      Status          : " + medication.getStatus());
+                    }
+                } else {
+                    System.out.println("Medications: None");
+                }
+                System.out.println("Status              : " + appointment.getMedicationStatus());
+
+                //System.out.println("Medication Status   : " + appointment.getMedicationStatus());
+                System.out.println("-------------------------------");
             }
         }
     }

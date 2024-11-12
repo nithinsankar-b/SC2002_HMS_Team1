@@ -10,11 +10,7 @@ import java.time.LocalDate;
 import java.time.LocalTime;
 import java.time.format.DateTimeFormatter;
 import java.time.format.DateTimeParseException;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.TreeMap;
+import java.util.*;
 
 import interfaces.IScheduleService;
 
@@ -224,6 +220,31 @@ public class ScheduleService implements IScheduleService{
             }
         }
     }
+    public void setAvailable1(String doctorID, LocalDate date, LocalTime timeSlot) {
+        Map<LocalDate, Map<LocalTime, Schedule>> doctorSchedule = scheduleMap.get(doctorID);
+        if (doctorSchedule != null) {
+            Schedule schedule = doctorSchedule.get(date).get(timeSlot);
+            System.out.println(schedule.getStatus());
+            if (schedule != null && schedule.getStatus().startsWith("P")){
+                schedule.setStatus("Available"); // Change status to Available
+                saveSchedule(); // Save changes to CSV
+            } else if(schedule != null && "Available".equals(schedule.getStatus())){
+                System.out.println("Already available");
+            }
+        }
+    }
+    public void setUnavailable2(String doctorID, LocalDate date, LocalTime timeSlot, String patientID) {
+        Map<LocalDate, Map<LocalTime, Schedule>> doctorSchedule = scheduleMap.get(doctorID);
+        if (doctorSchedule != null) {
+            Schedule schedule = doctorSchedule.get(date).get(timeSlot);
+            if (schedule != null && "Available".equals(schedule.getStatus())) {
+                schedule.setStatus(patientID); // Change status to Blocked
+                saveSchedule(); // Save changes to CSV
+            } else if(schedule != null && "Blocked".equals(schedule.getStatus()))
+                System.out.println("Already blocked");
+        }
+    }
+
 
     /**
      * Sets a specified time slot as unavailable (blocked) for a doctor.
@@ -277,7 +298,7 @@ public class ScheduleService implements IScheduleService{
             System.out.println("No schedule found for Doctor ID: " + doctorID);
         }
     }*/
-    public void printSchedule(String doctorID) {
+    /*public void printSchedule(String doctorID) {
         Map<LocalDate, Map<LocalTime, Schedule>> doctorSchedule = scheduleMap.get(doctorID);
         LocalDate currentDate = LocalDate.now();
 
@@ -304,6 +325,53 @@ public class ScheduleService implements IScheduleService{
             }
         } else {
             System.out.println("No schedule found for Doctor ID: " + doctorID);
+        }
+    } */
+
+    public void printSchedule(String doctorID) {
+        Map<LocalDate, Map<LocalTime, Schedule>> doctorSchedule = scheduleMap.get(doctorID);
+        LocalDate currentDate = LocalDate.now();
+
+        // Ask user for the date
+        Scanner scanner = new Scanner(System.in);
+        System.out.print("Enter the day (1-31): ");
+        int day = Integer.parseInt(scanner.nextLine());
+
+        System.out.print("Enter the month (1-12): ");
+        int month = Integer.parseInt(scanner.nextLine());
+
+        System.out.print("Enter the year (YYYY): ");
+        int year = Integer.parseInt(scanner.nextLine());
+
+        // Create the selected date
+        LocalDate selectedDate = LocalDate.of(year, month, day);
+
+        // Check if the selected date is within the allowed range (18 Nov 2024 to 18 Dec 2024)
+        LocalDate startDate = LocalDate.of(2024, 11, 18);
+        LocalDate endDate = LocalDate.of(2024, 12, 18);
+
+        if (selectedDate.isBefore(startDate) || selectedDate.isAfter(endDate)) {
+            System.out.println("Selected date is outside one month range");
+            return;
+        }
+
+        // Check if the doctor has a schedule
+        if (doctorSchedule != null && doctorSchedule.containsKey(selectedDate)) {
+            Map<LocalTime, Schedule> timeSlots = doctorSchedule.get(selectedDate);
+
+            // Sort time slots by time
+            Map<LocalTime, Schedule> sortedTimeSlots = new TreeMap<>(timeSlots);
+
+            System.out.println("Schedule for Doctor ID: " + doctorID + " on " + selectedDate);
+
+            // Print the schedule for the selected date
+            for (Map.Entry<LocalTime, Schedule> timeEntry : sortedTimeSlots.entrySet()) {
+                LocalTime timeSlot = timeEntry.getKey();
+                Schedule schedule = timeEntry.getValue();
+                System.out.println("Time: " + timeSlot + " - Status: " + schedule.getStatus());
+            }
+        } else {
+            System.out.println("No schedule found for Doctor ID: " + doctorID + " on " + selectedDate);
         }
     }
 

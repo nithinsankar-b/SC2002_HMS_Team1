@@ -10,8 +10,8 @@ public class BillingController {
         billingService = new BillingService();
     }
 
-    public double calculateBill(String appointmentId) {
-        return billingService.calculateTotalBill(appointmentId);
+    public String calculateBill(String appointmentId) {
+        return billingService.calculateAndDisplayBill(appointmentId);
     }
 
     public boolean payBill(String appointmentId) {
