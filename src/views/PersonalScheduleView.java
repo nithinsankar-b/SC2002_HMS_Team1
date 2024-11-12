@@ -27,7 +27,7 @@ public class PersonalScheduleView {
      * @param doctor the doctor whose personal schedule is to be displayed
      */
     public void displayPersonalSchedule(Doctor doctor) {
-        System.out.println("Displaying Personal Schedule for Doctor: " + doctor.getName() + " (ID: " + doctor.getHospitalID() + ")");
+        //System.out.println("Displaying Personal Schedule for Doctor: " + doctor.getName() + " (ID: " + doctor.getHospitalID() + ")");
         scheduleService.printSchedule(doctor.getHospitalID());
     }
 }

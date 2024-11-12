@@ -564,7 +564,7 @@ public class PatientController {
                 }
 
                 //System.out.println("Medication Status   : " + appointment.getMedicationStatus());
-                //System.out.println("-------------------------------");
+                System.out.println("-------------------------------");
             }
         }
     }
