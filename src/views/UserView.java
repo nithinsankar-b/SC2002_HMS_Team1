@@ -17,8 +17,8 @@ import services.DoctorService;
 import services.ScheduleService;
 import services.AppointmentRequestService;
 import services.MedicalRecordService;
-import src.controllers.BillingController;
-import src.services.BillingService;
+import controllers.BillingController;
+import services.BillingService;
 import views.DoctorView;
 import controllers.DoctorController;
 import views.PharmacistView;
@@ -26,7 +26,6 @@ import stores.InventoryDataStore;
 import models.User;
 import views.PatientView;
 
-import javax.swing.*;
 import java.io.Console;
 import java.util.Scanner;
 
@@ -105,7 +104,6 @@ public class UserView {
             String password = new String(passwordArray);
             //String password = scanner.nextLine();
 
-
             if (userService.login(hospitalID, password)) {
                 loggedInHospitalID = hospitalID;
                 System.out.println("Login successful!");
@@ -167,10 +165,10 @@ public class UserView {
                 // Create necessary services for Patient role
                 AppointmentService appointmentService = new AppointmentService();
                 PatientService patientService = new PatientService(userService);
-                BillingService billingService = new BillingService();
-                BillingController billingController = new BillingController(billingService);
+                BillingService billingService=new BillingService();
+                BillingController billingController=new BillingController();
                 PatientController patientController = new PatientController(patientService, appointmentService);
-                PatientView patientView = new PatientView(patientController, userService, billingController);
+                PatientView patientView = new PatientView(patientController, userService,billingController);
 
                 System.out.println("Navigating to Patient view...");
                 System.out.println(SEPARATOR);
@@ -224,8 +222,8 @@ public class UserView {
 
         // Instantiate PatientController
         PatientController patientController = new PatientController(patientService, appointmentService);
-        BillingService billingService = new BillingService();
-        BillingController billingController = new BillingController(billingService);
+        BillingService billingService=new BillingService();
+        BillingController billingController=new BillingController();
 
         // Instantiate PatientView
         PatientView patientView = new PatientView(patientController, userService, billingController);
@@ -235,7 +233,7 @@ public class UserView {
         System.out.println(SEPARATOR);
         patientView.start(user);
     }
-
+    
     private void navigateToPharmacistPage(User user) {
         // Create the AppointmentService and PatientService instances
         AppointmentService appointmentService = new AppointmentService();
@@ -244,7 +242,7 @@ public class UserView {
         PharmacistService pharmacistService = new PharmacistService(userService, appointmentService, inventoryService);
         PatientService patientService = new PatientService(userService);
         // Instantiate PatientController
-        PharmacistController pharmacistController = new PharmacistController(pharmacistService, inventoryService, appointmentService);
+        PharmacistController pharmacistController = new PharmacistController(pharmacistService, inventoryService,appointmentService);
 
         // Instantiate PatientView
         PharmacistView pharmacistView = new PharmacistView(pharmacistController, pharmacistService, userService, patientService);
@@ -265,13 +263,13 @@ public class UserView {
 
         AppointmentRequestService appointmentRequestService = new AppointmentRequestService(scheduleService, appointmentService);
 
-        DoctorService doctorService = new DoctorService(userService, scheduleService, medicalRecordService, appointmentService);
+        DoctorService doctorService = new DoctorService( userService,scheduleService,medicalRecordService, appointmentService);
 
         // Instantiate DoctorController
-        DoctorController doctorController = new DoctorController(doctorService, scheduleService, medicalRecordService, appointmentService);
+        DoctorController doctorController = new DoctorController(doctorService,  scheduleService,  medicalRecordService, appointmentService);
 
         // Instantiate DoctorView
-        DoctorView doctorView = new DoctorView(doctorController, doctorService, userService, scheduleService, medicalRecordService, appointmentService);
+        DoctorView doctorView = new DoctorView( doctorController, doctorService, userService, scheduleService, medicalRecordService, appointmentService);
 
         // Start the doctor operations (menu)
         System.out.println("Navigating to Doctor view...");
@@ -286,10 +284,10 @@ public class UserView {
         InventoryService inventoryService = new InventoryService(inventoryDataStore);
         ProjectAdminService adminService = new ProjectAdminService(new Administrator(user.getHospitalID(), user.getPassword(), null), inventoryService);
         AppointmentService appointmentService = new AppointmentService();
-
+    
         // Instantiate AdministratorController
         AdministratorController adminController = new AdministratorController(appointmentService, adminService, userService);
-
+    
         // Start the administrator operations (menu), passing in the logged-in hospital ID
         System.out.println("Navigating to Administrator view...");
         System.out.println(SEPARATOR);

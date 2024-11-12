@@ -1,27 +1,20 @@
-package src.controllers;
+// BillingController.java
+package controllers;
 
-
-import src.models.Billing;
-import src.services.BillingService;
-
-import java.util.List;
+import services.BillingService;
 
 public class BillingController {
     private final BillingService billingService;
 
-    public BillingController(BillingService billingService) {
-        this.billingService = billingService;
+    public BillingController() {
+        billingService = new BillingService();
     }
 
-    public List<Billing> viewUnpaidBills(String patientId) {
-        return billingService.getBillingByStatus(patientId, Billing.BillingStatus.UNPAID);
+    public double calculateBill(String appointmentId) {
+        return billingService.calculateTotalBill(appointmentId);
     }
 
-    public List<Billing> viewPaidBills(String patientId) {
-        return billingService.getBillingByStatus(patientId, Billing.BillingStatus.PAID);
-    }
-
-    public boolean payBill(String invoiceId) {
-        return billingService.markBillAsPaid(invoiceId);
+    public boolean payBill(String appointmentId) {
+        return billingService.payBill(appointmentId);
     }
 }

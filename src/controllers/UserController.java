@@ -1,8 +1,8 @@
 package controllers;
 
 import services.UserService;
-import src.controllers.BillingController;
-import src.services.BillingService;
+import controllers.BillingController;
+import services.BillingService;
 import views.UserView;
 import enums.UserRole;
 import models.User;
@@ -92,7 +92,7 @@ public class UserController {
     private void navigateToPatientPage(User user) {
         AppointmentService appointmentService = new AppointmentService();
         BillingService billingService=new BillingService();
-        BillingController billingController=new BillingController(billingService);
+        BillingController billingController=new BillingController();
         PatientService patientService = new PatientService(userService);
         PatientController patientController = new PatientController(patientService, appointmentService);
         PatientView patientView = new PatientView(patientController, userService, billingController);

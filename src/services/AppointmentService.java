@@ -134,9 +134,8 @@ public class AppointmentService implements IAppointmentService {
         Appointment appointment = getAppointment(appointmentId);
 
         // Check if the appointment exists and is in a PENDING state
-        if (appointment != null && appointment.getStatus() == AppointmentStatus.PENDING) {
+        if (appointment != null && appointment.getStatus() == AppointmentStatus.COMPLETED) {
             appointment.setMedicationStatus(MedicationStatus.PENDING);
-            appointment.setStatus(AppointmentStatus.COMPLETED);
             appointment.setServiceProvided(serviceProvided);
             appointment.setConsultationNotes(consultationNotes);
 
@@ -240,7 +239,7 @@ public class AppointmentService implements IAppointmentService {
     }
 
     // Load appointments from CSV file
-    private void loadAppointmentsFromCSV() {
+    public void loadAppointmentsFromCSV() {
         try (BufferedReader reader = new BufferedReader(new FileReader(APPOINTMENT_FILE))) {
             String line;
             // Skip header line

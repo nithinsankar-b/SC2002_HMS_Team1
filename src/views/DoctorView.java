@@ -5,6 +5,7 @@ import java.time.format.DateTimeFormatter;
 import java.util.Scanner;
 import models.Doctor;
 import controllers.DoctorController;
+import interfaces.IDoctorView;
 import models.User;
 import services.AppointmentRequestService;
 import services.AppointmentService;
@@ -17,7 +18,7 @@ import services.UserService;
  * The {@code DoctorView} class provides a user interface for doctors to manage their operations.
  * It allows doctors to view medical records, manage schedules, handle appointments, and more.
  */
-public class DoctorView {
+public class DoctorView implements IDoctorView {
     private final Scanner scanner; // Scanner for user input
     private final DoctorController doctorController; // Controller for doctor operations
     private final UserService userService; // Service to manage user details
@@ -77,14 +78,12 @@ public class DoctorView {
             case 2 -> doctorController.personalScheduleView(doctor);
             case 3 -> doctorController.upcomingAppointmentsView(doctor);
             case 4 -> doctorController.pendingAppointmentsView(doctor);
-            case 5 -> doctorController.setToAvailable(doctor);
-            case 6 -> doctorController.setToUnavailable(doctor);
-            case 7 -> doctorController.acceptAppointmentRequest();
-            case 8 -> doctorController.declineAppointmentRequest();
-            case 9 -> doctorController.newPatientDiagnosis();
-            case 10 -> doctorController.newPatientPrescription();
-            case 11 -> doctorController.appointmentOutcomeRecord();
-            case 12 -> {
+            case 5 -> manageAvailabilityMenu(doctor);
+            case 6 -> manageAppointmentRequestsMenu();
+            case 7 -> managePatientRecordsMenu();
+            case 8 -> doctorController.appointmentOutcomeRecord();
+            case 9 -> changePassword();
+            case 10 -> {
                 System.out.println("Logging out...");
                 isRunning = false;
             }
@@ -115,20 +114,76 @@ public class DoctorView {
     /**
      * Displays the menu options for doctor operations.
      */
-    private void displayMenu() {
+    public void displayMenu() {
         System.out.println("Please choose an option:");
         System.out.println("1. View Medical Records");
         System.out.println("2. View Personal Schedule");
         System.out.println("3. View Upcoming Appointments");
         System.out.println("4. View Pending Appointment Requests");
-        System.out.println("5. Set Date to Available");
-        System.out.println("6. Block Out Date");
-        System.out.println("7. Accept Appointment Request");
-        System.out.println("8. Decline Appointment Request");
-        System.out.println("9. Add New Diagnosis for Patient");
-        System.out.println("10. Add New Prescription for Patient");
-        System.out.println("11. Record Appointment Outcome");
-        System.out.println("12. Log Out");
+        System.out.println("5. Set Availability.");
+        System.out.println("6. Accept or Decline Appointment Request.");
+        System.out.println("7. Update Patient Medical Records.");
+        System.out.println("8. Record Appointment Outcome");
+        System.out.println("9. Change Password");
+        System.out.println("10. Log Out");
+    }
+    
+    public void manageAvailabilityMenu(User user) {
+    	Doctor doctor = doctorService.getDoctorById(user.getHospitalID());
+        boolean managingAvailability = true;
+        while (managingAvailability) {
+            System.out.println("Manage Availability:");
+            System.out.println("1. Set Date to Available");
+            System.out.println("2. Set Date to Unavailable");
+            System.out.println("3. Return to Main Menu");
+
+            int choice = getUserInput();
+
+            switch (choice) {
+                case 1 -> doctorController.setToAvailable(doctor);
+                case 2 -> doctorController.setToUnavailable(doctor);
+                case 3 -> managingAvailability = false;
+                default -> System.out.println("ERROR: Invalid choice, please try again.");
+            }
+        }
+    }
+    
+    private void manageAppointmentRequestsMenu() {
+        boolean managingRequests = true;
+        while (managingRequests) {
+            System.out.println("Accept or Decline Appointment Request:");
+            System.out.println("1. Accept Appointment Request");
+            System.out.println("2. Decline Appointment Request");
+            System.out.println("3. Return to Main Menu");
+
+            int choice = getUserInput();
+
+            switch (choice) {
+                case 1 -> doctorController.acceptAppointmentRequest();
+                case 2 -> doctorController.declineAppointmentRequest();
+                case 3 -> managingRequests = false;
+                default -> System.out.println("ERROR: Invalid choice, please try again.");
+            }
+           }
+        }
+    
+    private void managePatientRecordsMenu() {
+        boolean managingRecords = true;
+        while (managingRecords) {
+            System.out.println("Update Patient Medical Records:");
+            System.out.println("1. Add New Diagnosis for Patient");
+            System.out.println("2. Add New Prescription for Patient");
+            System.out.println("3. Return to Main Menu");
+
+            int choice = getUserInput();
+
+            switch (choice) {
+                case 1 -> doctorController.newPatientDiagnosis();
+                case 2 -> doctorController.newPatientPrescription();
+                case 3 -> managingRecords = false;
+                default -> System.out.println("ERROR: Invalid choice, please try again.");
+            }
+        }
     }
 
     /**
@@ -162,6 +217,20 @@ public class DoctorView {
      */
     public void showErrorMessage(String message) {
         System.out.println("ERROR: " + message);
+    }
+    private void changePassword()
+    {
+      Scanner sc=new Scanner(System.in);
+      System.out.println("Enter Hospital ID");
+      String id = sc.nextLine();
+      
+      System.out.println("Enter old password");
+      String oldPassword = sc.nextLine();
+      
+      System.out.println("Enter new password");
+      String newPassword = sc.nextLine();
+      
+      doctorController.changePassword(id, oldPassword, newPassword);
     }
 }
 
