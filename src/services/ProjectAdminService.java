@@ -9,7 +9,7 @@ import interfaces.IInventoryService;
 import interfaces.IProjectAdmService;
 import services.UserService;
 
-import java.io.IOException;
+import java.io.*;
 import java.util.List;
 
 import enums.UserRole;
@@ -27,6 +27,8 @@ public class ProjectAdminService implements IProjectAdmService {
     private UserService userService;
 
     private static final String STAFF_CSV_PATH = "data/Staff_List.csv";
+    private static final String DOCTOR_CSV_PATH = "data/doctor.csv";
+    private static final String PHARMACIST_CSV_PATH = "data/pharmacist.csv";
 
     /**
      * Constructs a ProjectAdminService with the specified Administrator and IInventoryService.
@@ -34,6 +36,7 @@ public class ProjectAdminService implements IProjectAdmService {
      *
      * @param administrator   The administrator managing the service.
      * @param inventoryService The inventory service to manage inventory-related operations.
+     * @param userService The user service to manage user-related operations.
      */
     public ProjectAdminService(Administrator administrator, IInventoryService inventoryService, UserService userService) {
         this.administrator = administrator;
@@ -94,13 +97,78 @@ public void addOrUpdateStaff(Staff staffMember) {
     try {
         staffDataStore.writeStaffToCSV(STAFF_CSV_PATH);
         System.out.println("Staff member added/updated: " + staffMember.getId());
+        
+        // Update the respective doctor or pharmacist CSV
+        if (role.equalsIgnoreCase("Doctor")) {
+            addOrUpdateDoctorCSV(staffMember);
+        } else if (role.equalsIgnoreCase("Pharmacist")) {
+            addOrUpdatePharmacistCSV(staffMember);
+        }
+        
     } catch (IOException e) {
         System.err.println("Error saving staff data: " + e.getMessage());
     }
 }
 
+
+    private void addOrUpdateDoctorCSV(Staff staffMember) {
+        updateOrAppendToCSV("data/doctor.csv", staffMember);
+    }
     
+    private void addOrUpdatePharmacistCSV(Staff staffMember) {
+        updateOrAppendToCSV("data/pharmacist.csv", staffMember);
+    }
+    private void updateOrAppendToCSV(String csvPath, Staff staffMember) {
+        File inputFile = new File(csvPath);
+        File tempFile = new File("temp.csv");
     
+        boolean updated = false;
+    
+        try (BufferedReader reader = new BufferedReader(new FileReader(inputFile));
+             BufferedWriter writer = new BufferedWriter(new FileWriter(tempFile))) {
+    
+            String line;
+            while ((line = reader.readLine()) != null) {
+                if (line.startsWith(staffMember.getId() + ",")) {
+                    // Replace the line with the updated information for the staff member
+                    writer.write(staffMember.getId() + "," + staffMember.getName() + ",default@example.com");
+                    writer.newLine();
+                    updated = true;
+                } else {
+                    // Copy the existing line
+                    writer.write(line);
+                    writer.newLine();
+                }
+            }
+    
+            // If the staff member was not found in the existing file, append as a new line
+            if (!updated) {
+                writer.write(staffMember.getId() + "," + staffMember.getName() + ",default@example.com");
+                writer.newLine();
+            }
+    
+        } catch (IOException e) {
+            System.err.println("Error updating/adding to " + csvPath + ": " + e.getMessage());
+        }
+    
+        // Replace the original file with the updated temporary file
+        if (!inputFile.delete()) {
+            System.err.println("Could not delete original file");
+        }
+        if (!tempFile.renameTo(inputFile)) {
+            System.err.println("Could not rename temp file to original file name");
+        }
+    }
+        
+
+    private void updateCSV(String csvPath, Staff staffMember) {
+        try (BufferedWriter writer = new BufferedWriter(new FileWriter(csvPath, true))) {
+            writer.write(staffMember.getId() + "," + staffMember.getName() + ",default@example.com");
+            writer.newLine();
+        } catch (IOException e) {
+            System.err.println("Error writing to " + csvPath + ": " + e.getMessage());
+        }
+    }
 
     /**
      * Removes a staff member from the system by their ID.
@@ -110,23 +178,96 @@ public void addOrUpdateStaff(Staff staffMember) {
      */
     @Override
     public boolean removeStaff(String staffId) {
+        // Check if the staff member is an Administrator
+        User user = userService.getUserById(staffId);
+        if (user != null && user.getRole() == UserRole.ADMINISTRATOR) {
+            System.out.println("Error: Administrator cannot be removed.");
+            return false;
+        }
+    
+        // Proceed with removal if the staff member is not an Administrator
         if (!staffDataStore.getStaffList().containsKey(staffId)) {
             System.out.println("Staff not found for ID: " + staffId);
             return false;
         }
-
-        staffDataStore.removeStaff(staffId);
+    
+        // Determine the role of the staff member to delete from the appropriate CSV
+        Staff staffMember = staffDataStore.getStaffList().get(staffId);
+        staffDataStore.removeStaff(staffId); // Simply call the method without assignment
         userService.removeUser(staffId); // Remove from UserService as well
-
+    
+        boolean removed = false; // Initialize the removed flag
+    
         try {
             staffDataStore.writeStaffToCSV(STAFF_CSV_PATH);
-            System.out.println("Staff member removed: " + staffId);
-            return true;
+    
+            // Remove from the specific CSV file based on role
+            if (staffMember.getRole().equalsIgnoreCase("Doctor")) {
+                removed = removeFromCSV("data/doctor.csv", staffId);
+            } else if (staffMember.getRole().equalsIgnoreCase("Pharmacist")) {
+                removed = removeFromCSV("data/pharmacist.csv", staffId);
+            }
+    
+            if (removed) {
+                System.out.println("Staff member removed: " + staffId);
+            } else {
+                System.out.println("Failed to remove staff from specific CSV.");
+            }
+    
         } catch (IOException e) {
             System.err.println("Error saving staff data: " + e.getMessage());
             return false;
         }
+    
+        return removed;
     }
+    
+
+    private boolean removeFromCSV(String csvPath, String staffId) {
+        File inputFile = new File(csvPath);
+        File tempFile = new File("temp.csv");
+    
+        boolean found = false;
+    
+        try (BufferedReader reader = new BufferedReader(new FileReader(inputFile));
+             BufferedWriter writer = new BufferedWriter(new FileWriter(tempFile))) {
+    
+            String line;
+            while ((line = reader.readLine()) != null) {
+                // Check if this line contains the ID to remove
+                if (line.startsWith(staffId + ",")) {
+                    found = true; // Mark that we found and skipped this ID
+                    continue; // Skip this line to effectively remove it
+                }
+                writer.write(line);
+                writer.newLine();
+            }
+        } catch (IOException e) {
+            System.err.println("Error processing file: " + e.getMessage());
+            return false;
+        }
+    
+        // Ensure the temporary file can replace the original file
+        if (found) {
+            if (inputFile.delete()) {
+                if (!tempFile.renameTo(inputFile)) {
+                    System.err.println("Could not rename temp file to original file name.");
+                    return false;
+                }
+            } else {
+                System.err.println("Could not delete original file.");
+                return false;
+            }
+        } else {
+            // Clean up the temporary file if the ID wasn't found
+            tempFile.delete();
+            System.out.println("Staff ID not found: " + staffId);
+        }
+    
+        return found;
+    }
+    
+
 
     /**
      * Retrieves a list of all staff members.
