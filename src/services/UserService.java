@@ -41,6 +41,19 @@ public class UserService implements IUserService {
             System.out.println("Error reading CSV file: " + e.getMessage());
         }
     }
+    
+ // Save users to CSV
+    public void saveToCSV() {
+        try (FileWriter writer = new FileWriter("data/User.csv")) {
+            writer.write("hospitalID,password,role\n"); // CSV header
+            for (User user : users.values()) {
+                writer.write(user.getHospitalID() + "," + user.getPassword() + "," + user.getRole() + "\n");
+            }
+            
+        } catch (IOException e) {
+            System.out.println("Error writing to CSV file: " + e.getMessage());
+        }
+    }
 
     /**
      * Authenticates a user with the provided hospital ID and password.
@@ -68,6 +81,8 @@ public class UserService implements IUserService {
         User user = users.get(hospitalID);
         if (user != null && user.getPassword().equals(oldPassword)) {
             user.setPassword(newPassword);
+            saveToCSV();
+            loadUsersFromCSV("data/User.csv");
             return true;
         }
         return false;

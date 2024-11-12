@@ -98,7 +98,7 @@ public class DoctorController {
        String startTime = sc.nextLine();
        boolean success = doctorService.setUnavailability(doctor, date, startTime);
        if(success) {
-System.out.println("Requested appointment slot is Blocked.");
+System.out.println("Requested appointment slot is set to unavailable.");
        }else {
          System.out.println("error");
        }

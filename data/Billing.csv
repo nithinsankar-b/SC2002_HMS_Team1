@@ -1,0 +1,4 @@
+InvoiceID,PatientID,DoctorID,AppointmentID,Total_Amount,Status
+"I002","P1002","D002","165",0.00,"UNPAID"
+"I003","P1003","D003","125",0.00,"UNPAID"
+"I001","P1001","D001","1731196846882",165.00,"PAID"

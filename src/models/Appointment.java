@@ -1,13 +1,21 @@
 package models;
 
+import java.io.BufferedReader;
+import java.io.FileReader;
+import java.io.IOException;
 import java.time.LocalDateTime;
 import enums.AppointmentStatus;
 import enums.MedicationStatus;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
+
 import models.Medication;
 
 public class Appointment {
+	private static final String APPOINTMENT_FILE = "data/Appointment.csv";
+    private static Map<String, Appointment> appointmentCache = new HashMap<>();
     private final String appointmentId;
     private final String patientId;
     private final String doctorId;
@@ -141,7 +149,7 @@ public class Appointment {
         }
 
         // Return the formatted string with all values
-        return appointmentId + "," + patientId + "," + doctorId + "," +
+        return "\""+ appointmentId + "\"" + "," + patientId + "," + doctorId + "," +
                 appointmentDateTime + "," + status + "," +
                 consultationNotes + "," + serviceProvided + "," +
                 medicationsStr.toString() + "," + quantitiesStr.toString() + "," + medicationStatus;
@@ -154,5 +162,32 @@ public class Appointment {
 
     public void setQuantities(List<Integer> prescribedQuantities) {
         quantities=prescribedQuantities;
+    }
+    
+    public static Appointment getAppointmentById(String appointmentId) {
+        // Check cache first for the appointment
+        if (appointmentCache.containsKey(appointmentId)) {
+            return appointmentCache.get(appointmentId);
+        }
+
+        // Load the appointment from file if not in cache
+        try (BufferedReader reader = new BufferedReader(new FileReader(APPOINTMENT_FILE))) {
+            String line;
+            reader.readLine(); // Skip header line
+            while ((line = reader.readLine()) != null) {
+                Appointment appointment = Appointment.fromString(line);
+
+                // Check if appointment is successfully created and matches the ID
+                if (appointment != null && appointment.getAppointmentId().equals(appointmentId)) {
+                    appointmentCache.put(appointmentId, appointment); // Cache it for future calls
+                    return appointment;
+                }
+            }
+        } catch (IOException e) {
+            System.err.println("Error loading appointment record: " + e.getMessage());
+        }
+
+        System.err.println("Appointment ID " + appointmentId + " not found.");
+        return null; // Return null if appointment not found
     }
 }

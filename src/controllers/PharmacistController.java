@@ -29,7 +29,7 @@ public class PharmacistController {
 	    private final InventoryService inventoryService;
 	    private final AppointmentService appointmentService;
 	    private final MedicalInventoryView medicalInventoryView;
-	    
+	    private final UserService userService;
 	    private final AppointmentOutcomeRecordView appointmentOutcomeRecordView;
 
 	    // Constructor
@@ -42,6 +42,7 @@ public class PharmacistController {
 	        
 
 	        // Initialize only necessary views
+	        this.userService = new UserService();
 	        this.medicalInventoryView = new MedicalInventoryView(inventoryService);
 	        
 	        this.appointmentOutcomeRecordView = new AppointmentOutcomeRecordView();
@@ -78,6 +79,11 @@ public class PharmacistController {
 	    public void viewAppointmentOutcomeRecords() {
 	    	appointmentOutcomeRecordView.loadAndPrintAppointments();
 	    }
+	    
+	    public void changePassword(String hospitalID, String oldPassword, String newPassword)
+	     {
+	       userService.changePassword(hospitalID, oldPassword, newPassword);
+	     }
 	}
 
 
