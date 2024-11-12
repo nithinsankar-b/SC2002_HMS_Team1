@@ -11,6 +11,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.UUID;
 import java.time.LocalTime;
 import java.time.format.DateTimeParseException;
 
@@ -298,7 +299,6 @@ public class DoctorService implements IDoctorService {
             }
 
             // Record the appointment outcome with the created medications and quantities
-            //appointmentService.recordAppointmentOutcome(appointmentId, serviceProvided, prescribedMedications, prescribedQuantities, consultationNotes);
             appointment.setServiceProvided(serviceProvided);
             appointment.setConsultationNotes(consultationNotes);
             appointment.setMedications(prescribedMedications);
@@ -306,8 +306,48 @@ public class DoctorService implements IDoctorService {
             appointment.setStatus(AppointmentStatus.COMPLETED);
             appointmentService.saveAppointmentsToCSV();
             System.out.println("Appointment outcome recorded successfully.");
+
+            // Generate and write billing entry to Billing.csv
+            writeBillingEntry(appointment);
         } else {
             System.out.println("Appointment not found or already completed.");
+        }
+    }
+
+    /**
+     * Writes a billing entry for a completed appointment to the Billing.csv file.
+     *
+     * @param appointment The completed appointment for which billing is recorded.
+     */
+    private void writeBillingEntry(Appointment appointment) {
+        String billingFilePath = "data/Billing.csv";
+        String invoiceID = UUID.randomUUID().toString();  // Generate a unique Invoice ID
+        String patientID = appointment.getPatientId();
+        String doctorID = appointment.getDoctorId();
+        String appointmentID = appointment.getAppointmentId();
+        double totalAmount = 0.0;
+        String status = "UNPAID";
+
+        try (BufferedWriter writer = new BufferedWriter(new FileWriter(billingFilePath, true))) {
+            // Check if Billing.csv exists and write header if file is empty
+            if (new java.io.File(billingFilePath).length() == 0) {
+                writer.write("InvoiceID,PatientID,DoctorID,AppointmentID,Total_Amount,Status");
+                writer.newLine();
+            }
+            
+            // Write the billing entry
+            String billingEntry = String.join(",",
+                invoiceID, 
+                patientID, 
+                doctorID, 
+                appointmentID, 
+                String.valueOf(totalAmount), 
+                status
+            );
+            writer.write(billingEntry);
+            writer.newLine();
+        } catch (IOException e) {
+            System.out.println("Error writing to Billing.csv: " + e.getMessage());
         }
     }
 

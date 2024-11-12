@@ -1,18 +1,16 @@
 package models;
 
-import java.util.Objects;
-
 public class Billing {
-    public enum BillingStatus { PAID, UNPAID }
-
     private String invoiceId;
     private String patientId;
     private String doctorId;
     private String appointmentId;
     private double totalAmount;
-    private BillingStatus status;
+    private String status;
 
-    public Billing(String invoiceId, String patientId, String doctorId, String appointmentId, double totalAmount, BillingStatus status) {
+    public Billing() {}
+
+    public Billing(String invoiceId, String patientId, String doctorId, String appointmentId, double totalAmount, String status) {
         this.invoiceId = invoiceId;
         this.patientId = patientId;
         this.doctorId = doctorId;
@@ -21,36 +19,69 @@ public class Billing {
         this.status = status;
     }
 
-    // Getters and setters
-    public String getInvoiceId() { return invoiceId; }
-    public String getPatientId() { return patientId; }
-    public String getDoctorId() { return doctorId; }
-    public String getAppointmentId() { return appointmentId; }
-    public double getTotalAmount() { return totalAmount; }
-    public BillingStatus getStatus() { return status; }
-    public void setStatus(BillingStatus status) { this.status = status; }
-
-    // Convert to CSV format
-    public String toCsvString() {
-        return invoiceId + "," + patientId + "," + doctorId + "," + appointmentId + "," + totalAmount + "," + status;
+    // Getters and Setters
+    public String getInvoiceId() {
+        return invoiceId;
     }
 
-    // Create Billing object from CSV format
-    public static Billing fromCsvString(String csvLine) {
-        String[] parts = csvLine.split(",");
-        return new Billing(parts[0], parts[1], parts[2], parts[3], Double.parseDouble(parts[4]), BillingStatus.valueOf(parts[5]));
+    public void setInvoiceId(String invoiceId) {
+        this.invoiceId = invoiceId;
+    }
+
+    public String getPatientId() {
+        return patientId;
+    }
+
+    public void setPatientId(String patientId) {
+        this.patientId = patientId;
+    }
+
+    public String getDoctorId() {
+        return doctorId;
+    }
+
+    public void setDoctorId(String doctorId) {
+        this.doctorId = doctorId;
+    }
+
+    public String getAppointmentId() {
+        return appointmentId;
+    }
+
+    public void setAppointmentId(String appointmentId) {
+        this.appointmentId = appointmentId;
+    }
+
+    public double getTotalAmount() {
+        return totalAmount;
+    }
+
+    public void setTotalAmount(double totalAmount) {
+        this.totalAmount = totalAmount;
+    }
+
+    public String getStatus() {
+        return status;
+    }
+
+    public void setStatus(String status) {
+        this.status = status;
     }
 
     @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (!(o instanceof Billing)) return false;
-        Billing billing = (Billing) o;
-        return Objects.equals(invoiceId, billing.invoiceId);
+    public String toString() {
+        // Enclose appointmentId in double quotes to avoid issues with large numbers
+        return invoiceId + "," + patientId + "," + doctorId + ",\"" + appointmentId + "\","
+                + totalAmount + "," + status;
     }
 
-    @Override
-    public int hashCode() {
-        return Objects.hash(invoiceId);
+    public static Billing fromCSV(String line) {
+        // Split the line by comma and remove surrounding quotes from appointmentId if present
+        String[] fields = line.split(",");
+        
+        // Handle the case where appointmentId might have quotes around it
+        String appointmentId = fields[3].replace("\"", "").trim();
+        
+        return new Billing(fields[0], fields[1], fields[2], appointmentId, Double.parseDouble(fields[4]), fields[5]);
     }
 }

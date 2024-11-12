@@ -1,18 +1,18 @@
 package views;
 
 import interfaces.iPatientView;
+import models.Patient;
+import models.User;
+import models.Billing;
+import controllers.PatientController;
+import controllers.BillingController;
+import services.PatientService;
+import services.UserService;
 
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
-import java.util.Scanner;
-import models.Patient;
-import controllers.PatientController;
-import models.User;
-import models.Billing;
-import controllers.BillingController;
 import java.util.List;
-import services.PatientService;
-import services.UserService;
+import java.util.Scanner;
 
 public class PatientView implements iPatientView {
     private final Scanner scanner;
@@ -21,47 +21,24 @@ public class PatientView implements iPatientView {
     private final BillingController billingController;
 
     public PatientView(PatientController patientController, UserService userService, BillingController billingController) {
-        this.scanner = new Scanner(System.in); // Do not close scanner here, managed centrally by UserView
+        this.scanner = new Scanner(System.in); // Centralized Scanner management
         this.patientController = patientController;
         this.userService = userService;
-        this.billingController=billingController;
+        this.billingController = billingController;
     }
 
-    // Main method to handle different patient operations
     public void start(User user) {
         PatientService patientService = new PatientService(userService);
         boolean isRunning = true;
 
-        // Load patient details from the User object
         Patient patient = patientService.getPatientById(user.getHospitalID());
         if (patient == null) {
-            // Add logic to guide the user to register a new patient if not found.
             System.out.println("Patient record not found for user: " + user.getHospitalID());
             System.out.println("Do you want to register a new patient? (Y/N): ");
             String userInput = scanner.nextLine().trim().toUpperCase();
 
             if (userInput.equals("Y")) {
-                // Prompt the user for patient information
-                System.out.print("Enter Patient Name: ");
-                String name = scanner.nextLine().trim();
-
-                System.out.print("Enter Date of Birth (yyyy-MM-dd): ");
-                String dobString = scanner.nextLine().trim();
-                LocalDate dateOfBirth = LocalDate.parse(dobString, DateTimeFormatter.ISO_LOCAL_DATE);
-
-                System.out.print("Enter Gender: ");
-                String gender = scanner.nextLine().trim();
-
-                System.out.print("Enter Blood Type: ");
-                String bloodType = scanner.nextLine().trim();
-
-                System.out.print("Enter Contact Information (email or phone): ");
-                String contactInformation = scanner.nextLine().trim();
-
-                // Register new patient using user data
-                patient = new Patient(user, name, dateOfBirth, gender, bloodType, contactInformation);
-                patientService.addPatient(patient);
-                System.out.println("New patient registered successfully.");
+                registerNewPatient(user);
             } else {
                 System.out.println("Unable to proceed without patient information.");
                 return;
@@ -75,23 +52,22 @@ public class PatientView implements iPatientView {
             switch (choice) {
                 case 1 -> patientController.viewPatientDetails(patient);
                 case 2 -> patientController.viewAllocatedAppointments(patient);
-                case 3 ->  patientController.viewAllocatedAppointments2(patient);
+                case 3 -> patientController.viewAllocatedAppointments2(patient);
                 case 4 -> patientController.viewAppointmentHistory(patient);
                 case 5 -> patientController.updateContactInformation(patient);
                 case 6 -> patientController.createAppointment(patient);
                 case 7 -> patientController.cancelAppointment(patient);
                 case 8 -> patientController.rescheduleAppointment(patient);
                 case 9 -> patientController.viewAvailableAppointmentSlots();
-                case 10 ->patientController.viewPastRecords(patient);
+                case 10 -> patientController.viewPastRecords(patient);
                 case 11 -> showBillingOptions(patient);
                 case 12 -> {
                     System.out.println("Logging out...");
-                    isRunning = false; // Exit the loop to log out
+                    isRunning = false;
                 }
                 default -> showErrorMessage("Invalid choice, please try again.");
             }
 
-            // Only prompt to continue if the user has not chosen to log out
             if (isRunning) {
                 System.out.println("\nDo you want to continue (Y/N): ");
                 String userInput = scanner.nextLine().trim().toUpperCase();
@@ -103,11 +79,30 @@ public class PatientView implements iPatientView {
                 }
             }
         }
-
-        // Do not close the scanner here as it's used in the main UserView
     }
 
-    // Implementing the display method to show the main menu
+    private void registerNewPatient(User user) {
+        System.out.print("Enter Patient Name: ");
+        String name = scanner.nextLine().trim();
+
+        System.out.print("Enter Date of Birth (yyyy-MM-dd): ");
+        String dobString = scanner.nextLine().trim();
+        LocalDate dateOfBirth = LocalDate.parse(dobString, DateTimeFormatter.ISO_LOCAL_DATE);
+
+        System.out.print("Enter Gender: ");
+        String gender = scanner.nextLine().trim();
+
+        System.out.print("Enter Blood Type: ");
+        String bloodType = scanner.nextLine().trim();
+
+        System.out.print("Enter Contact Information (email or phone): ");
+        String contactInformation = scanner.nextLine().trim();
+
+        Patient patient = new Patient(user, name, dateOfBirth, gender, bloodType, contactInformation);
+        new PatientService(userService).addPatient(patient);
+        System.out.println("New patient registered successfully.");
+    }
+
     public void displayMenu() {
         System.out.println("Please choose an option:");
         System.out.println("1. View Medical Record");
@@ -121,24 +116,48 @@ public class PatientView implements iPatientView {
         System.out.println("9. View Available Appointment Slots");
         System.out.println("10. View Past Outcome Records");
         System.out.println("11. View Billing Details");
-        //System.out.println("12. View Upcoming Appointments");
         System.out.println("12. Log Out");
     }
 
-    @Override
-    public void display(Patient patient) {
-        System.out.println("Displaying information for patient ID: " + patient.getHospitalID());
-    }
-
-    // Get user input with error checking
     private int getUserInput() {
         int choice = -1;
         try {
             choice = Integer.parseInt(scanner.nextLine());
         } catch (NumberFormatException e) {
-            showErrorMessage("Invalid input. Please enter a number between 1 and 10.");
+            showErrorMessage("Invalid input. Please enter a number between 1 and 12.");
         }
         return choice;
+    }
+
+    public void showBillingOptions(Patient patient) {
+        System.out.print("Enter Appointment ID to view bill: ");
+        String appointmentId = scanner.nextLine().trim();
+
+        double billAmount = billingController.calculateBill(appointmentId);
+        if (billAmount == 0.0) {
+            System.out.println("No unpaid bill found for the provided Appointment ID.");
+            return;
+        }
+
+        System.out.printf("Total Bill Amount: $%.2f%n", billAmount);
+        System.out.print("Do you want to pay this bill? (Y/N): ");
+        String paymentConfirmation = scanner.nextLine().trim().toUpperCase();
+
+        if (paymentConfirmation.equals("Y") || paymentConfirmation.equals("YES")) {
+            boolean isPaid = billingController.payBill(appointmentId);
+            if (isPaid) {
+                System.out.println("Payment successful.");
+            } else {
+                System.out.println("Payment failed. Please try again.");
+            }
+        } else {
+            System.out.println("Bill payment canceled.");
+        }
+    }
+
+    @Override
+    public void display(Patient patient) {
+        System.out.println("Displaying information for patient ID: " + patient.getHospitalID());
     }
 
     @Override
@@ -147,7 +166,6 @@ public class PatientView implements iPatientView {
             System.out.println("Patient ID: " + patient.getHospitalID());
             System.out.println("Name: " + patient.getName());
             System.out.println("Contact: " + patient.getContactInformation());
-            // Display other patient details as needed
         } else {
             showErrorMessage("Patient details not found.");
         }
@@ -161,39 +179,5 @@ public class PatientView implements iPatientView {
     @Override
     public void showErrorMessage(String message) {
         System.out.println("ERROR: " + message);
-    }
-
-    public void showBillingOptions(Patient patient) {
-        System.out.println("1. View Unpaid Bills");
-        System.out.println("2. View Paid Bills");
-        System.out.print("Select an option: ");
-        int choice = scanner.nextInt();
-
-        if (choice == 1) {
-            List<Billing> unpaidBills = billingController.viewUnpaidBills(patient.getHospitalID());
-            displayBills(unpaidBills);
-
-            System.out.print("Enter the Invoice ID to pay: ");
-            String invoiceId = scanner.next();
-            boolean paymentSuccess = billingController.payBill(invoiceId);
-            if (paymentSuccess) {
-                System.out.println("Payment successful.");
-            } else {
-                System.out.println("Payment failed or Invoice ID not found.");
-            }
-        } else if (choice == 2) {
-            List<Billing> paidBills = billingController.viewPaidBills(patient.getHospitalID());
-            displayBills(paidBills);
-        }
-    }
-
-    private void displayBills(List<Billing> bills) {
-        if (bills.isEmpty()) {
-            System.out.println("No records found.");
-        } else {
-            for (Billing bill : bills) {
-                System.out.println("Invoice ID: " + bill.getInvoiceId() + ", Amount: $" + bill.getTotalAmount() + ", Status: " + bill.getStatus());
-            }
-        }
     }
 }

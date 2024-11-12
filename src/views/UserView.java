@@ -166,7 +166,7 @@ public class UserView {
                 AppointmentService appointmentService = new AppointmentService();
                 PatientService patientService = new PatientService(userService);
                 BillingService billingService=new BillingService();
-                BillingController billingController=new BillingController(billingService);
+                BillingController billingController=new BillingController();
                 PatientController patientController = new PatientController(patientService, appointmentService);
                 PatientView patientView = new PatientView(patientController, userService,billingController);
 
@@ -223,7 +223,7 @@ public class UserView {
         // Instantiate PatientController
         PatientController patientController = new PatientController(patientService, appointmentService);
         BillingService billingService=new BillingService();
-        BillingController billingController=new BillingController(billingService);
+        BillingController billingController=new BillingController();
 
         // Instantiate PatientView
         PatientView patientView = new PatientView(patientController, userService, billingController);

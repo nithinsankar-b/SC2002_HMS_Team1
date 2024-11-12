@@ -17,7 +17,7 @@ import java.io.IOException;
 import java.util.List;
 import java.util.stream.Collectors;
 import java.util.ArrayList;
-
+import java.util.Scanner;
 /**
  * The InventoryService class provides methods for managing medication inventory,
  * including loading and saving inventory data from/to a CSV file, submitting
@@ -110,26 +110,55 @@ public class InventoryService implements IInventoryService {
      *
      *  the name of the medicine to submit a replenishment request for
      */
+
+
     @Override
     public void submitReplenishmentRequest() {
         List<Inventory> inventoryDataList = inventoryDataStore.getInventoryList();
 
-        // Iterate through the inventory data list
-        for (Inventory data : inventoryDataList) {
-            // Check if the current stock is less than or equal to the low-level alert
-            if (data.getCurrentStock() <= data.getLowLevelAlert()) {
-                // Set the replenishment status to PENDING
-                data.setReplenishmentStatus(ReplenishmentStatus.PENDING);
-                System.out.println("Replenishment request submitted for: " + data.getMedicineName());
-            } else {
-                // Print if stock is sufficient
-                System.out.println("Stock level is sufficient for: " + data.getMedicineName());
+        // Create a Scanner object to accept user input for medicine names
+        Scanner scanner = new Scanner(System.in);
+
+        // Ask for medicine names input, assuming they are comma-separated
+        System.out.println("Enter the list of medicines (comma-separated) to check and submit replenishment requests:");
+        String input = scanner.nextLine();
+
+        // Split the input string into individual medicine names
+        String[] requestedMedicines = input.split(",");
+
+        // Iterate through the requested medicines
+        for (String medicineName : requestedMedicines) {
+            medicineName = medicineName.trim(); // Remove any extra spaces
+            
+            // Search for the medicine in the inventory list
+            boolean found = false;
+            for (Inventory data : inventoryDataList) {
+                if (data.getMedicineName().equalsIgnoreCase(medicineName)) {
+                    found = true;
+
+                    // Check if the current stock is less than or equal to the low-level alert
+                    if (data.getCurrentStock() <= data.getLowLevelAlert()) {
+                        // Set the replenishment status to PENDING
+                        data.setReplenishmentStatus(ReplenishmentStatus.PENDING);
+                        System.out.println("Replenishment request submitted for: " + data.getMedicineName());
+                    } else {
+                        // Print if stock is sufficient
+                        System.out.println("Stock level is sufficient for: " + data.getMedicineName());
+                    }
+                    break; // Stop searching once the medicine is found
+                }
+            }
+
+            if (!found) {
+                // Print if the medicine is not found in the inventory list
+                System.out.println("Medicine not found in the inventory: " + medicineName);
             }
         }
 
-        // Save the updated data to CSV after processing all inventory items
+        // Save the updated data to CSV after processing all requested medicines
         saveDataToCSV();
     }
+
 
     /**
      * Calculates the amount to replenish based on the current stock and the low-level alert.
