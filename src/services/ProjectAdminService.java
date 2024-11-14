@@ -1,7 +1,7 @@
 package services;
 
 import models.Administrator;
-import src.models.Inventory;
+import models.Inventory;
 import models.Staff;
 import models.User;
 import stores.StaffDataStore;

@@ -28,18 +28,7 @@ public class ScheduleService implements IScheduleService{
     /**
      * Constructs a {@code ScheduleService} and loads the schedule from the CSV file.
      */
-   
-   /* public ScheduleService() {
-        this.scheduleMap = new HashMap<>();
-        
-        // Check if schedule CSV already exists; generate if not
-        if (!Files.exists(Paths.get(SCHEDULE_FILE))) {
-            generateSchedule("D001", LocalDate.of(2024, 11, 11), LocalDate.of(2024, 12, 31), "Available");
-            generateSchedule("D002", LocalDate.of(2024, 11, 11), LocalDate.of(2024, 12, 31), "Available");
-        }
-        
-        loadSchedule(); // Load the schedule data into memory
-    }*/
+  
     public ScheduleService() {
         this.scheduleMap = new HashMap<>();
 
@@ -122,9 +111,7 @@ public class ScheduleService implements IScheduleService{
     public Map<String, Map<LocalDate, Map<LocalTime, Schedule>>> getScheduleMap() {
         return scheduleMap;
     }
-    
-    
-    
+   
     
 
     /**
@@ -208,23 +195,13 @@ public class ScheduleService implements IScheduleService{
      * @param date the date of the time slot
      * @param timeSlot the time slot to set as available
      */
-    public void setAvailable(String doctorID, LocalDate date, LocalTime timeSlot) {
-        Map<LocalDate, Map<LocalTime, Schedule>> doctorSchedule = scheduleMap.get(doctorID);
-        if (doctorSchedule != null) {
-            Schedule schedule = doctorSchedule.get(date).get(timeSlot);
-            if (schedule != null && "Blocked".equals(schedule.getStatus())) {
-                schedule.setStatus("Available"); // Change status to Available
-                saveSchedule(); // Save changes to CSV
-            } else if(schedule != null && "Available".equals(schedule.getStatus())){
-                System.out.println("Already available");
-            }
-        }
-    }
+    
+
     public void setAvailable1(String doctorID, LocalDate date, LocalTime timeSlot) {
         Map<LocalDate, Map<LocalTime, Schedule>> doctorSchedule = scheduleMap.get(doctorID);
         if (doctorSchedule != null) {
             Schedule schedule = doctorSchedule.get(date).get(timeSlot);
-            System.out.println(schedule.getStatus());
+            
             if (schedule != null && schedule.getStatus().startsWith("P")){
                 schedule.setStatus("Available"); // Change status to Available
                 saveSchedule(); // Save changes to CSV
@@ -246,88 +223,229 @@ public class ScheduleService implements IScheduleService{
     }
 
 
-    /**
-     * Sets a specified time slot as unavailable (blocked) for a doctor.
-     *
-     * @param doctorID the ID of the doctor
-     * @param date the date of the time slot
-     * @param timeSlot the time slot to set as unavailable
-     */
+    public void unblockTimeSlots(String doctorID) {
+        Scanner scanner = new Scanner(System.in);
+
+        // Prompt for start date (day, month, year)
+        System.out.print("Enter the start day (1-31): ");
+        int startDay = Integer.parseInt(scanner.nextLine());
+
+        System.out.print("Enter the start month (1-12): ");
+        int startMonth = Integer.parseInt(scanner.nextLine());
+
+        System.out.print("Enter the start year (YYYY): ");
+        int startYear = Integer.parseInt(scanner.nextLine());
+
+        // Parse start date
+        LocalDate startDate = LocalDate.of(startYear, startMonth, startDay);
+
+        // Prompt for end date (day, month, year)
+        System.out.print("Enter the end day (1-31): ");
+        int endDay = Integer.parseInt(scanner.nextLine());
+
+        System.out.print("Enter the end month (1-12): ");
+        int endMonth = Integer.parseInt(scanner.nextLine());
+
+        System.out.print("Enter the end year (YYYY): ");
+        int endYear = Integer.parseInt(scanner.nextLine());
+
+        // Parse end date
+        LocalDate endDate = LocalDate.of(endYear, endMonth, endDay);
+
+        // Prompt for start and end time for making slots available
+        System.out.print("Enter the start time (HH:mm, e.g., 14:00): ");
+        LocalTime startTime = LocalTime.parse(scanner.nextLine());
+
+        System.out.print("Enter the end time (HH:mm, e.g., 14:30): ");
+        LocalTime endTime = LocalTime.parse(scanner.nextLine());
+
+        // Validate 30-minute intervals for the times
+        if (startTime.getMinute() % 30 != 0 || endTime.getMinute() % 30 != 0) {
+            System.out.println("Error: Time slots must be in 30-minute intervals (e.g., 14:00, 14:30).");
+            return;
+        }
+
+        Map<LocalDate, Map<LocalTime, Schedule>> doctorSchedule = scheduleMap.get(doctorID);
+
+        if (doctorSchedule == null) {
+            System.out.println("No schedule found for doctor: " + doctorID);
+            return;
+        }
+
+        boolean anySetAvailable = false;
+
+        for (LocalDate date = startDate; !date.isAfter(endDate); date = date.plusDays(1)) {
+            LocalTime availableStartTime = date.equals(startDate) ? startTime : LocalTime.of(9, 0);
+            LocalTime availableEndTime = date.equals(endDate) ? endTime : LocalTime.of(16, 30);
+
+            Map<LocalTime, Schedule> dailySchedule = doctorSchedule.get(date);
+            if (dailySchedule == null) continue;
+
+            for (LocalTime time = availableStartTime; !time.isAfter(availableEndTime); time = time.plusMinutes(30)) {
+                Schedule schedule = dailySchedule.get(time);
+
+                if (schedule != null) {
+                    // Check for patient appointment
+                    if (schedule.getStatus() != null && schedule.getStatus().startsWith("P")) {
+                        System.out.println("Cannot make time available for " + date + " " + time +
+                                           " due to appointment with patient ID: " + schedule.getStatus());
+                        continue;  // Skip to the next time slot
+                    }
+
+                    if ("Available".equals(schedule.getStatus())) {
+                        System.out.println("Slot already available: " + date + " " + time);
+                        continue;
+                    }
+
+                    // Set the slot to available
+                    setAvailable(doctorID, date, time);
+                    anySetAvailable = true;
+                }
+            }
+
+            System.out.println("Checked and made available slots for " + date + " from " + availableStartTime + " to " + availableEndTime);
+        }
+
+        if (!anySetAvailable) {
+            System.out.println("No time slots were made available in the specified range.");
+        } else {
+            System.out.println("Time slot availability update completed for the specified range.");
+        }
+    }
+
+    // Helper method to set individual slots to available
+    public void setAvailable(String doctorID, LocalDate date, LocalTime timeSlot) {
+        Map<LocalDate, Map<LocalTime, Schedule>> doctorSchedule = scheduleMap.get(doctorID);
+        if (doctorSchedule != null) {
+            Map<LocalTime, Schedule> dailySchedule = doctorSchedule.get(date);
+            if (dailySchedule != null) {
+                Schedule schedule = dailySchedule.get(timeSlot);
+                if (schedule != null && "Blocked".equals(schedule.getStatus())) {
+                    schedule.setStatus("Available"); // Change status to Available
+                    saveSchedule(); // Save changes to CSV
+                } else if (schedule != null && "Available".equals(schedule.getStatus())) {
+                    System.out.println("Slot already available: " + date + " " + timeSlot);
+                }
+            }
+        }
+    }
+
+  
+    
+    public void blockTimeSlots(String doctorID) {
+        Scanner scanner = new Scanner(System.in);
+
+        // Prompt for start date (day, month, year)
+        System.out.print("Enter the start day (1-31): ");
+        int startDay = Integer.parseInt(scanner.nextLine());
+
+        System.out.print("Enter the start month (1-12): ");
+        int startMonth = Integer.parseInt(scanner.nextLine());
+
+        System.out.print("Enter the start year (YYYY): ");
+        int startYear = Integer.parseInt(scanner.nextLine());
+
+        // Parse start date
+        LocalDate startDate = LocalDate.of(startYear, startMonth, startDay);
+
+        // Prompt for end date (day, month, year)
+        System.out.print("Enter the end day (1-31): ");
+        int endDay = Integer.parseInt(scanner.nextLine());
+
+        System.out.print("Enter the end month (1-12): ");
+        int endMonth = Integer.parseInt(scanner.nextLine());
+
+        System.out.print("Enter the end year (YYYY): ");
+        int endYear = Integer.parseInt(scanner.nextLine());
+
+        // Parse end date
+        LocalDate endDate = LocalDate.of(endYear, endMonth, endDay);
+
+        // Prompt for start and end time for blocking
+        System.out.print("Enter the start time (HH:mm, e.g., 14:00): ");
+        LocalTime startTime = LocalTime.parse(scanner.nextLine());
+
+        System.out.print("Enter the end time (HH:mm, e.g., 14:30): ");
+        LocalTime endTime = LocalTime.parse(scanner.nextLine());
+
+        // Validate 30-minute intervals for the times
+        if (startTime.getMinute() % 30 != 0 || endTime.getMinute() % 30 != 0) {
+            System.out.println("Error: Time slots must be in 30-minute intervals (e.g., 14:00, 14:30).");
+            return;
+        }
+
+        Map<LocalDate, Map<LocalTime, Schedule>> doctorSchedule = scheduleMap.get(doctorID);
+
+        if (doctorSchedule == null) {
+            System.out.println("No schedule found for doctor: " + doctorID);
+            return;
+        }
+
+        boolean anyBlocked = false;
+
+        for (LocalDate date = startDate; !date.isAfter(endDate); date = date.plusDays(1)) {
+            LocalTime blockStartTime = date.equals(startDate) ? startTime : LocalTime.of(9, 0);
+            LocalTime blockEndTime = date.equals(endDate) ? endTime : LocalTime.of(16, 30);
+
+            Map<LocalTime, Schedule> dailySchedule = doctorSchedule.get(date);
+            if (dailySchedule == null) continue;
+
+            for (LocalTime time = blockStartTime; !time.isAfter(blockEndTime); time = time.plusMinutes(30)) {
+                Schedule schedule = dailySchedule.get(time);
+
+                if (schedule != null) {
+                    if (schedule.getStatus() != null && schedule.getStatus().startsWith("P")) {
+                        // Print message if slot has a patient appointment
+                        System.out.println("Cannot block time for " + date + " " + time +
+                                           " due to appointment with patient ID: " + schedule.getStatus());
+                        continue;  // Skip to the next time slot
+                    }
+
+                    if ("Blocked".equals(schedule.getStatus())) {
+                        System.out.println("Slot already blocked: " + date + " " + time);
+                        continue;
+                    }
+
+                    // Block the slot by marking it as unavailable
+                    setUnavailable(doctorID, date, time);
+                    anyBlocked = true;
+                }
+            }
+
+            System.out.println("Checked and blocked slots for " + date + " from " + blockStartTime + " to " + blockEndTime);
+        }
+
+        if (!anyBlocked) {
+            System.out.println("No time slots were blocked in the specified range.");
+        } else {
+            System.out.println("Time slot blocking completed for the specified range.");
+        }
+    }
+
+    
     public void setUnavailable(String doctorID, LocalDate date, LocalTime timeSlot) {
         Map<LocalDate, Map<LocalTime, Schedule>> doctorSchedule = scheduleMap.get(doctorID);
         if (doctorSchedule != null) {
-            Schedule schedule = doctorSchedule.get(date).get(timeSlot);
-            if (schedule != null && "Available".equals(schedule.getStatus())) {
-                schedule.setStatus("Blocked"); // Change status to Blocked
-                saveSchedule(); // Save changes to CSV
-            } else if(schedule != null && "Blocked".equals(schedule.getStatus()))
-                System.out.println("Already blocked");
+            Map<LocalTime, Schedule> dailySchedule = doctorSchedule.get(date);
+            if (dailySchedule != null) {
+                Schedule schedule = dailySchedule.get(timeSlot);
+                if (schedule != null && "Available".equals(schedule.getStatus())) {
+                    schedule.setStatus("Blocked"); // Change status to Blocked
+                    saveSchedule(); // Save changes to CSV
+                } else if (schedule != null && "Blocked".equals(schedule.getStatus())) {
+                    System.out.println("Slot already blocked: " + date + " " + timeSlot);
+                }
             }
         }
-    
+    }
 
+    
     /**
      * Prints the schedule for a specific doctor, sorted by date and time.
      *
      * @param doctorID the ID of the doctor whose schedule to print
      */
-    /*public void printSchedule(String doctorID) {
-        Map<LocalDate, Map<LocalTime, Schedule>> doctorSchedule = scheduleMap.get(doctorID);
-        LocalDate currentDate = LocalDate.now();
-        
-        if (doctorSchedule != null) {
-            Map<LocalDate, Map<LocalTime, Schedule>> sortedSchedule = new TreeMap<>(doctorSchedule);
-
-            for (Map.Entry<LocalDate, Map<LocalTime, Schedule>> dateEntry : sortedSchedule.entrySet()) {
-                LocalDate date = dateEntry.getKey();
-                
-                // Only print schedules for the current date and future dates
-                if (!date.isBefore(currentDate)) {
-                    System.out.println("Date: " + date);
-
-                    Map<LocalTime, Schedule> sortedTimeSlots = new TreeMap<>(dateEntry.getValue());
-                    for (Map.Entry<LocalTime, Schedule> timeEntry : sortedTimeSlots.entrySet()) {
-                        LocalTime timeSlot = timeEntry.getKey();
-                        Schedule schedule = timeEntry.getValue();
-                        System.out.println("Time: " + timeSlot + " - Status: " + schedule.getStatus());
-                    }
-                    System.out.println();
-                }
-            }
-        } else {
-            System.out.println("No schedule found for Doctor ID: " + doctorID);
-        }
-    }*/
-    /*public void printSchedule(String doctorID) {
-        Map<LocalDate, Map<LocalTime, Schedule>> doctorSchedule = scheduleMap.get(doctorID);
-        LocalDate currentDate = LocalDate.now();
-
-        if (doctorSchedule != null) {
-            Map<LocalDate, Map<LocalTime, Schedule>> sortedSchedule = new TreeMap<>(doctorSchedule);
-
-            // Iterate through sorted schedule for this doctor
-            for (Map.Entry<LocalDate, Map<LocalTime, Schedule>> dateEntry : sortedSchedule.entrySet()) {
-                LocalDate date = dateEntry.getKey();
-
-                // Only print schedules for the current date and future dates
-                if (!date.isBefore(currentDate)) {
-                    System.out.println("Date: " + date);
-
-                    // Sort time slots for the current date
-                    Map<LocalTime, Schedule> sortedTimeSlots = new TreeMap<>(dateEntry.getValue());
-                    for (Map.Entry<LocalTime, Schedule> timeEntry : sortedTimeSlots.entrySet()) {
-                        LocalTime timeSlot = timeEntry.getKey();
-                        Schedule schedule = timeEntry.getValue();
-                        System.out.println("Time: " + timeSlot + " - Status: " + schedule.getStatus());
-                    }
-                    System.out.println();
-                }
-            }
-        } else {
-            System.out.println("No schedule found for Doctor ID: " + doctorID);
-        }
-    } */
-
+    
     public void printSchedule(String doctorID) {
         Map<LocalDate, Map<LocalTime, Schedule>> doctorSchedule = scheduleMap.get(doctorID);
         LocalDate currentDate = LocalDate.now();
@@ -382,42 +500,7 @@ public class ScheduleService implements IScheduleService{
      *
      * @param doctorID the ID of the doctor whose upcoming appointments to print
      */
-    /*public void printUpcomingAppointments(String doctorID) {
-        LocalDate today = LocalDate.now();
-        LocalTime currentTime = LocalTime.now();
-        List<String> upcomingAppointments = new ArrayList<>();
-
-        Map<LocalDate, Map<LocalTime, Schedule>> doctorSchedule = scheduleMap.get(doctorID);
-
-        if (doctorSchedule != null) {
-            for (Map.Entry<LocalDate, Map<LocalTime, Schedule>> dateEntry : doctorSchedule.entrySet()) {
-                LocalDate date = dateEntry.getKey();
-
-                if (date.isAfter(today) || (date.equals(today) && dateEntry.getValue().keySet().stream().anyMatch(time -> time.isAfter(currentTime)))) {
-                    for (Map.Entry<LocalTime, Schedule> timeEntry : dateEntry.getValue().entrySet()) {
-                        LocalTime timeSlot = timeEntry.getKey();
-                        Schedule schedule = timeEntry.getValue();
-                        String status = schedule.getStatus();
-
-                        if (!"Available".equals(status) && !"Blocked".equals(status) && (date.isAfter(today) || (date.equals(today) && timeSlot.isAfter(currentTime)))) {
-                            upcomingAppointments.add("Patient ID: " + status + ", Date: " + date + ", Time Slot: " + timeSlot);
-                        }
-                    }
-                }
-            }
-        } else {
-            System.out.println("No schedule found for Doctor ID: " + doctorID);
-            return;
-        }
-
-        if (upcomingAppointments.isEmpty()) {
-            System.out.println("No upcoming appointments found for Doctor ID: " + doctorID);
-        } else {
-            for (String appointment : upcomingAppointments) {
-                System.out.println(appointment);
-            }
-        }
-    }*/
+  
     public void printUpcomingAppointments(String doctorID) {
         LocalDate today = LocalDate.now();
         LocalTime currentTime = LocalTime.now();

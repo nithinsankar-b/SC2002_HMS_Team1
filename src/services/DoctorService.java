@@ -34,7 +34,7 @@ import services.MedicalRecordService;
 import services.DoctorService;
 import services.AppointmentService;
 import services.UserService;
-import src.models.Inventory;
+import models.Inventory;
 import stores.InventoryDataStore;
 
 
