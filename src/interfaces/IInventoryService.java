@@ -1,6 +1,6 @@
 package interfaces;
 
-import src.models.Inventory;
+import models.Inventory;
 import java.util.List;
 
 /**

@@ -1,7 +1,7 @@
 package interfaces;
 
 import models.Staff;
-import src.models.Inventory;
+import models.Inventory;
 import java.util.List;
 
 /**

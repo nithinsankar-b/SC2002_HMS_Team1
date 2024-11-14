@@ -8,23 +8,31 @@ import views.PatientMedicalRecordView;
 import views.PendingAppointmentRequestView;
 import views.PersonalScheduleView;
 import views.UpcomingAppointmentsView;
+import views.AppointmentOutcomeRecordView;
 import services.AppointmentRequestService;
 import services.MedicalRecordService;
-
+import models.Appointment;
 import models.Doctor;
+import models.Medication;
 
+import java.time.LocalDate;
+import java.time.LocalTime;
+import java.time.format.DateTimeFormatter;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Scanner;
 public class DoctorController {
   private final DoctorService doctorService;
     private final AppointmentService appointmentService;
-  private final ScheduleService scheduleService;
-  private final AppointmentRequestService appointmentRequestService;
-  private final MedicalRecordService medicalRecordService;
-  private final UserService userService;
+    private final ScheduleService scheduleService;
+    private final AppointmentRequestService appointmentRequestService;
+    private final MedicalRecordService medicalRecordService;
+    private final UserService userService;
     private final PatientMedicalRecordView medicalRecordsView;
     private final PendingAppointmentRequestView viewPendingAppointmentRequest;
     private final PersonalScheduleView personalScheduleView;
     private final UpcomingAppointmentsView viewUpcomingAppointments;
+    private final AppointmentOutcomeRecordView appointmentOutcomeRecordView;
 
 
     public DoctorController(DoctorService doctorService, ScheduleService scheduleService, MedicalRecordService medicalRecordService, AppointmentService appointmentService ) {
@@ -40,7 +48,7 @@ public class DoctorController {
         this.viewPendingAppointmentRequest = new PendingAppointmentRequestView(scheduleService, appointmentService);
         this.personalScheduleView = new PersonalScheduleView(scheduleService);
         this.viewUpcomingAppointments = new UpcomingAppointmentsView(scheduleService);
-
+        this.appointmentOutcomeRecordView = new AppointmentOutcomeRecordView();
     }
     //viewing medical records
     public void medicalRecordsView(String patientId) {
@@ -105,10 +113,19 @@ System.out.println("Requested appointment slot is set to unavailable.");
          System.out.println("error");
        }
      }
+     
+     public void blockSlots(Doctor doctor) {
+    	 scheduleService.blockTimeSlots(doctor.getHospitalID());
+     }
+     
+     public void unblockSlots(Doctor doctor) {
+    	 scheduleService.unblockTimeSlots(doctor.getHospitalID());
+     }
+     
 
      public void newPatientDiagnosis() {
        Scanner sc = new Scanner(System.in);
-       System.out.println("Enter PatientId): ");
+       System.out.println("Enter PatientID: ");
        String patientId = sc.nextLine();
        System.out.println("Enter latest diagnosis: ");
        String newDiagnosis = sc.nextLine();
@@ -117,15 +134,16 @@ System.out.println("Requested appointment slot is set to unavailable.");
 
      public void newPatientPrescription() {
        Scanner sc = new Scanner(System.in);
-       System.out.println("Enter PatientId: ");
+       System.out.println("Enter PatientID: ");
        String patientId = sc.nextLine();
        System.out.println("Enter latest Prescription: ");
        String newDiagnosis = sc.nextLine();
        doctorService.updatePatientPrescription(patientId, newDiagnosis);
      }
 
-     public void appointmentOutcomeRecord() {
+     public void appointmentOutcomeRecord(Doctor doctor) {
        Scanner sc = new Scanner(System.in);
+    
        System.out.println("Enter AppointmentID: ");
        String appointmentId = sc.nextLine();
        System.out.println("Enter Service Provided: ");
@@ -136,13 +154,71 @@ System.out.println("Requested appointment slot is set to unavailable.");
          String quantitiesList = sc.nextLine();
        System.out.println("Enter Consultation Notes: ");
        String consultationNotes = sc.nextLine();
+       LocalDate date = appointmentService.getAppointmentById(appointmentId).getAppointmentDateTime().toLocalDate();
+       LocalTime time = appointmentService.getAppointmentById(appointmentId).getAppointmentDateTime().toLocalTime();
+       scheduleService.setAvailable1(doctor.getHospitalID(), date, time);
        doctorService.recordAppointmentOutcome(appointmentId, serviceProvided, medicineList, quantitiesList, consultationNotes);
 
      }
+     
+     public boolean viewAppointmentOutcomeRecords(Doctor doctor) {
+    	    // Initialize AppointmentService to fetch appointments
+    	    AppointmentService appointmentService = new AppointmentService();
+    	    List<Appointment> allAppointments = appointmentService.viewScheduledAppointments();
+
+    	    // Filter out appointments that are CONFIRMED and belong to the specified doctor
+    	    List<Appointment> confirmedAppointments = new ArrayList<>();
+    	    for (Appointment appointment : allAppointments) {
+    	        if (enums.AppointmentStatus.CONFIRMED.equals(appointment.getStatus()) &&
+    	                appointment.getDoctorId().equals(doctor.getHospitalID())) {
+    	            confirmedAppointments.add(appointment);
+    	        }
+    	    }
+
+    	    // If there are confirmed appointments, display them
+    	    if (confirmedAppointments.isEmpty()) {
+    	        System.out.println("No confirmed appointments found for Doctor " + doctor.getName());
+    	        return false;
+    	    } else {
+    	        System.out.println("Displaying Confirmed Appointments for Doctor: " + doctor.getName());
+    	        for (Appointment appointment : confirmedAppointments) {
+    	            List<Medication> medications = appointment.getMedications();
+    	            System.out.println("--------------------------------------");
+    	            System.out.println("Appointment ID        : " + appointment.getAppointmentId());
+    	            System.out.println("Patient ID            : " + appointment.getPatientId());
+    	            System.out.println("Doctor ID             : " + appointment.getDoctorId());
+
+    	            // Split the appointment date and time
+    	            System.out.println("Appointment Date      : " + appointment.getAppointmentDateTime().toLocalDate());
+    	            System.out.println("Appointment Time      : " + appointment.getAppointmentDateTime().toLocalTime());
+    	            
+    	            System.out.println("Status                : " + appointment.getStatus());
+    	            System.out.println("Consultation Notes    : " + appointment.getConsultationNotes());
+    	            System.out.println("Service Provided      : " + appointment.getServiceProvided());
+
+    	            // Display medications, if any
+    	            if (medications != null && !medications.isEmpty()) {
+    	                System.out.println("Medications:");
+    	                for (Medication medication : medications) {
+    	                    System.out.println("    Name              : " + medication.getName());
+    	                    System.out.println("    Quantity          : " + medication.getQuantity());
+    	                }
+    	            } else {
+    	                System.out.println("Medications: None");
+    	            }
+    	            System.out.println("Medication Status     : " + appointment.getMedicationStatus());
+    	            System.out.println("--------------------------------------");
+    	        }
+    	    }
+    	    return true;
+    	}
+
+
 
      public void changePassword(String hospitalID, String oldPassword, String newPassword)
      {
        userService.changePassword(hospitalID, oldPassword, newPassword);
      }
+    
 
 }

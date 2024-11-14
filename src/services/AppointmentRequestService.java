@@ -34,6 +34,8 @@ public class AppointmentRequestService implements IAppointmentRequestService {
         this.scheduleService = scheduleService;
         this.appointmentService = appointmentService;
     }
+    
+    
 
     /**
      * Accepts an appointment request, updates its status, and schedules the appointment.
@@ -118,37 +120,6 @@ public class AppointmentRequestService implements IAppointmentRequestService {
         }
     }
 
-    /**
-     * Declines an appointment request and updates its status.
-     *
-     * @param request The appointment request to be declined.
-     */
-    /*public void declineRequest(AppointmentRequest request) {
-        // Change request status to cancelled
-        request.setStatus("Cancelled");
-
-        // Update the status of the existing appointment record
-        Appointment existingAppointment = appointmentService.getAppointmentById(request.getRequestId());
-
-        if (existingAppointment != null) {
-            existingAppointment.setStatus(enums.AppointmentStatus.CANCELLED); // Set appointment status to CANCELLED
-
-            // Update the schedule from "PatientID" back to "Available"
-            if (scheduleService.cancelAppointment(request.getDoctorId(), request.getRequestedDate(), request.getRequestedTimeSlot(), request.getPatientId())) {
-                // If successfully cancelled, update the schedule with availability
-                scheduleService.setAvailable(request.getDoctorId(), request.getRequestedDate(), request.getRequestedTimeSlot());
-
-                // Save the updated appointment record
-                appointmentService.updateAppointment(existingAppointment);
-                saveAppointmentRequest(request); // Save the updated request to CSV
-                System.out.println("Appointment cancelled and schedule updated successfully.");
-            } else {
-                System.out.println("Failed to cancel the appointment due to an error in updating the schedule.");
-            }
-        } else {
-            System.out.println("Appointment record not found.");
-        }
-    }*/
     
     /**
      * Declines an appointment request and updates its status.
@@ -187,7 +158,8 @@ public class AppointmentRequestService implements IAppointmentRequestService {
 
 
     /**
-     * Saves an appointment request to the CSV file.
+     * Saves an appointment request to the CSV file by appending it.
+     * Ensures that new requests are added under the header line.
      *
      * @param request The appointment request to be saved.
      */
@@ -218,18 +190,29 @@ public class AppointmentRequestService implements IAppointmentRequestService {
             System.err.println("Error saving appointment request: " + e.getMessage());
         }
     }
+
+
+
     public void save(AppointmentRequest request) {
         try {
-            // Create a FileWriter in append mode, so the request is added to the end of the file
+            // Open the file in append mode, which adds new data to the end of the file
             try (BufferedWriter writer = new BufferedWriter(new FileWriter(appointmentRequestFile, true))) {
+                // Ensure there is a new line before writing the request if file isn't empty
+                writer.newLine();  // This ensures a new line before appending data
+                
                 // Write the request to the CSV file
                 writer.write(request.toString());
-                writer.newLine(); // Add a new line after each request
+                writer.flush(); // Ensure the data is written to disk
             }
         } catch (IOException e) {
             System.err.println("Error saving appointment request: " + e.getMessage());
         }
     }
+
+
+
+
+
 
     /**
      * Loads all appointment requests from the CSV file.

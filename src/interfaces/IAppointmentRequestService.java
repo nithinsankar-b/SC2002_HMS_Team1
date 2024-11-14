@@ -19,7 +19,5 @@ public interface IAppointmentRequestService {
 
     void saveAppointmentRequest(AppointmentRequest request);
 
-    void save(AppointmentRequest request);
-
     List<AppointmentRequest> getAllRequests();
 }

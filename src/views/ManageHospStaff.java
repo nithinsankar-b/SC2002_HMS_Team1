@@ -1,7 +1,7 @@
 package views;
 
 import models.Staff;
-import src.models.Inventory;
+import models.Inventory;
 import models.Appointment;
 import java.util.List;
 import java.util.Scanner;

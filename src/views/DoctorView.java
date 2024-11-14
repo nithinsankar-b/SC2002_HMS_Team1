@@ -65,10 +65,11 @@ public class DoctorView implements IDoctorView {
         }
         
         boolean isRunning = true;
-
+   
         while (isRunning) {
             displayMenu();
             int choice = getUserInput();
+            boolean inMainMenu = true;
 
             switch (choice) {
             case 1 ->{ Scanner sc = new Scanner(System.in);
@@ -78,10 +79,14 @@ public class DoctorView implements IDoctorView {
             case 2 -> doctorController.personalScheduleView(doctor);
             case 3 -> doctorController.upcomingAppointmentsView(doctor);
             case 4 -> doctorController.pendingAppointmentsView(doctor);
-            case 5 -> manageAvailabilityMenu(doctor);
-            case 6 -> manageAppointmentRequestsMenu(doctor);
-            case 7 -> managePatientRecordsMenu();
-            case 8 -> doctorController.appointmentOutcomeRecord();
+            case 5 -> {manageAvailabilityMenu(doctor);
+            inMainMenu = false;}
+            case 6 -> {manageAppointmentRequestsMenu(doctor);
+            inMainMenu = false;}
+            case 7 -> {managePatientRecordsMenu(); 
+            inMainMenu = false;}
+            case 8 -> {if(doctorController.viewAppointmentOutcomeRecords(doctor)) {
+            	doctorController.appointmentOutcomeRecord(doctor);}}
             case 9 -> changePassword();
             case 10 -> {
                 System.out.println("Logging out...");
@@ -91,7 +96,7 @@ public class DoctorView implements IDoctorView {
         }
 
             // Only prompt to continue if the user has not chosen to log out
-            if (isRunning) {
+            if (isRunning && inMainMenu) {
             	Scanner sc=new Scanner(System.in);
             
             	
@@ -140,9 +145,10 @@ public class DoctorView implements IDoctorView {
             int choice = getUserInput();
 
             switch (choice) {
-                case 1 -> doctorController.setToAvailable(doctor);
-                case 2 -> doctorController.setToUnavailable(doctor);
-                case 3 -> managingAvailability = false;
+                case 1 -> doctorController.unblockSlots(doctor);
+                case 2 -> doctorController.blockSlots(doctor);
+                case 3 -> {managingAvailability = false;
+                return;}
                 default -> System.out.println("ERROR: Invalid choice, please try again.");
             }
         }
@@ -161,7 +167,8 @@ public class DoctorView implements IDoctorView {
             switch (choice) {
                 case 1 -> doctorController.acceptAppointmentRequest(doctor);
                 case 2 -> doctorController.declineAppointmentRequest(doctor);
-                case 3 -> managingRequests = false;
+                case 3 -> {managingRequests = false;
+                return;}
                 default -> System.out.println("ERROR: Invalid choice, please try again.");
             }
            }
@@ -180,7 +187,8 @@ public class DoctorView implements IDoctorView {
             switch (choice) {
                 case 1 -> doctorController.newPatientDiagnosis();
                 case 2 -> doctorController.newPatientPrescription();
-                case 3 -> managingRecords = false;
+                case 3 -> {managingRecords = false;
+                return;}
                 default -> System.out.println("ERROR: Invalid choice, please try again.");
             }
         }

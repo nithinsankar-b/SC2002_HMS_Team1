@@ -2,7 +2,7 @@ package views;
 
 import models.Staff;
 import models.Appointment;
-import src.models.Inventory;
+import models.Inventory;
 import java.util.List;
 import interfaces.IAdministratorView;
 

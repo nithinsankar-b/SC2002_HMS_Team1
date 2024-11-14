@@ -32,15 +32,11 @@ public class UpcomingAppointmentsView {
      *
      * @param doctor the doctor for whom to display upcoming appointments
      */
-    /*public void displayUpcomingAppointments(Doctor doctor) {
-        System.out.println("Displaying Upcoming Appointments for Doctor: " + doctor.getName() + " " + doctor.getHospitalID());
-        scheduleService.printUpcomingAppointments(doctor.getHospitalID());
-    }*/
     public void displayUpcomingAppointments(Doctor doctor) {
         System.out.println("Displaying Upcoming Appointments for Doctor: " + doctor.getName() + " " + doctor.getHospitalID());
 
         // Fetch all appointments
-        AppointmentService appointmentService=new AppointmentService();
+        AppointmentService appointmentService = new AppointmentService();
         List<Appointment> allAppointments = appointmentService.viewScheduledAppointments();
 
         // Filter the appointments for the given doctor and confirmed status
@@ -57,9 +53,14 @@ public class UpcomingAppointmentsView {
             System.out.println("No upcoming confirmed appointments found for Doctor: " + doctor.getName());
         } else {
             for (Appointment appointment : doctorAppointments) {
-                System.out.println("Appointment ID: " + appointment.getAppointmentId() + ", Patient ID: " + appointment.getPatientId() +
-                        ", DateTime: " + appointment.getAppointmentDateTime() + ", Status: " + appointment.getStatus());
+            	System.out.println("----------------------------");
+                System.out.println("Appointment ID : " + appointment.getAppointmentId());
+                System.out.println("Patient ID     : " + appointment.getPatientId());
+                System.out.println("Date           : " + appointment.getAppointmentDateTime().toLocalDate()); // Show the date
+                System.out.println("Time           : " + appointment.getAppointmentDateTime().toLocalTime()); // Show the time
+                System.out.println("----------------------------"); // Separator for readability
             }
         }
     }
+
 }

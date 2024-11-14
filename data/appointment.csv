@@ -1,0 +1,4 @@
+appointmentId,patientId,doctorId,appointmentDateTime,status,consultationNotes,serviceProvided,medications,quantity,medicationStatus
+"1154490",P1001,D001,2024-11-21T12:00,COMPLETED,Medically fit,Consultation,Paracetamol,10,PENDING
+"6650745",P1002,D002,2024-11-24T14:00,CANCELLED,,,No medications,0,PENDING
+"8149373",P1001,D002,2024-11-23T09:00,COMPLETED,Healthy,Monthly check up,Paracetamol,10,PENDING

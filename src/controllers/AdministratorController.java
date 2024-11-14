@@ -8,7 +8,7 @@ import stores.InventoryDataStore;
 import interfaces.IInventoryService;
 import models.Administrator;
 import models.Appointment;
-import src.models.Inventory;
+import models.Inventory;
 import models.Staff;
 import java.util.List;
 import services.UserService;

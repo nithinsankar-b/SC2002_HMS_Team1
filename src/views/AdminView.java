@@ -3,7 +3,7 @@ package views;
 import interfaces.IAdministratorView;
 import models.Staff;
 import models.Appointment;
-import src.models.Inventory;
+import models.Inventory;
 import services.ProjectAdminService;
 import controllers.AdministratorController;
 
