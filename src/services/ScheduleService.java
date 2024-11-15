@@ -205,9 +205,9 @@ public class ScheduleService implements IScheduleService{
             if (schedule != null && schedule.getStatus().startsWith("P")){
                 schedule.setStatus("Available"); // Change status to Available
                 saveSchedule(); // Save changes to CSV
-            } else if(schedule != null && "Available".equals(schedule.getStatus())){
-                System.out.println("Already available");
-            }
+            } //else if(schedule != null && "Available".equals(schedule.getStatus())){
+                //System.out.println("");
+            //}
         }
     }
     public void setUnavailable2(String doctorID, LocalDate date, LocalTime timeSlot, String patientID) {

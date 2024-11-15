@@ -11,6 +11,7 @@ import services.AppointmentService;
 import services.InventoryService;
 import services.PatientService;
 import services.ProjectAdminService;
+import services.ReplenishmentService;
 import models.Administrator;
 import services.PharmacistService;
 import services.DoctorService;
@@ -194,10 +195,11 @@ public class UserView {
                 // Create necessary services for Pharmacist role
                 InventoryDataStore inventoryDataStore = new InventoryDataStore();
                 InventoryService inventoryService = new InventoryService(inventoryDataStore);
+                ReplenishmentService replenishmentService = new ReplenishmentService();
                 appointmentService = new AppointmentService();
                 PharmacistService pharmacistService = new PharmacistService(userService, appointmentService, inventoryService);
                 patientService = new PatientService(userService);
-                PharmacistController pharmacistController = new PharmacistController(pharmacistService, inventoryService, appointmentService);
+                PharmacistController pharmacistController = new PharmacistController(pharmacistService, inventoryService, appointmentService, replenishmentService);
                 PharmacistView pharmacistView = new PharmacistView(pharmacistController, pharmacistService, userService, patientService);
 
                 System.out.println("Navigating to Pharmacist view...");
@@ -241,8 +243,9 @@ public class UserView {
         InventoryService inventoryService = new InventoryService(inventoryDataStore);
         PharmacistService pharmacistService = new PharmacistService(userService, appointmentService, inventoryService);
         PatientService patientService = new PatientService(userService);
+        ReplenishmentService replenishmentService = new ReplenishmentService();
         // Instantiate PatientController
-        PharmacistController pharmacistController = new PharmacistController(pharmacistService, inventoryService,appointmentService);
+        PharmacistController pharmacistController = new PharmacistController(pharmacistService, inventoryService,appointmentService, replenishmentService);
 
         // Instantiate PatientView
         PharmacistView pharmacistView = new PharmacistView(pharmacistController, pharmacistService, userService, patientService);

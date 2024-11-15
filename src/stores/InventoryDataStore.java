@@ -124,6 +124,18 @@ public class InventoryDataStore {
             System.err.println("Error writing inventory data to CSV: " + e.getMessage());
         }
     }
+    
+    public List<Inventory> getLowStockInventory() {
+        List<Inventory> lowStockInventory = new ArrayList<>();
+
+        for (Inventory item : inventoryList) {
+            if (item.getCurrentStock() <= item.getLowLevelAlert()) {
+                lowStockInventory.add(item);
+            }
+        }
+
+        return lowStockInventory;
+    }
 
 }
 

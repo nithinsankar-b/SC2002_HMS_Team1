@@ -4,6 +4,7 @@ import views.AdminView;
 import services.AppointmentService;
 import services.InventoryService;
 import services.ProjectAdminService;
+import services.ReplenishmentService;
 import stores.InventoryDataStore;
 import interfaces.IInventoryService;
 import models.Administrator;
@@ -11,6 +12,8 @@ import models.Appointment;
 import models.Inventory;
 import models.Staff;
 import java.util.List;
+import java.util.Scanner;
+
 import services.UserService;
 
 /**
@@ -183,13 +186,16 @@ public class AdministratorController {
                     break;
 
                 case 5:
-                    String medicineReplenish = adminView.getMedicineName();
-                    boolean success = inventoryService.approveReplenishmentRequest(medicineReplenish);
-                    if (success) {
-                        System.out.println("Replenishment request approved and stock updated.");
-                    } else {
-                        System.out.println("Replenishment request not found or already processed.");
-                    }
+                	Scanner sc=new Scanner(System.in);
+                	System.out.println("Enter Request Id");
+                    String medicineReplenish = sc.nextLine();
+				 ReplenishmentService replenishmentService = new ReplenishmentService();
+				 boolean f = replenishmentService .approveRequest(medicineReplenish);
+				 if(f)
+					 System.out.println("Approve Successful");
+				 else
+					 System.out.println("Approve failed");
+
                     break;
 
                 case 6:
