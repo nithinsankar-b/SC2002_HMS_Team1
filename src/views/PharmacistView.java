@@ -68,10 +68,11 @@ public class PharmacistView implements IPharmacistView {
             switch (choice) {
                 case 1 -> pharmacistController.viewMedicationInventory();
                 case 2 -> pharmacistController.submitReplenishmentRequest();
-                case 3 -> updatePrescriptionStatus(); 
-                case 4 -> viewAppointmentOutcomeRecords(); 
-                case 5 -> changePassword();
-                case 6 -> {
+                case 3 -> pharmacistController.viewReplenishmentRequests();  // New case for viewing requests
+                case 4 -> updatePrescriptionStatus();
+                case 5 -> viewAppointmentOutcomeRecords();
+                case 6 -> changePassword();
+                case 7 -> {
                     System.out.println("Logging out...");
                     isRunning = false;
                 }
@@ -117,11 +118,21 @@ public class PharmacistView implements IPharmacistView {
      * Updates the prescription status based on the appointment ID provided by the user.
      */
     private void updatePrescriptionStatus() {
+System.out.println("Appointments with Pending Medication Status:");
+    	
+
+        AppointmentOutcomeRecordView appointmentOutcomeRecordView = new AppointmentOutcomeRecordView();
+		// Print pending appointments using AppointmentOutcomeRecordView
+        boolean f=appointmentOutcomeRecordView.loadAndPrintPendingAppointments();
+        if(f) {
         System.out.print("Enter Appointment ID: ");
         String appointmentId = scanner.nextLine().trim();
-
-        // Call the controller method to update the prescription
+     // Call the controller method to update the prescription
         pharmacistController.updatePrescription(appointmentId);
+        }else {
+        	System.out.println("No Appointments with Pending Medication Status");
+        }
+        
     }
 
     // Method to view appointment outcome records
@@ -133,15 +144,17 @@ public class PharmacistView implements IPharmacistView {
     /**
      * Displays the menu options available to the pharmacist.
      */
-     public void displayMenu() {
+    public void displayMenu() {
         System.out.println("Please choose an option:");
         System.out.println("1. View Medication Inventory");
         System.out.println("2. Submit Replenishment Request");
-        System.out.println("3. Update Prescription Status");
-        System.out.println("4. View Appointment Outcome Record"); 
-        System.out.println("5. Change Password");
-        System.out.println("6. Log Out");
+        System.out.println("3. View Replenishment Requests");  // New option to view requests
+        System.out.println("4. Update Prescription Status");
+        System.out.println("5. View Appointment Outcome Record");
+        System.out.println("6. Change Password");
+        System.out.println("7. Log Out");
     }
+
     /**
      * Gets user input for menu selection with error checking.
      *

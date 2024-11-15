@@ -248,7 +248,7 @@ public class InventoryService implements IInventoryService {
                     System.out.println("Not enough medicine in the inventory for: " + medicineName);
                     return;
                 }
-
+                System.out.println(quantity);
                 // Update stock and set medication status to DISPENSED
                 data.setCurrentStock(data.getCurrentStock() - quantity);
                 appointment.setMedicationStatus(MedicationStatus.DISPENSED);
@@ -427,4 +427,25 @@ public class InventoryService implements IInventoryService {
         System.out.println("Replenishment request not found or already processed for: " + medicineName);
         return false;
     }
+    
+    public List<InventoryDisplay> getLowStockInventory() {
+        List<InventoryDisplay> lowStockInventory = new ArrayList<>();
+
+        // Get low stock items from the InventoryDataStore
+        for (Inventory item : inventoryDataStore.getLowStockInventory()) {
+            // Determine inventory status (Low or Sufficient)
+            InventoryStatus status = InventoryDisplay.getInventoryStatus(item.getCurrentStock(), item.getLowLevelAlert());
+
+            InventoryDisplay displayItem = new InventoryDisplay(
+                    item.getMedicineName(),
+                    item.getCurrentStock(),
+                    status, // Set the inventory status (Low or Sufficient)
+                    item.getReplenishmentStatus()
+            );
+            lowStockInventory.add(displayItem);
+        }
+
+        return lowStockInventory;
+    }
+
 }

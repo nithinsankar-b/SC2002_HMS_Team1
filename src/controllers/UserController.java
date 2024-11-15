@@ -11,6 +11,7 @@ import stores.InventoryDataStore;
 import services.InventoryService;
 import services.PatientService;
 import services.PharmacistService;
+import services.ReplenishmentService;
 import services.DoctorService;
 import services.ScheduleService;
 import services.AppointmentRequestService;
@@ -105,10 +106,11 @@ public class UserController {
     private void navigateToPharmacistPage(User user) {
         AppointmentService appointmentService = new AppointmentService();
         InventoryDataStore inventoryDataStore = new InventoryDataStore();
+        ReplenishmentService replenishmentService = new ReplenishmentService();
         InventoryService inventoryService = new InventoryService(inventoryDataStore);
         PharmacistService pharmacistService = new PharmacistService(userService, appointmentService, inventoryService);
         PatientService patientService = new PatientService(userService);
-        PharmacistController pharmacistController = new PharmacistController(pharmacistService, inventoryService, appointmentService);
+        PharmacistController pharmacistController = new PharmacistController(pharmacistService, inventoryService, appointmentService, replenishmentService);
         PharmacistView pharmacistView = new PharmacistView(pharmacistController, pharmacistService, userService, patientService);
 
         // Start the pharmacist operations (menu)

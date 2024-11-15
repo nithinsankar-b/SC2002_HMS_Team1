@@ -33,15 +33,15 @@ public class MedicalInventoryView {
         }
 
         System.out.println("Medication Inventory:");
-        System.out.printf("%-20s %-15s %-10s %-20s\n", "Name", "Quantity", "Status", "Replenishment Status");
+        System.out.printf("%-20s %-15s %-10s \n", "Name", "Quantity", "Status");
         System.out.println("--------------------------------------------------------------------");
 
         for (InventoryDisplay medication : inventory) {
-            System.out.printf("%-20s %-15d %-10s %-20s\n",
+            System.out.printf("%-20s %-15d %-10s \n",
                 medication.getName(),
                 medication.getQuantity(),
-                medication.getStatus(),
-                medication.getReplenishmentStatus()); // Display Replenishment Status
+                medication.getStatus()
+                ); 
         }
     }
 

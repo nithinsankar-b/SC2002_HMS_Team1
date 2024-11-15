@@ -21,7 +21,7 @@ public class AppointmentOutcomeRecordView {
 
                 if (fields.length == 10) { // Ensure we have all 10 fields
                     //System.out.println("\nAppointment Details:");
-                    if(!fields[4].trim().equals("COMPLETED"))
+                    if(!fields[4].trim().equals("COMPLETED") && !(fields[9].trim().equals("PENDING")))
                     {
                         continue;
                     }
@@ -66,6 +66,63 @@ public class AppointmentOutcomeRecordView {
             System.err.println("Error reading file: " + e.getMessage());
         }
     }
+    
+    public boolean loadAndPrintPendingAppointments() {
+        try (BufferedReader br = new BufferedReader(new FileReader(csvFilePath))) {
+            String line = br.readLine(); // Read the header line
+            boolean found=false;
+
+            while ((line = br.readLine()) != null) {
+                String[] fields = line.split(",");
+
+                if (fields.length == 10) {
+                    // Filter by PENDING medication status
+                    if (!fields[9].trim().equals("PENDING") || !(fields[4].trim().equals("COMPLETED"))) {
+                        continue;
+                    }
+                    found=true;
+                    // Print appointment details in the specified format
+                    System.out.println("Appointment ID      : " + fields[0].replace("\"", "").trim());
+                    System.out.println("Patient ID          : " + fields[1].trim());
+                    System.out.println("Doctor ID           : " + fields[2].trim());
+                    System.out.println("Appointment Date and Time: " + fields[3].trim());
+                    System.out.println("Status              : " + fields[4].trim());
+                    System.out.println("Consultation Notes  : " + fields[5].trim());
+                    System.out.println("Service Provided    : " + fields[6].trim());
+
+                    // Handle medications and quantities
+                    String medications = fields[7].trim();
+                    String quantities = fields[8].trim();
+
+                    if (!medications.isEmpty() && !quantities.isEmpty()) {
+                        String[] medicationList = medications.split(";");
+                        String[] quantityList = quantities.split(";");
+
+                        System.out.println("Medications:");
+                        for (int i = 0; i < medicationList.length; i++) {
+                            String medication = medicationList[i].trim();
+                            String quantity = (i < quantityList.length) ? quantityList[i].trim() : "N/A";
+
+                            System.out.println("- Name: " + medication);
+                            System.out.println("  Quantity: " + quantity);
+                        }
+                    } else {
+                        System.out.println("Medications: No medications listed");
+                    }
+
+                    System.out.println("Medication Status   : " + fields[9].trim());
+                    System.out.println("----------------------------------------");
+                } else {
+                    System.out.println("Warning: Skipping line due to unexpected format -> " + line);
+                }
+            }
+            return found;
+        } catch (IOException e) {
+            System.err.println("Error reading file: " + e.getMessage());
+            return false;
+        }
+    }
+
 
     public static void main(String[] args) {
         AppointmentOutcomeRecordView view = new AppointmentOutcomeRecordView();
