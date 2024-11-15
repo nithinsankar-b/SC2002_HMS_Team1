@@ -168,7 +168,7 @@ public class PatientController {
             System.out.print("Enter Doctor ID: ");
             String doctorId = scanner.nextLine();
 
-            System.out.println("Enter a date in the upcoming week: ");
+            System.out.println("Enter a date in the upcoming month: ");
             // Ask for the date
             System.out.print("Enter Day (1-31): ");
             int day = Integer.parseInt(scanner.nextLine());
@@ -187,7 +187,7 @@ public class PatientController {
             LocalDateTime endDateTime = LocalDateTime.of(endDate, LocalTime.of(11, 0));
 
             if (localDate.isBefore(startDate) || localDate.isAfter(endDate) || (localDate.isEqual(startDate) && localDate.atStartOfDay().isBefore(startDateTime))) {
-                System.out.println("Appointments can only be booked for one week in advance.");
+                System.out.println("Appointments can only be booked for one month in advance.");
                 return;
             }
 
@@ -330,7 +330,7 @@ public class PatientController {
                     DateTimeFormatter currentFormatter = DateTimeFormatter.ofPattern("dd MMM yyyy, HH:mm 'HRS'");
                     System.out.println("Current Appointment Slot: " + currentDateTime.format(currentFormatter));
 
-                    System.out.println("Enter a date in the upcoming week: ");
+                    System.out.println("Enter a date in the upcoming month: ");
                     // Ask for the new appointment date in yyyy-MM-dd format
                     System.out.print("Enter Day (1-31): ");
                     int day = Integer.parseInt(scanner.nextLine());
@@ -349,7 +349,7 @@ public class PatientController {
                     LocalDateTime rangeEndTime = rangeEndDate.atTime(11, 0); //
 
                     if (newDate.isBefore(rangeStartDate) || newDate.isAfter(rangeEndDate)) {
-                        System.out.println("Appointments can only be booked for one week in advance.");
+                        System.out.println("Appointments can only be booked for one month in advance.");
                         return; // Exit if the new date is outside the allowed range
                     }
 
@@ -507,7 +507,7 @@ public class PatientController {
 
         if (date.isBefore(startDate) || date.isAfter(endDate) ||
                 (date.isEqual(startDate) && date.atStartOfDay().isBefore(startDateTime))) {
-            System.out.println("Appointments can only be booked for one week in advance.");
+            System.out.println("Appointments can only be booked for one month in advance.");
             return;
         }
 

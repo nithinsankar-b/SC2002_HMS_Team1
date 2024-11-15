@@ -151,9 +151,11 @@ public class AppointmentRequest {
      *
      * @return A CSV string containing the details of this appointment request.
      */
+    @Override
     public String toString() {
         return String.join(",", "\"" + requestId + "\"", doctorId, patientId, requestedDate.toString(), requestedTimeSlot.toString(), status);
     }
+
 
     /**
      * Creates an AppointmentRequest from a CSV string.

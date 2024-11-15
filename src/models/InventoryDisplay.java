@@ -63,7 +63,17 @@ public class InventoryDisplay {
      *
      * @return The replenishment status.
      */
-    public ReplenishmentStatus getReplenishmentStatus() { // Getter for the new field
+    public ReplenishmentStatus getReplenishmentStatus() {
         return replenishmentStatus;
+    }
+
+    /**
+     * Helper method to determine the inventory status based on stock and alert levels.
+     * @param currentStock The current stock level.
+     * @param lowLevelAlert The low stock alert level.
+     * @return InventoryStatus - whether the item is low or sufficient.
+     */
+    public static InventoryStatus getInventoryStatus(int currentStock, int lowLevelAlert) {
+        return currentStock <= lowLevelAlert ? InventoryStatus.LOWSTOCK : InventoryStatus.INSTOCK;
     }
 }

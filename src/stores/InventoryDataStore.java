@@ -1,6 +1,6 @@
 package stores;
 
-import src.models.Inventory;
+import models.Inventory;
 import enums.MedicationStatus;
 import enums.ReplenishmentStatus;
 
@@ -123,6 +123,18 @@ public class InventoryDataStore {
         } catch (IOException e) {
             System.err.println("Error writing inventory data to CSV: " + e.getMessage());
         }
+    }
+    
+    public List<Inventory> getLowStockInventory() {
+        List<Inventory> lowStockInventory = new ArrayList<>();
+
+        for (Inventory item : inventoryList) {
+            if (item.getCurrentStock() <= item.getLowLevelAlert()) {
+                lowStockInventory.add(item);
+            }
+        }
+
+        return lowStockInventory;
     }
 
 }
