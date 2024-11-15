@@ -99,11 +99,11 @@ public class UserView {
             System.out.print("Enter Hospital ID (Case Sensitive): ");
             String hospitalID = scanner.nextLine();
 
-            //System.out.print("Enter Password: ");
-            Console console = System.console();
-            char[] passwordArray = console.readPassword("Enter Password: ");
-            String password = new String(passwordArray);
-            //String password = scanner.nextLine();
+            System.out.print("Enter Password: ");
+           // Console console = System.console();
+           // char[] passwordArray = console.readPassword("Enter Password: ");
+            //String password = new String(passwordArray);
+            String password = scanner.nextLine();
 
             if (userService.login(hospitalID, password)) {
                 loggedInHospitalID = hospitalID;

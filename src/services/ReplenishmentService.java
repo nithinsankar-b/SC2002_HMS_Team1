@@ -109,26 +109,24 @@ public class ReplenishmentService {
 
     
 
-    // Parses a CSV row into a ReplenishmentRequest object
-    private ReplenishmentRequest parseCsvRow(String csvRow) {
-        String[] parts = csvRow.split(",");
-        if (parts.length < 3) return null; // Check to ensure data integrity
+   // Method to parse each row from the CSV file
+   private ReplenishmentRequest parseCsvRow(String csvRow) {
+    String[] parts = csvRow.split(",");
+    if (parts.length < 3) return null;
 
-        String id = parts[0].trim();  // Ensure no leading/trailing spaces
-        List<String> medicines = List.of(parts[1].split(";"));
-        
-        StatusEnum status;
-        try {
-            status = StatusEnum.valueOf(parts[2].trim());
-        } catch (IllegalArgumentException e) {
-            status = StatusEnum.PENDING;  // Default to PENDING in case of invalid status
-            System.out.println("Invalid status value, defaulting to PENDING.");
-        }
+    String id = parts[0].trim();  // Use the ID from the CSV
+    List<String> medicines = List.of(parts[1].split(";")); // Assumes medicines are separated by semicolons
 
-        ReplenishmentRequest request = new ReplenishmentRequest(medicines);
-        request.setStatus(status);
-        return request;
+    StatusEnum status;
+    try {
+        status = StatusEnum.valueOf(parts[2].trim());
+    } catch (IllegalArgumentException e) {
+        status = StatusEnum.PENDING;
+        System.out.println("Invalid status value, defaulting to PENDING.");
     }
+
+    return new ReplenishmentRequest(id, medicines, status);
+}
 
     // Generates the CSV file with headers if it does not exist
     private void generateCsvIfNotExists() {
@@ -146,12 +144,29 @@ public class ReplenishmentService {
     
     
     // Approves a replenishment request by changing its status to APPROVED
-    public boolean approveRequest(String requestId) {
-        boolean result = updateRequestStatus(requestId, StatusEnum.APPROVED);
-        if (!result) {
-            System.out.println("Request ID " + requestId + " not found. Approval failed.");
+    public String approveRequest(String requestId) {
+        boolean found = false;
+        String medicineName = null;
+    
+        List<ReplenishmentRequest> requests = getAllRequests();
+        for (ReplenishmentRequest request : requests) {
+            if (request.getId().equals(requestId) && request.getStatus() == StatusEnum.PENDING) {
+                request.setStatus(StatusEnum.APPROVED);
+                medicineName = request.getMedicines().get(0); // Assuming single medicine per request
+                found = true;
+                break;
+            }
         }
-        return result;
+    
+        if (found) {
+            // Save the updated status to CSV
+            saveRequestsToCSV(requests);
+            System.out.println("Replenishment request approved for: " + medicineName);
+            return medicineName;
+        } else {
+            System.out.println("Request ID not found or already approved.");
+            return null;
+        }
     }
 
     // Rejects a replenishment request by changing its status to REJECTED
@@ -190,4 +205,18 @@ public class ReplenishmentService {
         }
 
         return found;  // Return true if the request was found and updated, false otherwise
-    }}
+    }
+// Helper method to save the requests list back to CSV after updating statuses
+private void saveRequestsToCSV(List<ReplenishmentRequest> requests) {
+    try (BufferedWriter writer = new BufferedWriter(new FileWriter(csvFile))) {
+        writer.write("Request ID,Medicines,Status");
+        writer.newLine();
+        for (ReplenishmentRequest request : requests) {
+            writer.write(request.toCsvFormat());
+            writer.newLine();
+        }
+    } catch (IOException e) {
+        e.printStackTrace();
+    }
+}
+}

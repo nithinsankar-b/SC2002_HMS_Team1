@@ -232,6 +232,12 @@ public class AdminView implements IAdministratorView {
             System.out.println("Failed to change password. Please check your current password.");
         }
     }
+
+    public String getRequestIdForReplenishment() {
+        System.out.print("Enter Request ID: ");
+        return scanner.nextLine();
+    }
+    
 }
 
 

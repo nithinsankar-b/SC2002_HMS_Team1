@@ -2,6 +2,7 @@ package services;
 
 import models.Administrator;
 import models.Inventory;
+import models.ReplenishmentRequest;
 import models.Staff;
 import models.User;
 import stores.StaffDataStore;
@@ -12,6 +13,7 @@ import services.UserService;
 import java.io.*;
 import java.util.List;
 
+import enums.StatusEnum;
 import enums.UserRole;
 
 /**
@@ -25,6 +27,7 @@ public class ProjectAdminService implements IProjectAdmService {
     private StaffDataStore staffDataStore;
     private IInventoryService inventoryService;
     private UserService userService;
+    private ReplenishmentService replenishmentService;  // Add this attribute
 
     private static final String STAFF_CSV_PATH = "data/Staff_List.csv";
     private static final String DOCTOR_CSV_PATH = "data/doctor.csv";
@@ -43,6 +46,7 @@ public class ProjectAdminService implements IProjectAdmService {
         this.staffDataStore = new StaffDataStore();
         this.inventoryService = inventoryService;
         this.userService = userService;
+        this.replenishmentService = replenishmentService;  // Initialize ReplenishmentService
 
         try {
             staffDataStore.loadStaffFromCSV(STAFF_CSV_PATH);
@@ -372,6 +376,16 @@ public void addOrUpdateStaff(Staff staffMember) {
     @Override
     public boolean approveReplenishmentRequest(String medicineName) {
         return inventoryService.approveReplenishmentRequest(medicineName);
+    }
+    // Method to view pending replenishment requests
+    public List<ReplenishmentRequest> viewPendingReplenishmentRequests() {
+        return replenishmentService.getRequestsByStatus(StatusEnum.PENDING);
+    }
+
+
+    // Method to decline a replenishment request
+    public boolean declineReplenishmentRequest(String requestId) {
+        return replenishmentService.rejectRequest(requestId);
     }
 }
 
