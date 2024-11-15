@@ -1,3 +1,4 @@
+hospitalID,password,role
 P100,password,DOCTOR
 P1009,patient9,PATIENT
 P1007,patient7,PATIENT
@@ -13,6 +14,6 @@ P1002,patient2,PATIENT
 P1013,patient13,PATIENT
 P1010,patient10,PATIENT
 D002,doctor2,DOCTOR
-PH001,pharmacist1,PHARMACIST
+PH001,password,PHARMACIST
 P1011,patient11,PATIENT
 D001,doctor1,DOCTOR

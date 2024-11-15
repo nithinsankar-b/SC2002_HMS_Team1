@@ -62,7 +62,8 @@ public class PatientView implements iPatientView {
                 case 9 -> patientController.viewAvailableAppointmentSlots();
                 case 10 -> patientController.viewPastRecords(patient);
                 case 11 -> showBillingOptions(patient);
-                case 12 -> {
+                case 12-> patientController.changePassword(patient);
+                case 13 -> {
                     System.out.println("Logging out...");
                     isRunning = false;
                 }
@@ -117,7 +118,8 @@ public class PatientView implements iPatientView {
         System.out.println("9. View Available Appointment Slots");
         System.out.println("10. View Past Outcome Records");
         System.out.println("11. View Billing Details");
-        System.out.println("12. Log Out");
+        System.out.println("12. Change Password");
+        System.out.println("13. Log Out");
     }
 
     private int getUserInput() {

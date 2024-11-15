@@ -170,18 +170,43 @@ public class PatientController {
 
             System.out.println("Enter a date in the upcoming month: ");
             // Ask for the date
-            System.out.print("Enter Day (1-31): ");
-            int day = Integer.parseInt(scanner.nextLine());
+            int day = 0, month = 0, year = 0;
+            boolean validInput = false;
 
-            System.out.print("Enter Month (1-12): ");
-            int month = Integer.parseInt(scanner.nextLine());
+            while (!validInput) {
+                try {
+                    System.out.print("Enter Day (1-31): ");
+                    day = Integer.parseInt(scanner.nextLine());
+                    if (day < 1 || day > 31) {
+                        System.out.println("Invalid day! Please enter a number between 1 and 31.");
+                        continue;
+                    }
 
-            System.out.print("Enter Year (YYYY): ");
-            int year = Integer.parseInt(scanner.nextLine());
+                    System.out.print("Enter Month (1-12): ");
+                    month = Integer.parseInt(scanner.nextLine());
+                    if (month < 1 || month > 12) {
+                        System.out.println("Invalid month! Please enter a number between 1 and 12.");
+                        continue;
+                    }
+
+                    System.out.print("Enter Year (YYYY): ");
+                    year = Integer.parseInt(scanner.nextLine());
+                    if (year < 1000 || year > 9999) {
+                        System.out.println("Invalid year! Please enter a valid 4-digit year.");
+                        continue;
+                    }
+
+                    // If all inputs are valid, exit the loop
+                    validInput = true;
+                } catch (NumberFormatException e) {
+                    System.out.println("Invalid input! Please enter a valid number.");
+                }
+            }
+
             LocalDate localDate = LocalDate.of(year, month, day);
 
 
-            LocalDate startDate = LocalDate.of(2024, 11, 18);
+            LocalDate startDate = LocalDate.of(2024, 11, 17);
             LocalDate endDate = LocalDate.of(2024, 12, 18);
             LocalDateTime startDateTime = LocalDateTime.of(startDate, LocalTime.of(11, 30));
             LocalDateTime endDateTime = LocalDateTime.of(endDate, LocalTime.of(11, 0));
@@ -194,7 +219,7 @@ public class PatientController {
             // Display available slots for the given day and doctor
             List<LocalDateTime> availableSlots = appointmentService.getAvailableSlots(doctorId, localDate);
             if (availableSlots.isEmpty()) {
-                System.out.println("No available slots for the given date.");
+                System.out.println("Invalid Doctor ID!");
                 return;
             } else {
                 DateTimeFormatter timeFormatter = DateTimeFormatter.ofPattern("HH:mm 'HRS'");
@@ -332,18 +357,44 @@ public class PatientController {
 
                     System.out.println("Enter a date in the upcoming month: ");
                     // Ask for the new appointment date in yyyy-MM-dd format
-                    System.out.print("Enter Day (1-31): ");
-                    int day = Integer.parseInt(scanner.nextLine());
 
-                    System.out.print("Enter Month (1-12): ");
-                    int month = Integer.parseInt(scanner.nextLine());
+                    int day = 0, month = 0, year = 0;
+                    boolean validInput = false;
 
-                    System.out.print("Enter Year (YYYY): ");
-                    int year = Integer.parseInt(scanner.nextLine());
+                    while (!validInput) {
+                        try {
+                            System.out.print("Enter Day (1-31): ");
+                            day = Integer.parseInt(scanner.nextLine());
+                            if (day < 1 || day > 31) {
+                                System.out.println("Invalid day! Please enter a number between 1 and 31.");
+                                continue;
+                            }
+
+                            System.out.print("Enter Month (1-12): ");
+                            month = Integer.parseInt(scanner.nextLine());
+                            if (month < 1 || month > 12) {
+                                System.out.println("Invalid month! Please enter a number between 1 and 12.");
+                                continue;
+                            }
+
+                            System.out.print("Enter Year (YYYY): ");
+                            year = Integer.parseInt(scanner.nextLine());
+                            if (year < 1000 || year > 9999) {
+                                System.out.println("Invalid year! Please enter a valid 4-digit year.");
+                                continue;
+                            }
+
+                            // If all inputs are valid, exit the loop
+                            validInput = true;
+                        } catch (NumberFormatException e) {
+                            System.out.println("Invalid input! Please enter a valid number.");
+                        }
+                    }
+
                     LocalDate newDate = LocalDate.of(year, month, day);
 
 
-                    LocalDate rangeStartDate = LocalDate.of(2024, 11, 18); //
+                    LocalDate rangeStartDate = LocalDate.of(2024, 11, 17); //
                     LocalDate rangeEndDate = LocalDate.of(2024, 12, 18); //
                     LocalDateTime rangeStartTime = rangeStartDate.atTime(11, 30); //
                     LocalDateTime rangeEndTime = rangeEndDate.atTime(11, 0); //
@@ -356,7 +407,7 @@ public class PatientController {
                     // Fetch available slots for that doctor on the specified date
                     List<LocalDateTime> availableSlots = appointmentService.getAvailableSlots(doctorId, newDate);
                     if (availableSlots.isEmpty()) {
-                        System.out.println("No available slots for the given date.");
+                        System.out.println("Invalid Doctor ID.");
                         return; // Exit the method if no slots are available
                     } else {
                         // Display the available slots to the user
@@ -423,32 +474,6 @@ public class PatientController {
         }
     }
 
-
-    // Method to view available appointment slots
-    /*public void viewAvailableAppointmentSlots() {
-        Scanner scanner = new Scanner(System.in);
-        System.out.print("Enter Doctor ID: ");
-        String doctorId = scanner.nextLine();
-        System.out.print("Enter date for available slots (yyyy-MM-dd): ");
-        String dateStr = scanner.nextLine();
-
-        LocalDate date = LocalDate.parse(dateStr);
-
-        List<LocalDateTime> availableSlots = appointmentService.getAvailableSlots(doctorId, date);
-        if (availableSlots.isEmpty()) {
-            System.out.println("No available slots for the given date.");
-        } else {
-            System.out.println("Available slots:");
-
-            // Define the date and time format in 24-hour format
-            DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd MMM yyyy, HH:mm 'HRS'");
-
-            // Format and display each slot
-            availableSlots.forEach(slot ->
-                    System.out.println(slot.format(formatter))
-            );
-        }
-    } */
     public void viewAvailableAppointmentSlots() {
         Scanner scanner = new Scanner(System.in);
 
@@ -480,14 +505,39 @@ public class PatientController {
         String doctorId = scanner.nextLine();
 
         // Ask for appointment date
-        System.out.print("Enter Day (1-31): ");
-        int day = Integer.parseInt(scanner.nextLine());
+        int day = 0, month = 0, year = 0;
+        boolean validInput = false;
 
-        System.out.print("Enter Month (1-12): ");
-        int month = Integer.parseInt(scanner.nextLine());
+        while (!validInput) {
+            try {
+                System.out.print("Enter Day (1-31): ");
+                day = Integer.parseInt(scanner.nextLine());
+                if (day < 1 || day > 31) {
+                    System.out.println("Invalid day! Please enter a number between 1 and 31.");
+                    continue;
+                }
 
-        System.out.print("Enter Year (YYYY): ");
-        int year = Integer.parseInt(scanner.nextLine());
+                System.out.print("Enter Month (1-12): ");
+                month = Integer.parseInt(scanner.nextLine());
+                if (month < 1 || month > 12) {
+                    System.out.println("Invalid month! Please enter a number between 1 and 12.");
+                    continue;
+                }
+
+                System.out.print("Enter Year (YYYY): ");
+                year = Integer.parseInt(scanner.nextLine());
+                if (year < 1000 || year > 9999) {
+                    System.out.println("Invalid year! Please enter a valid 4-digit year.");
+                    continue;
+                }
+
+                // If all inputs are valid, exit the loop
+                validInput = true;
+            } catch (NumberFormatException e) {
+                System.out.println("Invalid input! Please enter a valid number.");
+            }
+        }
+
 
         // Parse and validate the date
         LocalDate date;
@@ -500,7 +550,7 @@ public class PatientController {
         }
 
         // Define appointment booking window
-        LocalDate startDate = LocalDate.of(2024, 11, 18);
+        LocalDate startDate = LocalDate.of(2024, 11, 17);
         LocalDate endDate = LocalDate.of(2024, 12, 18);
         LocalDateTime startDateTime = LocalDateTime.of(startDate, LocalTime.of(11, 30));
         LocalDateTime endDateTime = LocalDateTime.of(endDate, LocalTime.of(11, 0));
@@ -514,7 +564,7 @@ public class PatientController {
         // Get available slots from the appointment service
         List<LocalDateTime> availableSlots = appointmentService.getAvailableSlots(doctorId, date);
         if (availableSlots.isEmpty()) {
-            System.out.println("No available slots for the given date.");
+            System.out.println("Invalid Doctor ID!");
         } else {
             System.out.println("Available slots:");
 
@@ -569,4 +619,22 @@ public class PatientController {
             }
         }
     }
+
+    public void changePassword(Patient patient) {
+        UserService userService=new UserService();
+        Scanner scanner = new Scanner(System.in);
+
+        // Prompt for old password
+        System.out.print("Enter your old password: ");
+        String oldPassword = scanner.nextLine();
+
+        // Prompt for new password
+        System.out.print("Enter your new password: ");
+        String newPassword = scanner.nextLine();
+
+        // Delegate the password change to UserService
+        userService.changePassword(patient.getHospitalID(), oldPassword, newPassword);
+
+    }
+
 }
