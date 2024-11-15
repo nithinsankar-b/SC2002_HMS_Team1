@@ -3,8 +3,7 @@ package interfaces;
 import models.Patient;
 
 public interface iPatientView {
-    
-    // Method to display patient details
+        // Method to display patient details
     public void showPatientDetails(Patient patient);
 
     // Method to display a success message

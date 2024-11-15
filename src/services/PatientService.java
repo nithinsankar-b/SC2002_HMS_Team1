@@ -137,7 +137,7 @@ public class PatientService{
     }
 
     // Method to save patients back to the CSV file
-    
+
     public void savePatientsToCSV() {
         String csvFilePath = "data/Patient.csv";
         try (BufferedWriter bw = new BufferedWriter(new FileWriter(csvFilePath))) {

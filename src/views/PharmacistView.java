@@ -1,7 +1,7 @@
 package views;
 
 import controllers.PharmacistController;
-import interfaces.IPharmacistView;
+
 import models.Pharmacist;
 import models.User;
 import services.PharmacistService;
@@ -16,7 +16,7 @@ import java.util.Scanner;
  * with the system. It allows pharmacists to manage medications, update prescription statuses, 
  * view appointment outcomes, and change their passwords.
  */
-public class PharmacistView implements IPharmacistView {
+public class PharmacistView {
     private final Scanner scanner; // Scanner for user input
     private final PharmacistController pharmacistController; // Controller for pharmacist operations
     private final PharmacistService pharmacistService; // Service for managing pharmacists

@@ -5,7 +5,6 @@ import java.time.format.DateTimeFormatter;
 import java.util.Scanner;
 import models.Doctor;
 import controllers.DoctorController;
-import interfaces.IDoctorView;
 import models.User;
 import services.AppointmentRequestService;
 import services.AppointmentService;
@@ -18,7 +17,7 @@ import services.UserService;
  * The {@code DoctorView} class provides a user interface for doctors to manage their operations.
  * It allows doctors to view medical records, manage schedules, handle appointments, and more.
  */
-public class DoctorView implements IDoctorView {
+public class DoctorView {
     private final Scanner scanner; // Scanner for user input
     private final DoctorController doctorController; // Controller for doctor operations
     private final UserService userService; // Service to manage user details
