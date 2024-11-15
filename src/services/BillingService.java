@@ -1,13 +1,15 @@
 package services;
 
 import models.Appointment;
+import interfaces.IBillingService;
 
-public class BillingService {
+public class BillingService implements IBillingService {
     public static final double CONSULTATION_CHARGE = 100.0;
     public static final double PARACETAMOL_CHARGE = 10.0;
     public static final double IBUPROFEN_CHARGE = 20.0;
     public static final double AMOXICILLIN_CHARGE = 15.0;
 
+    @Override
     public double calculateBill(Appointment appointment) {
         double totalBill = CONSULTATION_CHARGE; // Start with consultation charge
 

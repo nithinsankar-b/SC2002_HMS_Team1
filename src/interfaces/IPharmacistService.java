@@ -1,27 +1,64 @@
 package interfaces;
 
 import models.Pharmacist;
+import models.Appointment;
+
 import java.util.List;
 
-/**
- * Interface for pharmacist service operations.
- * This interface defines methods for loading and saving pharmacist data from and to a CSV file.
- */
 public interface IPharmacistService {
 
     /**
-     * Loads a list of pharmacists from a CSV file.
+     * Adds a new pharmacist to the system.
      *
-     * @param filePath The path to the CSV file containing pharmacist data.
-     * @return A list of pharmacists loaded from the CSV file.
+     * @param pharmacist the pharmacist to add
      */
-    List<Pharmacist> loadPharmacistsFromCSV(String filePath);
+    void addPharmacist(Pharmacist pharmacist);
 
     /**
-     * Saves a list of pharmacists to a CSV file.
+     * Retrieves a pharmacist by their hospital ID.
      *
-     * @param pharmacists The list of pharmacists to save.
-     * @param filePath The path to the CSV file where pharmacist data will be saved.
+     * @param hospitalID the hospital ID of the pharmacist
+     * @return the pharmacist with the specified hospital ID, or {@code null} if not found
      */
-    void savePharmacistsToCSV(List<Pharmacist> pharmacists, String filePath);
+    Pharmacist getPharmacistById(String hospitalID);
+
+    /**
+     * Updates the contact information of a pharmacist.
+     *
+     * @param hospitalID the hospital ID of the pharmacist
+     * @param newContactInformation the new contact information to set
+     * @return {@code true} if the update was successful, {@code false} otherwise
+     */
+    boolean updatePharmacistContact(String hospitalID, String newContactInformation);
+
+    /**
+     * Lists all pharmacists in the system.
+     */
+    void listAllPharmacists();
+
+    /**
+     * Loads pharmacists from a CSV file.
+     */
+    void loadPharmacistsFromCSV();
+
+    /**
+     * Saves the current list of pharmacists to a CSV file.
+     */
+    void savePharmacistsToCSV();
+
+    /**
+     * Retrieves appointments for a given patient ID.
+     *
+     * @param patientId the ID of the patient
+     * @return a list of appointments for the specified patient
+     */
+    List<Appointment> getAppointmentsByPatientId(String patientId);
+
+    /**
+     * Updates the prescription status for a given appointment and updates inventory accordingly.
+     *
+     * @param appointmentID the ID of the appointment to update
+     * @return {@code true} if the update was successful, {@code false} otherwise
+     */
+    boolean updatePrescriptionStatus(String appointmentID);
 }

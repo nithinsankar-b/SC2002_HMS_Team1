@@ -22,8 +22,9 @@ import enums.MedicationStatus;
 import services.UserService;
 import services.AppointmentService;
 import services.InventoryService;
+import interfaces.IPharmacistService;
 
-public class PharmacistService {
+public class PharmacistService implements IPharmacistService {
     
     private final Map<String, Pharmacist> pharmacists;
     private final UserService userService;
@@ -52,6 +53,7 @@ public class PharmacistService {
      *
      * @param pharmacist the pharmacist to add
      */
+    @Override
     public void addPharmacist(Pharmacist pharmacist) {
         if (!pharmacists.containsKey(pharmacist.getHospitalID())) {
             pharmacists.put(pharmacist.getHospitalID(), pharmacist);
@@ -68,6 +70,7 @@ public class PharmacistService {
      * @param hospitalID the hospital ID of the pharmacist
      * @return the pharmacist with the specified hospital ID, or {@code null} if not found
      */
+    @Override
     public Pharmacist getPharmacistById(String hospitalID) {
         return pharmacists.get(hospitalID);
     }
@@ -79,6 +82,7 @@ public class PharmacistService {
      * @param newContactInformation the new contact information to set
      * @return {@code true} if the update was successful, {@code false} otherwise
      */
+    @Override
     public boolean updatePharmacistContact(String hospitalID, String newContactInformation) {
         Pharmacist pharmacist = pharmacists.get(hospitalID);
         if (pharmacist != null) {
@@ -92,6 +96,7 @@ public class PharmacistService {
     /**
      * Lists all pharmacists in the system.
      */
+    @Override
     public void listAllPharmacists() {
         pharmacists.values().forEach(pharmacist -> {
             System.out.println("Pharmacist ID: " + pharmacist.getHospitalID());
@@ -104,6 +109,7 @@ public class PharmacistService {
     /**
      * Loads pharmacists from a CSV file.
      */
+    @Override
     public void loadPharmacistsFromCSV() {
         String line;
         try (BufferedReader br = new BufferedReader(new FileReader(CSV_FILE_PATH))) {
@@ -129,6 +135,7 @@ public class PharmacistService {
     /**
      * Saves the current list of pharmacists to a CSV file.
      */
+    @Override
     public void savePharmacistsToCSV() {
         try (BufferedWriter bw = new BufferedWriter(new FileWriter(CSV_FILE_PATH))) {
             bw.write("Pharmacist ID,Name,Contact Information");
@@ -152,7 +159,8 @@ public class PharmacistService {
      * @param patientId the ID of the patient
      * @return a list of appointments for the specified patient
      */
-    private List<Appointment> getAppointmentsByPatientId(String patientId) {
+    @Override
+    public List<Appointment> getAppointmentsByPatientId(String patientId) {
         List<Appointment> allAppointments = appointmentService.viewScheduledAppointments();
         List<Appointment> patientAppointments = new ArrayList<>();
         for (Appointment appointment : allAppointments) {
@@ -169,6 +177,7 @@ public class PharmacistService {
      * @param appointmentID the ID of the appointment to update
      * @return {@code true} if the update was successful, {@code false} otherwise
      */
+    @Override
     public boolean updatePrescriptionStatus(String appointmentID) {
         Appointment appointment = appointmentService.getAppointmentById(appointmentID);
 
@@ -203,12 +212,6 @@ public class PharmacistService {
 
         return false;
     }
-
-
-
-
-
-
 
 }
 

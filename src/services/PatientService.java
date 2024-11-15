@@ -17,8 +17,9 @@ import models.MedicalRecord;
 import services.MedicalRecordService;
 import services.UserService;
 import services.AppointmentService;
+import interfaces.iPatientService;
 
-public class PatientService {
+public class PatientService{
     private final Map<String, Patient> patients;
     private final UserService userService;
 
@@ -31,6 +32,7 @@ public class PatientService {
     }
 
     // Method to add a new patient
+
     public void addPatient(Patient patient) {
         if (!patients.containsKey(patient.getHospitalID())) {
             patients.put(patient.getHospitalID(), patient);
@@ -42,6 +44,7 @@ public class PatientService {
     }
 
     // Method to retrieve a patient by their hospital ID
+
     public Patient getPatientById(String hospitalID) {
         return patients.get(hospitalID);
     }
@@ -57,6 +60,7 @@ public class PatientService {
         }
         return false;
     } */
+
 
     public boolean updatePatientContact(String hospitalID, String newContactInformation, String contactType) {
         Patient patient = patients.get(hospitalID);
@@ -81,6 +85,7 @@ public class PatientService {
 
     // Method to list all patients
     // For administrator to use
+
     public void listAllPatients() {
         patients.values().forEach(patient -> {
             System.out.println("Patient ID: " + patient.getHospitalID());
@@ -93,7 +98,8 @@ public class PatientService {
         });
     }
 
-    private void loadPatientsFromCSV() {
+
+    public void loadPatientsFromCSV() {
         String filePath = "data/Patient.csv";
         String line;
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
@@ -131,7 +137,8 @@ public class PatientService {
     }
 
     // Method to save patients back to the CSV file
-    private void savePatientsToCSV() {
+    
+    public void savePatientsToCSV() {
         String csvFilePath = "data/Patient.csv";
         try (BufferedWriter bw = new BufferedWriter(new FileWriter(csvFilePath))) {
             // Write the header

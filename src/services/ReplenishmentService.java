@@ -9,8 +9,9 @@ import java.util.stream.Collectors;
 
 import enums.StatusEnum;
 import models.ReplenishmentRequest;
+import interfaces.IReplenishmentService;
 
-public class ReplenishmentService {
+public class ReplenishmentService implements IReplenishmentService {
 
     private final String csvFile = "data/replenishment_requests.csv";
 
@@ -19,6 +20,7 @@ public class ReplenishmentService {
         generateCsvIfNotExists();
     }
 
+    @Override
     public List<ReplenishmentRequest> createReplenishmentRequest(List<String> medicines) {
         List<ReplenishmentRequest> newRequests = new ArrayList<>();
 
@@ -39,7 +41,8 @@ public class ReplenishmentService {
         return newRequests;  // Return the list of newly created requests
     }
 
-    private void writeToCsv(ReplenishmentRequest request) {
+    @Override
+    public void writeToCsv(ReplenishmentRequest request) {
         try (BufferedWriter writer = new BufferedWriter(new FileWriter(csvFile, true))) {
             for (String medicine : request.getMedicines()) {
             	
@@ -60,6 +63,7 @@ public class ReplenishmentService {
 
 
     // Retrieves all replenishment requests from the CSV file (skips header)
+    @Override
     public List<ReplenishmentRequest> getAllRequests() {
         List<ReplenishmentRequest> requests = new ArrayList<>();
         try (BufferedReader reader = new BufferedReader(new FileReader(csvFile))) {
@@ -79,7 +83,8 @@ public class ReplenishmentService {
     }
 
     // Method to check if a medicine already exists in the CSV with status PENDING
-    private boolean isMedicineAlreadyRequested(String medicineName) {
+    @Override
+    public boolean isMedicineAlreadyRequested(String medicineName) {
         try (BufferedReader reader = new BufferedReader(new FileReader(csvFile))) {
             String line;
             // Skip header
@@ -101,6 +106,7 @@ public class ReplenishmentService {
     }
 
     // Retrieves replenishment requests by status
+    @Override
     public List<ReplenishmentRequest> getRequestsByStatus(StatusEnum status) {
         return getAllRequests().stream()
                 .filter(request -> request.getStatus() == status)
@@ -110,7 +116,8 @@ public class ReplenishmentService {
     
 
     // Parses a CSV row into a ReplenishmentRequest object
-    private ReplenishmentRequest parseCsvRow(String csvRow) {
+    @Override
+    public ReplenishmentRequest parseCsvRow(String csvRow) {
         String[] parts = csvRow.split(",");
         if (parts.length < 3) return null; // Check to ensure data integrity
 
@@ -131,7 +138,8 @@ public class ReplenishmentService {
     }
 
     // Generates the CSV file with headers if it does not exist
-    private void generateCsvIfNotExists() {
+    @Override
+    public void generateCsvIfNotExists() {
         File file = new File(csvFile);
         if (!file.exists()) {
             try (BufferedWriter writer = new BufferedWriter(new FileWriter(csvFile))) {
@@ -146,6 +154,7 @@ public class ReplenishmentService {
     
     
     // Approves a replenishment request by changing its status to APPROVED
+    @Override
     public boolean approveRequest(String requestId) {
         boolean result = updateRequestStatus(requestId, StatusEnum.APPROVED);
         if (!result) {
@@ -155,6 +164,7 @@ public class ReplenishmentService {
     }
 
     // Rejects a replenishment request by changing its status to REJECTED
+    @Override
     public boolean rejectRequest(String requestId) {
         boolean result = updateRequestStatus(requestId, StatusEnum.REJECTED);
         if (!result) {
@@ -165,6 +175,7 @@ public class ReplenishmentService {
 
     		
  // Updates the status of a specific replenishment request by ID
+    @Override
     public boolean updateRequestStatus(String requestId, StatusEnum newStatus) {
         boolean found = false;
 
