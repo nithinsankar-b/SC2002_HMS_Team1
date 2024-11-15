@@ -291,8 +291,7 @@ public class InventoryService implements IInventoryService {
         for (Inventory item : inventoryDataList) {
             System.out.println("Medicine Name: " + item.getMedicineName() +
                     " | Current Stock: " + item.getCurrentStock() +
-                    " | Low Level Alert: " + item.getLowLevelAlert() +
-                    " | Replenishment Status: " + item.getReplenishmentStatus());
+                    " | Low Level Alert: " + item.getLowLevelAlert());
         }
     }
 

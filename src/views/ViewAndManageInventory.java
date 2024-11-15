@@ -40,9 +40,10 @@ public class ViewAndManageInventory implements IAdministratorView {
         System.out.println("3. Update Stock");
         System.out.println("4. Update Low Stock Alert");
         System.out.println("5. Approve Replenishment Request");
-        System.out.println("6. View Inventory");
-        System.out.println("7. Return to Main Menu");
-        System.out.print("Choose an option: ");
+        System.out.println("6. View Pending Replenishment Requests");
+        System.out.println("7. Decline Replenishment Request");
+        System.out.println("8. View Inventory");
+        System.out.println("9. Return to Main Menu");
     }
 
     /**
@@ -160,8 +161,7 @@ public class ViewAndManageInventory implements IAdministratorView {
             for (Inventory inventory : inventoryList) {
                 System.out.println("Medicine: " + inventory.getMedicineName() +
                                    ", Stock: " + inventory.getCurrentStock() +
-                                   ", Low Stock Alert: " + inventory.getLowLevelAlert() +
-                                   ", Replenishment Status: " + inventory.getReplenishmentStatus());
+                                   ", Low Stock Alert: " + inventory.getLowLevelAlert());
             }
         }
     }
@@ -236,19 +236,3 @@ public class ViewAndManageInventory implements IAdministratorView {
         return scanner.nextInt();
     }
 }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-

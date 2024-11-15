@@ -10,10 +10,12 @@ import interfaces.IInventoryService;
 import models.Administrator;
 import models.Appointment;
 import models.Inventory;
+import models.ReplenishmentRequest;
 import models.Staff;
 import java.util.List;
 import java.util.Scanner;
 
+import enums.StatusEnum;
 import services.UserService;
 
 /**
@@ -27,6 +29,7 @@ public class AdministratorController {
     private final AdminView adminView;
     private final InventoryService inventoryService;
     private final UserService userService;
+    private final ReplenishmentService replenishmentService;
     private String loggedInHospitalID;
 
     /**
@@ -40,6 +43,7 @@ public class AdministratorController {
         this.appointmentService = appointmentService;
         this.adminService = adminService;
         this.userService = userService;
+        this.replenishmentService = new ReplenishmentService(); // Initialize ReplenishmentService here
 
         InventoryDataStore inventoryDataStore = new InventoryDataStore();
         this.inventoryService = new InventoryService(inventoryDataStore);
@@ -143,9 +147,10 @@ public class AdministratorController {
             System.out.println("3. Update Stock");
             System.out.println("4. Update Low Stock Alert");
             System.out.println("5. Approve Replenishment Request");
-            System.out.println("6. View Inventory");
-            System.out.println("7. Return to Main Menu");
-            System.out.print("Choose an option: ");
+            System.out.println("6. View Pending Replenishment Requests");
+            System.out.println("7. Decline Replenishment Request");
+            System.out.println("8. View Inventory");
+            System.out.println("9. Return to Main Menu");;
             
             int choice = adminView.getMenuChoice();
 
@@ -185,32 +190,50 @@ public class AdministratorController {
                     }
                     break;
 
-                case 5:
-                	Scanner sc=new Scanner(System.in);
-                	System.out.println("Enter Request Id");
-                    String medicineReplenish = sc.nextLine();
-				 ReplenishmentService replenishmentService = new ReplenishmentService();
-				 boolean f = replenishmentService .approveRequest(medicineReplenish);
-				 if(f)
-					 System.out.println("Approve Successful");
-				 else
-					 System.out.println("Approve failed");
-
+                    case 5:
+                    // Get the request ID from the user
+                    String requestId = adminView.getRequestIdForReplenishment();
+                    
+                    // Approve the request in ReplenishmentService and get the medicine name
+                    String medicineNames = replenishmentService.approveRequest(requestId);
+                
+                    // If a valid medicine name is returned, update the inventory stock
+                    if (medicineNames != null) {
+                        boolean inventoryUpdateSuccess = inventoryService.approveReplenishmentRequest(medicineNames);
+                        
+                        if (inventoryUpdateSuccess) {
+                            System.out.println("Replenishment request approved and inventory updated successfully.");
+                        } else {
+                            System.out.println("Failed to update inventory for replenished medicine.");
+                        }
+                    } else {
+                        System.out.println("Approval failed. Request ID not found in ReplenishmentService.");
+                    }
                     break;
+                
+                
 
-                case 6:
+                    case 6:
+                    viewPendingReplenishmentRequests();
+                    break;
+            
+                case 7:
+                    declineReplenishmentRequest();
+                    break;
+            
+                case 8:
                     inventoryService.viewMedicationInventory();
                     break;
-
-                case 7:
+            
+                case 9:
                     exit = true;
                     break;
-
+            
                 default:
                     System.out.println("Invalid choice. Please try again.");
             }
-        }
     }
+}
 
     /**
      * Manages appointments, displaying the list of scheduled appointments.
@@ -231,6 +254,35 @@ public class AdministratorController {
     public boolean changePassword(String hospitalID, String oldPassword, String newPassword) {
         return userService.changePassword(hospitalID, oldPassword, newPassword);
     }
+
+    private void viewPendingReplenishmentRequests() {
+        List<ReplenishmentRequest> pendingRequests = replenishmentService.getRequestsByStatus(StatusEnum.PENDING);
+        
+        if (pendingRequests.isEmpty()) {
+            System.out.println("No pending replenishment requests found.");
+        } else {
+            System.out.println("Pending Replenishment Requests:");
+            for (ReplenishmentRequest request : pendingRequests) {
+                System.out.println("Request ID: " + request.getId() + ", Medicines: " + request.getMedicines() + ", Status: " + request.getStatus());
+            }
+        }
+    }
+    
+
+private void declineReplenishmentRequest() {
+    Scanner sc = new Scanner(System.in);
+    System.out.print("Enter Request ID to decline: ");
+    String requestId = sc.nextLine();
+
+    boolean success = replenishmentService.rejectRequest(requestId);
+    if (success) {
+        System.out.println("Replenishment request declined successfully.");
+    } else {
+        System.out.println("Failed to decline replenishment request. Request ID not found.");
+    }
+}
+
+
 }
 
 
