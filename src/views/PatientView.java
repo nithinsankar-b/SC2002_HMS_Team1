@@ -8,7 +8,8 @@ import controllers.PatientController;
 import controllers.BillingController;
 import services.PatientService;
 import services.UserService;
-
+import models.Appointment;
+import models.PaymentLogger;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.util.List;
@@ -61,7 +62,8 @@ public class PatientView implements iPatientView {
                 case 9 -> patientController.viewAvailableAppointmentSlots();
                 case 10 -> patientController.viewPastRecords(patient);
                 case 11 -> showBillingOptions(patient);
-                case 12 -> {
+                case 12-> patientController.changePassword(patient);
+                case 13 -> {
                     System.out.println("Logging out...");
                     isRunning = false;
                 }
@@ -116,7 +118,8 @@ public class PatientView implements iPatientView {
         System.out.println("9. View Available Appointment Slots");
         System.out.println("10. View Past Outcome Records");
         System.out.println("11. View Billing Details");
-        System.out.println("12. Log Out");
+        System.out.println("12. Change Password");
+        System.out.println("13. Log Out");
     }
 
     private int getUserInput() {
@@ -130,31 +133,80 @@ public class PatientView implements iPatientView {
     }
 
     public void showBillingOptions(Patient patient) {
-        System.out.print("Enter Appointment ID to view bill: ");
-        String appointmentId = scanner.nextLine().trim();
+        boolean isBillingMenuRunning = true;
 
-        //double billAmount = billingController.calculateBill(appointmentId);
-        /*if (billAmount == 0.0) {
-            System.out.println("No unpaid bill found for the provided Appointment ID.");
-            return;
-        }*/
-        System.out.println(billingController.calculateBill(appointmentId));
+        while (isBillingMenuRunning) {
+            System.out.println("\n==== BILLING OPTIONS ====");
+            System.out.println("1. View Pending Payments");
+            System.out.println("2. View Completed Payments");
+            System.out.println("3. Pay a Bill");
+            System.out.println("4. Exit Billing Menu");
+            System.out.print("Enter your choice: ");
 
-        //System.out.printf("Total Bill Amount: $%.2f%n", billAmount);
-        System.out.print("Do you want to pay this bill? (Y/N): ");
-        String paymentConfirmation = scanner.nextLine().trim().toUpperCase();
+            int choice = getUserInput();
 
-        if (paymentConfirmation.equals("Y") || paymentConfirmation.equals("YES")) {
-            boolean isPaid = billingController.payBill(appointmentId);
-            if (isPaid) {
-                System.out.println("Payment successful.");
-            } else {
-                System.out.println("Payment failed. Please try again.");
+            switch (choice) {
+                case 1 -> {
+                    List<Appointment> pendingPayments = billingController.getPendingPayments(patient.getAppointments());
+                    if (pendingPayments.isEmpty()) {
+                        System.out.println("No pending payments found.");
+                    } else {
+                        System.out.println("\nPending Payments:");
+                        for (Appointment app : pendingPayments) {
+                            System.out.println("Appointment ID: " + app.getAppointmentId());
+                            System.out.println("Service: " + app.getServiceProvided());
+                            System.out.println("---------------------");
+                        }
+                    }
+                }
+                case 2 -> {
+                    List<String> completedPayments = PaymentLogger.getLoggedPayments();
+                    if (completedPayments.isEmpty()) {
+                        System.out.println("No completed payments found.");
+                    } else {
+                        System.out.println("\nCompleted Payments:");
+                        for (String payment : completedPayments) {
+                            String[] parts = payment.split(",");
+                            System.out.println("Appointment ID: " + parts[0]);
+                            System.out.println("Amount Paid: $" + parts[1]);
+                            System.out.println("Service Provided: " + parts[2]);
+                            System.out.println("---------------------");
+                        }
+                    }
+                }
+                case 3 -> {
+                    System.out.print("Enter Appointment ID to pay bill: ");
+                    String appointmentId = scanner.nextLine().trim();
+
+                    String billDetails = billingController.calculateBill(appointmentId);
+                    System.out.println(billDetails);
+
+                    if (billDetails.contains("Total Bill")) {
+                        System.out.print("Do you want to pay this bill? (Y/N): ");
+                        String paymentConfirmation = scanner.nextLine().trim().toUpperCase();
+
+                        if (paymentConfirmation.equals("Y") || paymentConfirmation.equals("YES")) {
+                            boolean isPaid = billingController.payBill(appointmentId);
+                            if (isPaid) {
+                                System.out.println("Payment successful.");
+                            } else {
+                                System.out.println("Payment failed. Please try again.");
+                            }
+                        } else {
+                            System.out.println("Bill payment canceled.");
+                        }
+                    }
+                }
+                case 4 -> {
+                    System.out.println("Exiting Billing Menu...");
+                    isBillingMenuRunning = false;
+                }
+                default -> System.out.println("Invalid choice! Please try again.");
             }
-        } else {
-            System.out.println("Bill payment canceled.");
         }
     }
+
+
 
     @Override
     public void display(Patient patient) {

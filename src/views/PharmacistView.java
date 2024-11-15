@@ -7,6 +7,7 @@ import models.User;
 import services.PharmacistService;
 import services.UserService;
 import services.PatientService;
+import views.AppointmentOutcomeRecordView;
 
 import java.util.Scanner;
 

@@ -82,10 +82,12 @@ public class UserService implements IUserService {
         if (user != null && user.getPassword().equals(oldPassword)) {
             // Update the password
             user.setPassword(newPassword);
+            users.put(hospitalID, user);
             saveToCSV();
-            loadUsersFromCSV("data/User.csv");
+            System.out.println("Password changed successfully!");
             return true;
         }
+        System.out.println("Error! Wrong details entered!");
         return false;
     }
 
