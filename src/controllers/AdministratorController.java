@@ -1,5 +1,7 @@
 package controllers;
 
+import models.*;
+import services.*;
 import views.AdminView;
 import services.AppointmentService;
 import services.InventoryService;
@@ -16,6 +18,7 @@ import java.util.List;
 import java.util.Scanner;
 
 import enums.StatusEnum;
+import views.MedicalInventoryView;
 import services.UserService;
 
 /**
@@ -39,7 +42,7 @@ public class AdministratorController {
      * @param adminService        Service to manage administrative tasks.
      * @param userService         Service to handle user-related operations.
      */
-    public AdministratorController(AppointmentService appointmentService, ProjectAdminService adminService, UserService userService) {
+    public AdministratorController(AppointmentService appointmentService, ProjectAdminService adminService, UserService userService, PatientService patientService) {
         this.appointmentService = appointmentService;
         this.adminService = adminService;
         this.userService = userService;
@@ -48,7 +51,7 @@ public class AdministratorController {
         InventoryDataStore inventoryDataStore = new InventoryDataStore();
         this.inventoryService = new InventoryService(inventoryDataStore);
 
-        this.adminView = new AdminView(this, adminService);
+        this.adminView = new AdminView(this, adminService, userService, patientService);
     }
 
     /**
@@ -93,20 +96,29 @@ public class AdministratorController {
         boolean exit = false;
 
         while (!exit) {
-            System.out.println("\n-- Manage Hospital Staff --");
+            System.out.println("===========================================");
+            System.out.println("-- Manage Hospital Staff --");
+            System.out.println("===========================================");
             System.out.println("1. Add or Update Staff");
             System.out.println("2. Remove Staff");
             System.out.println("3. View Staff List");
-            System.out.println("4. Return to Main Menu");
+//            System.out.println("4. Manage Patients");
+            System.out.println("4. User Password Recovery");
+            System.out.println("5. Return to Main Menu");
             System.out.print("Choose an option: ");
-            
+
             int choice = adminView.getMenuChoice();
 
             switch (choice) {
                 case 1:
                     Staff newStaff = adminView.getStaffDetails();
-                    adminService.addOrUpdateStaff(newStaff);
-                    System.out.println("Staff added/updated successfully.");
+                    if (newStaff != null) {
+                        adminService.addOrUpdateStaff(newStaff);
+                        System.out.println("Staff added/updated successfully.");
+                    } else{
+                        continue;
+                    }
+
                     break;
 
                 case 2:
@@ -123,8 +135,19 @@ public class AdministratorController {
                     List<Staff> staffList = adminService.getAllStaff();
                     adminView.displayListOfStaff(staffList);
                     break;
-
+//                case 4:
+//                    managePatients();
+//                    break;
                 case 4:
+                    String userId = adminView.getUserIDForPassword();
+                    String plaintextPassword = userService.getPlaintextPassword(userId);
+                    if (plaintextPassword != null) {
+                        System.out.println("Password: " + plaintextPassword);
+                    } else {
+                        System.out.println("User not found or unable to retrieve password.");
+                    }
+                    break;
+                case 5:
                     exit = true;
                     break;
 
@@ -191,25 +214,26 @@ public class AdministratorController {
                     break;
 
                     case 5:
+                    viewPendingReplenishmentRequests();
                     // Get the request ID from the user
                     String requestId = adminView.getRequestIdForReplenishment();
-                
+
                     // Approve the request in ReplenishmentService and get the medicine names
                     List<String> medicineNames = replenishmentService.approveRequest(requestId);
-                
+
                     // If valid medicine names are returned, update the inventory stock for each medicine
                     if (medicineNames != null && !medicineNames.isEmpty()) {
                         boolean allUpdatesSuccessful = true;
-                
+
                         for (String medName : medicineNames) {
                             boolean updateSuccess = inventoryService.approveReplenishmentRequest(medName);
-                
+
                             if (!updateSuccess) {
                                 allUpdatesSuccessful = false;
                                 System.out.println("Failed to update inventory for medicine: " + medName);
                             }
                         }
-                
+
                         if (allUpdatesSuccessful) {
                             System.out.println("Replenishment request approved and inventory updated successfully.");
                         } else {
@@ -219,10 +243,6 @@ public class AdministratorController {
                         System.out.println("Approval failed. Request ID not found in ReplenishmentService.");
                     }
                     break;
-                
-
-                
-                
 
                 case 6:
                     viewPendingReplenishmentRequests();
@@ -233,18 +253,68 @@ public class AdministratorController {
                     break;
 
                 case 8:
-                    inventoryService.viewMedicationInventory();
+                    MedicalInventoryView medicalInventoryView = new MedicalInventoryView(inventoryService);
+                    List<InventoryDisplay> inventory = inventoryService.getInventoryDisplay();
+                    medicalInventoryView.display(inventory);
                     break;
 
                 case 9:
                     exit = true;
                     break;
 
+
                 default:
                     System.out.println("Invalid choice. Please try again.");
             }
         }
     }
+
+    // Add a new method for managing patients
+    public void managePatients() {
+        boolean exit = false;
+
+        while (!exit) {
+            System.out.println("===========================================");
+            System.out.println("-- Manage Patients --");
+            System.out.println("===========================================");
+            System.out.println("1. Add New Patient");
+            System.out.println("2. View Patient List");
+            System.out.println("3. Remove Patient");
+            System.out.println("4. Return to Main Menu");
+            System.out.print("Choose an option: ");
+
+            int choice = adminView.getMenuChoice();
+
+            switch (choice) {
+                case 1:
+                    Patient newPatient = adminView.getPatientDetails();
+                    if (newPatient != null) {
+                        adminService.addOrUpdatePatient(newPatient);
+                    }
+                    break;
+                case 2:
+                    List<Patient> patientList = adminService.getAllPatients();
+                    adminView.displayPatientList(patientList);
+                    break;
+                case 3:
+                    System.out.print("Enter Patient ID to remove: ");
+                    String patientIdToDelete = new Scanner(System.in).nextLine();
+                    boolean deleted = adminService.removePatient(patientIdToDelete);
+                    if (deleted) {
+                        System.out.println("Patient removed successfully.");
+                    } else {
+                        System.out.println("Failed to remove patient.");
+                    }
+                    break;
+                case 4:
+                    exit = true;
+                    break;
+                default:
+                    System.out.println("Invalid choice. Please try again.");
+            }
+        }
+    }
+
 
     /**
      * Manages appointments, displaying the list of scheduled appointments.

@@ -7,7 +7,6 @@ import services.UserService;
 public class Main {
     public static void main(String[] args) {
         try {
-            // Get user from authentication
             UserService userService = new UserService();
             UserController userController = new UserController(userService);
             userController.run();

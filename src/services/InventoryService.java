@@ -248,10 +248,10 @@ public class InventoryService implements IInventoryService {
                     System.out.println("Not enough medicine in the inventory for: " + medicineName);
                     return;
                 }
-                System.out.println(quantity);
+//                System.out.println(quantity);
                 // Update stock and set medication status to DISPENSED
                 data.setCurrentStock(data.getCurrentStock() - quantity);
-                appointment.setMedicationStatus(MedicationStatus.DISPENSED);
+//                appointment.setMedicationStatus(MedicationStatus.DISPENSED);
                 System.out.println("Updated stock for medicine: " + medicineName + ". New stock: " + data.getCurrentStock());
 
                 // Check if stock falls below the low-level alert and update status
@@ -405,6 +405,7 @@ public class InventoryService implements IInventoryService {
      * @param medicineName The name of the medication.
      * @return True if the request was approved and stock updated, false otherwise.
      */
+
     public boolean approveReplenishmentRequest(String medicineName) {
         List<Inventory> inventoryDataList = inventoryDataStore.getInventoryList();
     

@@ -141,25 +141,134 @@ System.out.println("Requested appointment slot is set to unavailable.");
        doctorService.updatePatientPrescription(patientId, newDiagnosis);
      }
 
-     public void appointmentOutcomeRecord(Doctor doctor) {
-       Scanner sc = new Scanner(System.in);
-    
-       System.out.println("Enter AppointmentID: ");
-       String appointmentId = sc.nextLine();
-       System.out.println("Enter Service Provided: ");
-       String serviceProvided = sc.nextLine();
-       System.out.println("Enter medications prescribed  (if more than 1 medicine, separate by ;): ");
-       String medicineList = sc.nextLine();
-         System.out.println("Enter quantities prescribed (if more than 1 medicine, separate by ;): ");
-         String quantitiesList = sc.nextLine();
-       System.out.println("Enter Consultation Notes: ");
-       String consultationNotes = sc.nextLine();
-       LocalDate date = appointmentService.getAppointmentById(appointmentId).getAppointmentDateTime().toLocalDate();
-       LocalTime time = appointmentService.getAppointmentById(appointmentId).getAppointmentDateTime().toLocalTime();
-       scheduleService.setAvailable1(doctor.getHospitalID(), date, time);
-       doctorService.recordAppointmentOutcome(appointmentId, serviceProvided, medicineList, quantitiesList, consultationNotes);
+    public void appointmentOutcomeRecord(Doctor doctor) {
+        Scanner sc = new Scanner(System.in);
+        String appointmentId = null;
+        String serviceProvided = null;
+        String medicineList = null;
+        String quantitiesList = null;
+        String consultationNotes = null;
+        LocalDate date = null;
+        LocalTime time = null;
 
-     }
+        // Flag to check if everything is valid
+        boolean isValid = true;
+
+        // Prompt for Appointment ID
+        while (appointmentId == null) {
+            try {
+                System.out.println("Enter AppointmentID: ");
+                appointmentId = sc.nextLine();
+                if (appointmentService.getAppointmentById(appointmentId) == null) {
+                    throw new IllegalArgumentException("Appointment ID not found.");
+                }
+            } catch (IllegalArgumentException e) {
+                System.out.println("Invalid Appointment ID. Please try again.");
+                appointmentId = null; // Reset to re-prompt
+                isValid = false;
+            }
+        }
+
+        // Prompt for Service Provided
+        while (serviceProvided == null || serviceProvided.trim().isEmpty()) {
+            try {
+                System.out.println("Enter Service Provided: ");
+                serviceProvided = sc.nextLine();
+                if (serviceProvided.trim().isEmpty()) {
+                    throw new IllegalArgumentException("Service provided cannot be empty.");
+                }
+            } catch (IllegalArgumentException e) {
+                System.out.println("Invalid input. Please provide a valid service description.");
+                serviceProvided = null; // Reset to re-prompt
+                isValid = false;
+            }
+        }
+
+        // Prompt for Medications Prescribed
+        while (medicineList == null || medicineList.trim().isEmpty()) {
+            try {
+                System.out.println("Enter medications prescribed (if more than 1 medicine, separate by ;): ");
+                medicineList = sc.nextLine();
+                if (medicineList.trim().isEmpty()) {
+                    throw new IllegalArgumentException("Medicine list cannot be empty.");
+                }
+            } catch (IllegalArgumentException e) {
+                System.out.println("Invalid input. Please provide a valid list of medications.");
+                medicineList = null; // Reset to re-prompt
+                isValid = false;
+            }
+        }
+
+        // Prompt for Quantities Prescribed
+        while (quantitiesList == null || quantitiesList.trim().isEmpty()) {
+            try {
+                System.out.println("Enter quantities prescribed (if more than 1 medicine, separate by ;): ");
+                quantitiesList = sc.nextLine();
+                if (quantitiesList.trim().isEmpty()) {
+                    throw new IllegalArgumentException("Quantities list cannot be empty.");
+                }
+
+                // Check if medicineList and quantitiesList have matching counts
+                String[] medicines = medicineList.split(";");
+                String[] quantities = quantitiesList.split(";");
+                if (medicines.length != quantities.length) {
+                    throw new IllegalArgumentException("Number of medicines and quantities must match.");
+                }
+
+                // Ensure all quantities are numbers
+                for (String quantity : quantities) {
+                    try {
+                        Integer.parseInt(quantity.trim());  // Check if the quantity is a valid integer
+                    } catch (NumberFormatException e) {
+                        throw new IllegalArgumentException("Each quantity must be a valid number.");
+                    }
+                }
+            } catch (IllegalArgumentException e) {
+                System.out.println("Invalid input. Ensure the quantities match the number of medications and are valid numbers.");
+                quantitiesList = null; // Reset to re-prompt
+                isValid = false;
+            }
+        }
+
+        // Prompt for Consultation Notes
+        while (consultationNotes == null || consultationNotes.trim().isEmpty()) {
+            try {
+                System.out.println("Enter Consultation Notes: ");
+                consultationNotes = sc.nextLine();
+                if (consultationNotes.trim().isEmpty()) {
+                    throw new IllegalArgumentException("Consultation notes cannot be empty.");
+                }
+            } catch (IllegalArgumentException e) {
+                System.out.println("Invalid input. Please provide valid consultation notes.");
+                consultationNotes = null; // Reset to re-prompt
+                isValid = false;
+            }
+        }
+
+        // Retrieve Appointment Date and Time
+        try {
+            date = appointmentService.getAppointmentById(appointmentId).getAppointmentDateTime().toLocalDate();
+            time = appointmentService.getAppointmentById(appointmentId).getAppointmentDateTime().toLocalTime();
+        } catch (Exception e) {
+            System.out.println("Error retrieving appointment date and time. Please check the Appointment ID.");
+            isValid = false;
+        }
+
+        // If all inputs are valid, proceed to record the appointment outcome
+        if (isValid) {
+            try {
+                // Proceed to record the outcome only if the inputs are valid (including medicineList, quantitiesList)
+                scheduleService.setAvailable1(doctor.getHospitalID(), date, time);
+                doctorService.recordAppointmentOutcome(appointmentId, serviceProvided, medicineList, quantitiesList, consultationNotes);
+
+            } catch (Exception e) {
+                System.out.println("Error recording the appointment outcome. Please try again.");
+            }
+        } else {
+            // If any validation fails, do not record the appointment
+            System.out.println("Appointment outcome not recorded due to invalid inputs.");
+        }
+    }
      
      public boolean viewAppointmentOutcomeRecords(Doctor doctor) {
     	    // Initialize AppointmentService to fetch appointments

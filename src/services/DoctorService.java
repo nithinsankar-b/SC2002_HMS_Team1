@@ -326,6 +326,7 @@ public class DoctorService implements IDoctorService {
             }
 
             // Proceed if there are valid medications to record
+            // Check for inventory
             if (!prescribedMedications.isEmpty()) {
                 // Record the appointment outcome with the created medications and quantities
                 appointment.setServiceProvided(serviceProvided);
@@ -334,6 +335,7 @@ public class DoctorService implements IDoctorService {
                 appointment.setQuantities(prescribedQuantities);
                 appointment.setStatus(AppointmentStatus.COMPLETED);
                 appointmentService.saveAppointmentsToCSV();
+
                 System.out.println("Appointment outcome recorded successfully.");
 
                 // Generate and write billing entry to Billing.csv

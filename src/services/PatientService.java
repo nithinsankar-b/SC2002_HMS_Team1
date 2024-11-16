@@ -9,6 +9,7 @@ import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Scanner;
 
 import enums.UserRole;
 import models.Patient;
@@ -26,7 +27,6 @@ public class PatientService {
         this.userService = userService;
         this.patients = new HashMap<>();
         new AppointmentService();// Initialize AppointmentService
-// UserService will provide user details
         loadPatientsFromCSV(); // Load patients from the CSV file
     }
 
@@ -39,6 +39,11 @@ public class PatientService {
         } else {
             System.out.println("Patient already exists.");
         }
+    }
+
+    // Add a method to retrieve all patients as a list
+    public Map<String, Patient> getPatients() {
+        return patients;
     }
 
     // Method to retrieve a patient by their hospital ID
@@ -61,23 +66,39 @@ public class PatientService {
     public boolean updatePatientContact(String hospitalID, String newContactInformation, String contactType) {
         Patient patient = patients.get(hospitalID);
         if (patient != null) {
-            MedicalRecordService medicalRecordService=new MedicalRecordService();
-            // Update the corresponding medical record as well
+            MedicalRecordService medicalRecordService = new MedicalRecordService();
             MedicalRecord medicalRecord = medicalRecordService.getMedicalRecord(hospitalID);
+
             if (medicalRecord != null) {
-                if ("phone".equalsIgnoreCase(contactType)) {
+                if (contactType.equalsIgnoreCase("phone")) {
+                    newContactInformation = newContactInformation.replaceAll("(\\d{4})(?=\\d)", "$1 ");
                     medicalRecord.setPhoneNumber(newContactInformation);
-                } else if ("email".equalsIgnoreCase(contactType)) {
+                } else if (contactType.equalsIgnoreCase("email")) {
+                    if (!newContactInformation.matches("^[A-Za-z0-9+_.-]+@[A-Za-z0-9.-]+$")) {
+                        System.out.println("Invalid email format. Please provide a valid email address.");
+                        return false;
+                    }
                     medicalRecord.setEmailAddress(newContactInformation);
                 }
-                medicalRecordService.saveRecordsToCSV(); // Save medical records after update
+                medicalRecordService.saveRecordsToCSV();
             }
 
-            savePatientsToCSV(); // Save changes after update
+            if (contactType.equalsIgnoreCase("phone")) {
+                newContactInformation = newContactInformation.replaceAll("(\\d{4})(?=\\d)", "$1 ");
+            } else if (contactType.equalsIgnoreCase("email")) {
+                if (!newContactInformation.matches("^[A-Za-z0-9+_.-]+@[A-Za-z0-9.-]+$")) {
+                    System.out.println("Invalid email format. Please provide a valid email address.");
+                    return false;
+                }
+            }
+
+            patient.setContactInformation(newContactInformation);
+            savePatientsToCSV(); // Ensure the updated email or phone is saved to Patient.csv
             return true;
         }
         return false;
     }
+
 
     // Method to list all patients
     // For administrator to use
@@ -153,4 +174,57 @@ public class PatientService {
             System.out.println("Error saving the CSV file: " + e.getMessage());
         }
     }
+
+    public boolean checkAndPromptPasswordChange(String hospitalID, Scanner scanner) {
+        User user = userService.getUserById(hospitalID);
+        try {
+            String encryptedDefaultPassword = UserService.encryptPassword("password");
+            if (user != null && user.getPassword().equals("ENC(" + encryptedDefaultPassword + ")")) {
+                System.out.println("Your password is set to the default value. Please change it immediately.");
+                while (true) {
+                    System.out.print("Enter New Password: ");
+                    String newPassword = scanner.nextLine();
+
+                    System.out.print("Confirm New Password: ");
+                    String confirmPassword = scanner.nextLine();
+
+                    if (newPassword.equals(confirmPassword)) {
+                        if (userService.changePassword(hospitalID, "password", newPassword)) {
+                            System.out.println("Password changed successfully!");
+                            return true;
+                        } else {
+                            System.out.println("Failed to change password. Please try again.");
+                        }
+                    } else {
+                        System.out.println("Passwords do not match. Please try again.");
+                    }
+                }
+            }
+        } catch (Exception e) {
+            System.out.println("Error: " + e.getMessage());
+        }
+        return false;
+    }
+
+    public boolean removePatient(String patientId) {
+        if (!patients.containsKey(patientId)) {
+            return false;
+        }
+
+        patients.remove(patientId);
+
+        try (BufferedWriter writer = new BufferedWriter(new FileWriter("data/Patient.csv"))) {
+            for (Patient patient : patients.values()) {
+                writer.write(patient.getHospitalID() + "," + patient.getName() + "," + patient.getDateOfBirth() + ","
+                        + patient.getGender() + "," + patient.getBloodType() + "," + patient.getContactInformation());
+                writer.newLine();
+            }
+            return true;
+        } catch (IOException e) {
+            System.err.println("Error updating Patient.csv: " + e.getMessage());
+            return false;
+        }
+    }
+
+
 }

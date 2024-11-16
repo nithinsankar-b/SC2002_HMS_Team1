@@ -1,16 +1,12 @@
 package services;
 
-import models.Administrator;
-import models.Inventory;
-import models.ReplenishmentRequest;
-import models.Staff;
-import models.User;
+import models.*;
 import stores.StaffDataStore;
 import interfaces.IInventoryService;
 import interfaces.IProjectAdmService;
-import services.UserService;
 
 import java.io.*;
+import java.util.ArrayList;
 import java.util.List;
 
 import enums.StatusEnum;
@@ -28,6 +24,7 @@ public class ProjectAdminService implements IProjectAdmService {
     private IInventoryService inventoryService;
     private UserService userService;
     private ReplenishmentService replenishmentService;  // Add this attribute
+    private PatientService patientService;
 
     private static final String STAFF_CSV_PATH = "data/Staff_List.csv";
     private static final String DOCTOR_CSV_PATH = "data/doctor.csv";
@@ -41,18 +38,27 @@ public class ProjectAdminService implements IProjectAdmService {
      * @param inventoryService The inventory service to manage inventory-related operations.
      * @param userService The user service to manage user-related operations.
      */
-    public ProjectAdminService(Administrator administrator, IInventoryService inventoryService, UserService userService) {
+
+    public ProjectAdminService(Administrator administrator, IInventoryService inventoryService, UserService userService, PatientService patientService) {
         this.administrator = administrator;
         this.staffDataStore = new StaffDataStore();
         this.inventoryService = inventoryService;
         this.userService = userService;
-        this.replenishmentService = replenishmentService;  // Initialize ReplenishmentService
-
+        this.replenishmentService = new ReplenishmentService();
+        this.patientService = patientService; // Initialize patientService
         try {
             staffDataStore.loadStaffFromCSV(STAFF_CSV_PATH);
         } catch (IOException e) {
             System.err.println("Error loading data: " + e.getMessage());
         }
+    }
+
+    public PatientService getPatientService() {
+        return this.patientService; // Provide access to the PatientService instance
+    }
+
+    public Staff getStaffById(String staffId) {
+        return staffDataStore.getStaffList().get(staffId);
     }
 
     // ---------------------- Staff Management ----------------------
@@ -63,57 +69,129 @@ public class ProjectAdminService implements IProjectAdmService {
      * @param staffMember The staff member to be added or updated.
      */
     @Override
-public void addOrUpdateStaff(Staff staffMember) {
-    // Check if the staff member already exists in StaffDataStore
-    Staff existingStaff = staffDataStore.getStaffList().get(staffMember.getId());
+    public void addOrUpdateStaff(Staff staffMember) {
+        // Check if the staff member already exists in StaffDataStore
+        Staff existingStaff = staffDataStore.getStaffList().get(staffMember.getId());
 
-    // Determine the role
-    String role;
-    if (existingStaff != null) {
-        // If the staff member exists, preserve the existing role
-        role = existingStaff.getRole();
-        System.out.println("Updating existing staff. Preserving role: " + role);
-    } else {
-        // For new staff, validate that the role is either Doctor or Pharmacist
-        if (!"Doctor".equalsIgnoreCase(staffMember.getRole()) && !"Pharmacist".equalsIgnoreCase(staffMember.getRole())) {
-            System.out.println("Error: Only Doctor or Pharmacist roles can be added.");
-            return; // Exit the method if an invalid role is provided for new staff
+        // Determine the role
+        String role;
+        if (existingStaff != null) {
+            // If the staff member exists, preserve the existing role
+            role = existingStaff.getRole();
+            System.out.println("===========================================");
+            System.out.println("Updating existing staff. Preserving role: " + role);
+        } else {
+            // For NEW staff, validate that the role is either Doctor or Pharmacist
+            if (!"Doctor".equalsIgnoreCase(staffMember.getRole()) && !"Pharmacist".equalsIgnoreCase(staffMember.getRole())) {
+                System.out.println("Error: Only Doctor or Pharmacist roles can be added.");
+                return; // Exit the method if an invalid role is provided for new staff
+            }
+            role = staffMember.getRole(); // Use the provided role for new staff
+            System.out.println("Adding new staff with role: " + role);
         }
-        role = staffMember.getRole(); // Use the provided role for new staff
-        System.out.println("Adding new staff with role: " + role);
+
+        // Create a new Staff object with the preserved or validated role
+        Staff staffToSave = new Staff(staffMember.getId(), staffMember.getName(), role, staffMember.getGender(), staffMember.getAge());
+
+        // Add or update the staff member in StaffDataStore
+        staffDataStore.addOrUpdateStaff(staffToSave);
+
+        // Add or update the user in UserService
+        User existingUser = userService.getUserById(staffMember.getId());
+        String password = (existingUser != null) ? existingUser.getPassword() : "password"; // Default password for new users
+        try {
+            String encryptedPassword = UserService.encryptPassword(password);
+            password = "ENC(" + encryptedPassword + ")";// Encrypt the default password
+        } catch (Exception e) {
+            System.err.println("Error encrypting password for staff ID: " + staffMember.getId());
+            return;
+        }
+
+        // Set the appropriate role for UserService only if the user is new
+        UserRole userRole = UserRole.valueOf(role.toUpperCase());
+        userService.addUser(new User(staffMember.getId(), password, userRole));
+
+        // Write updated staff list to CSV
+        try {
+            staffDataStore.writeStaffToCSV(STAFF_CSV_PATH);
+            System.out.println("Staff member ID (added/updated): " + staffMember.getId());
+
+            // Update the respective doctor or pharmacist CSV
+            if (role.equalsIgnoreCase("Doctor")) {
+                addOrUpdateDoctorCSV(staffMember);
+            } else if (role.equalsIgnoreCase("Pharmacist")) {
+                addOrUpdatePharmacistCSV(staffMember);
+            }
+
+        } catch (IOException e) {
+            System.err.println("Error saving staff data: " + e.getMessage());
+        }
     }
 
-    // Create a new Staff object with the preserved or validated role
-    Staff staffToSave = new Staff(staffMember.getId(), staffMember.getName(), role, staffMember.getGender(), staffMember.getAge());
+    // Add method for adding or updating a patient
+    public void addOrUpdatePatient(Patient patient) {
+        patientService.addPatient(patient);
 
-    // Add or update the staff member in StaffDataStore
-    staffDataStore.addOrUpdateStaff(staffToSave);
-
-    // Add or update the user in UserService
-    User existingUser = userService.getUserById(staffMember.getId());
-    String password = (existingUser != null) ? existingUser.getPassword() : "password"; // Default password for new users
-
-    // Set the appropriate role for UserService only if the user is new
-    UserRole userRole = UserRole.valueOf(role.toUpperCase());
-    userService.addUser(new User(staffMember.getId(), password, userRole));
-
-    // Write updated staff list to CSV
-    try {
-        staffDataStore.writeStaffToCSV(STAFF_CSV_PATH);
-        System.out.println("Staff member added/updated: " + staffMember.getId());
-        
-        // Update the respective doctor or pharmacist CSV
-        if (role.equalsIgnoreCase("Doctor")) {
-            addOrUpdateDoctorCSV(staffMember);
-        } else if (role.equalsIgnoreCase("Pharmacist")) {
-            addOrUpdatePharmacistCSV(staffMember);
+        String password = patient.getPassword();
+        String encryptedPassword;
+        try {
+            encryptedPassword = UserService.encryptPassword(password);
+            encryptedPassword = "ENC(" + encryptedPassword + ")";
+        } catch (Exception e) {
+            System.err.println("Error encrypting password for patientID: " + patient.getHospitalID());
+            return;
         }
-        
-    } catch (IOException e) {
-        System.err.println("Error saving staff data: " + e.getMessage());
-    }
-}
 
+        try (BufferedWriter writer = new BufferedWriter(new FileWriter("data/User.csv", true))) {
+            writer.write(patient.getHospitalID() + "," + encryptedPassword + "," + patient.getRole());
+            writer.newLine();
+        } catch (IOException e) {
+            System.err.println("Error updating User.csv: " + e.getMessage());
+        }
+
+        List<Patient> patients = new ArrayList<>(patientService.getPatients().values());
+        patients.sort((p1, p2) -> p1.getHospitalID().compareToIgnoreCase(p2.getHospitalID()));
+
+        try (BufferedWriter writer = new BufferedWriter(new FileWriter("data/Patient.csv"))) {
+            for (Patient p : patients) {
+                writer.write(p.getHospitalID() + "," + p.getName() + "," + p.getDateOfBirth() + ","
+                        + p.getGender() + "," + p.getBloodType() + "," + p.getContactInformation());
+                writer.newLine();
+            }
+        } catch (IOException e) {
+            System.err.println("Error updating Patient.csv: " + e.getMessage());
+        }
+    }
+
+    public boolean removePatient(String patientId) {
+        Patient patient = patientService.getPatientById(patientId);
+        if (patient == null) {
+            System.out.println("Patient not found: " + patientId);
+            return false;
+        }
+
+        boolean patientRemoved = patientService.removePatient(patientId);
+        boolean userRemoved = userService.removeUser(patientId);
+
+        if (patientRemoved && userRemoved) {
+            System.out.println("Patient data removed successfully.");
+            return true;
+        } else {
+            System.out.println("Error removing patient data for: " + patientId);
+            System.out.println("Error removing patient data for: " + patientId);
+            return false;
+        }
+    }
+
+
+    public Patient getPatientById(String patientId) {
+        return patientService.getPatientById(patientId);
+    }
+
+    // Method for retrieving all patients
+    public List<Patient> getAllPatients() {
+        return new ArrayList<>(patientService.getPatients().values()); // Correctly extract values from the map
+    }
 
     private void addOrUpdateDoctorCSV(Staff staffMember) {
         updateOrAppendToCSV("data/doctor.csv", staffMember);

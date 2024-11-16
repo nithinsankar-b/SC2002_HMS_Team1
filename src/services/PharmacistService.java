@@ -179,7 +179,6 @@ public class PharmacistService {
             // Get medications and quantities from the appointment
             List<Medication> medications = appointment.getMedications();
             List<Integer> quantities = appointment.getQuantities();
-            
 
             // Ensure that the number of medications and quantities match
             if (medications.size() == quantities.size()) {
@@ -190,10 +189,9 @@ public class PharmacistService {
 
                     // Update the stock for the medication
                     inventoryService.updateStock(medication.getName(), quantity, appointmentID);  // Assuming `getName` method for Medication class
-
-                    // Set the medication status to DISPENSED
-                    medication.setStatus(MedicationStatus.DISPENSED); // Assuming `setMedicationStatus` method in Medication class
                 }
+                // Set the medication status to DISPENSED
+                appointment.setMedicationStatus(MedicationStatus.DISPENSED); // Assuming `setMedicationStatus` method in Medication class
 
                 return true;
             } else {

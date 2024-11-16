@@ -126,7 +126,7 @@ public class ReplenishmentService {
         } catch (IOException e) {
             e.printStackTrace();
         }
-        return false;
+        return false; // Medicine not found in any pending request
     }
 
     /**
@@ -151,8 +151,8 @@ public class ReplenishmentService {
         String[] parts = csvRow.split(",");
         if (parts.length < 3) return null;
 
-        String id = parts[0].trim();
-        List<String> medicines = List.of(parts[1].split(";")); // Medicines separated by semicolons
+    String id = parts[0].trim();  // Use the ID from the CSV
+    List<String> medicines = List.of(parts[1].split(";")); // Assumes medicines are separated by semicolons
 
         StatusEnum status;
         try {
@@ -190,7 +190,7 @@ public class ReplenishmentService {
     public List<String> approveRequest(String requestId) {
         List<String> approvedMedicines = new ArrayList<>();
         boolean found = false;
-    
+
         List<ReplenishmentRequest> requests = getAllRequests();
         for (ReplenishmentRequest request : requests) {
             if (request.getId().equals(requestId) && request.getStatus() == StatusEnum.PENDING) {
@@ -199,7 +199,7 @@ public class ReplenishmentService {
                 found = true;
             }
         }
-    
+
         if (found) {
             saveRequestsToCSV(requests);
             System.out.println("Replenishment request approved for: " + approvedMedicines);
@@ -209,9 +209,9 @@ public class ReplenishmentService {
             return null;
         }
     }
-    
-    
-    
+
+
+
 
     /**
      * Rejects a replenishment request by changing its status to `REJECTED`.
@@ -242,17 +242,17 @@ public class ReplenishmentService {
             List<String> updatedLines = new ArrayList<>();
 
             for (String line : lines) {
-                if (line.startsWith(requestId + ",")) {
-                    found = true;
+                if (line.startsWith(requestId + ",")) {  // Check if the line starts with the request ID
+                    found = true;  // Mark as found if the request ID matches
                     String[] parts = line.split(",");
-                    parts[2] = newStatus.name(); // Update status
-                    line = String.join(",", parts);
+                    parts[2] = newStatus.name();  // Update the status part
+                    line = String.join(",", parts);  // Re-join the line with the updated status
                 }
                 updatedLines.add(line);
             }
 
             if (found) {
-                Files.write(Paths.get(csvFile), updatedLines);
+                Files.write(Paths.get(csvFile), updatedLines);  // Overwrite the file with updated content only if found
             }
         } catch (IOException e) {
             e.printStackTrace();

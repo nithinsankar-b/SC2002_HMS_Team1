@@ -1,14 +1,20 @@
 package views;
 
+import enums.UserRole;
 import interfaces.IAdministratorView;
 import models.Staff;
+import models.*;
 import models.Appointment;
 import models.Inventory;
+import services.PatientService;
 import services.ProjectAdminService;
 import controllers.AdministratorController;
+import services.UserService;
 
+import java.time.LocalDate;
 import java.util.List;
 import java.util.Scanner;
+import java.lang.String;
 
 /**
  * The AdminView class implements the IAdministratorView interface and provides
@@ -19,6 +25,8 @@ public class AdminView implements IAdministratorView {
     private final Scanner scanner = new Scanner(System.in);
     private final AdministratorController adminController;
     private final ProjectAdminService adminService;
+    private final UserService userService;
+    private final PatientService patientService;
 
     /**
      * Constructs an AdminView with the specified AdministratorController and ProjectAdminService.
@@ -26,16 +34,19 @@ public class AdminView implements IAdministratorView {
      * @param adminController The controller managing administrator actions.
      * @param adminService    The service handling administrative operations.
      */
-    public AdminView(AdministratorController adminController, ProjectAdminService adminService) {
+    public AdminView(AdministratorController adminController, ProjectAdminService adminService, UserService userService, PatientService patientService) {
         this.adminController = adminController;
         this.adminService = adminService;
+        this.userService = userService;
+        this.patientService = patientService;
     }
+
 
     /**
      * Displays the administrator's main menu.
      */
     public void displayMenu() {
-        System.out.println("==== Administrator Menu ====");
+        System.out.println("Please choose an option:");
         System.out.println("1. Manage Hospital Staff");
         System.out.println("2. Manage Inventory");
         System.out.println("3. View Appointments");
@@ -104,45 +115,59 @@ public class AdminView implements IAdministratorView {
      * @return A new Staff object with the provided details.
      */
     public Staff getStaffDetails() {
-        System.out.print("Enter Staff ID: ");
-        String staffID = scanner.nextLine();
-    
+        System.out.print("\nEnter Staff ID: ");
+        String staffID = scanner.nextLine().trim();
+
+        Staff existingStaff = adminService.getStaffById(staffID); // Check if staff already exists
+        if (existingStaff != null) {
+            System.out.println("\nStaff ID exists.");
+            System.out.println("===========================================");
+            System.out.println("1. Update existing staff details");
+            System.out.println("2. Cancel");
+            System.out.print("Enter your choice: ");
+            int choice = scanner.nextInt();
+            scanner.nextLine(); // Consume newline
+
+            if (choice == 1) {
+                System.out.println("\nDetails to update for existing staff...");
+                System.out.println("===========================================");
+                System.out.print("Enter New Name (Leave EMPTY if no change): ");
+                String name = scanner.nextLine();
+                name = name.isEmpty() ? existingStaff.getName() : name;
+
+                System.out.print("Enter New Gender (Leave EMPTY if no change): ");
+                String gender = scanner.nextLine();
+                gender = gender.isEmpty() ? existingStaff.getGender() : gender;
+
+                System.out.print("Enter New Age (Leave EMPTY if no change): ");
+                String ageInput = scanner.nextLine();
+                int age = ageInput.isEmpty() ? existingStaff.getAge() : Integer.parseInt(ageInput);
+
+                return new Staff(existingStaff.getId(), name, existingStaff.getRole(), gender, age);
+            } else {
+                System.out.println("Operation cancelled.");
+                return null;
+            }
+        }
+
+        System.out.println("===========================================");
+        System.out.println("Adding new staff...");
+        System.out.println("===========================================");
         System.out.print("Enter Name: ");
         String name = scanner.nextLine();
-    
-        // Validate Role with first letter capitalized
-        String role;
-        while (true) {
-            System.out.print("Enter Role (Doctor/Pharmacist): "); // Exclude Administrator
-            role = scanner.nextLine().trim();
-            role = role.substring(0, 1).toUpperCase() + role.substring(1).toLowerCase();
-            if (role.equals("Doctor") || role.equals("Pharmacist")) { // Only allow Doctor or Pharmacist
-                break;
-            } else {
-                System.out.println("Invalid input. Role must be Doctor or Pharmacist.");
-            }
-        }
-    
-        // Validate Gender with first letter capitalized
-        String gender;
-        while (true) {
-            System.out.print("Enter Gender (Male/Female): ");
-            gender = scanner.nextLine().trim();
-            gender = gender.substring(0, 1).toUpperCase() + gender.substring(1).toLowerCase();
-            if (gender.equals("Male") || gender.equals("Female")) {
-                break;
-            } else {
-                System.out.println("Invalid input. Gender must be Male or Female.");
-            }
-        }
-    
+
+        String role = staffID.startsWith("D") ? "Doctor" : "Pharmacist";
+        System.out.println("Role: " + role);
+
+        System.out.print("Enter Gender (Male/Female): ");
+        String gender = scanner.nextLine();
+
         System.out.print("Enter Age: ");
         int age = scanner.nextInt();
-        scanner.nextLine();  // Consume newline
-    
+        scanner.nextLine(); // Consume newline
+
         return new Staff(staffID, name, role, gender, age);
     }
-    
 
     /**
      * Prompts the user to enter a staff ID for removal.
@@ -237,7 +262,95 @@ public class AdminView implements IAdministratorView {
         System.out.print("Enter Request ID: ");
         return scanner.nextLine();
     }
-    
+
+    public String getUserIDForPassword() {
+        System.out.print("\nEnter User ID to view password: ");
+        return scanner.nextLine();
+    }
+
+    // Add a method to get patient details
+    public Patient getPatientDetails() {
+        String patientID;
+        Patient existingPatient;
+
+        while (true) {
+            System.out.print("\nEnter Patient ID: ");
+            patientID = scanner.nextLine().trim();
+
+            existingPatient = adminService.getPatientById(patientID);
+            if (existingPatient == null) {
+                break;
+            }
+
+            System.out.println("Patient ID already exists. Please enter a new ID.");
+        }
+
+        System.out.print("Enter Name: ");
+        String name = scanner.nextLine();
+
+        LocalDate dateOfBirth;
+        while (true) {
+            System.out.print("Enter Date of Birth (yyyy-MM-dd): ");
+            String dobInput = scanner.nextLine().trim();
+            try {
+                dateOfBirth = LocalDate.parse(dobInput);
+                break;
+            } catch (Exception e) {
+                System.out.println("Invalid date format. Please enter in yyyy-MM-dd format.");
+            }
+        }
+
+        String gender;
+        while (true) {
+            System.out.print("Enter Gender (Male/Female): ");
+            gender = scanner.nextLine().trim().toLowerCase();
+            if (gender.equals("male") || gender.equals("female")) {
+                break;
+            }
+            System.out.println("Invalid gender. Please enter 'Male' or 'Female'.");
+        }
+
+        String bloodType;
+        while (true) {
+            System.out.print("Enter Blood Type: ");
+            bloodType = scanner.nextLine().trim().toUpperCase();
+            if (bloodType.matches("^(A|B|AB|O)[+-]$")) {
+                break;
+            }
+            System.out.println("Invalid blood type. Please enter a valid blood type.");
+        }
+
+        String contactInformation;
+        while (true) {
+            System.out.print("Enter Contact Information (email): ");
+            contactInformation = scanner.nextLine().trim();
+            if (contactInformation.matches("^[A-Za-z0-9+_.-]+@[A-Za-z0-9.-]+$")) {
+                break;
+            }
+            System.out.println("Invalid email format. Please enter a valid email address.");
+        }
+
+        return new Patient(
+                new User(patientID, "password", UserRole.PATIENT),
+                name, dateOfBirth, gender, bloodType, contactInformation
+        );
+    }
+
+
+    // Add a new method to display the list of patients
+    public void displayPatientList(List<Patient> patientList) {
+        System.out.println("Patient List:");
+        if (patientList.isEmpty()) {
+            System.out.println("No patients found.");
+        } else {
+            for (Patient patient : patientList) {
+                System.out.println("Patient ID: " + patient.getHospitalID() + ", Name: " + patient.getName() +
+                        ", DOB: " + patient.getDateOfBirth() + ", Gender: " + patient.getGender() +
+                        ", Blood Type: " + patient.getBloodType() + ", Contact: " + patient.getContactInformation());
+            }
+        }
+    }
+
 }
 
 

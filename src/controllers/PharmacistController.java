@@ -133,7 +133,6 @@ public class PharmacistController {
                         String medicines = parts[1].trim();
                         String status = parts[2].trim();
                         
-                        
                         // Print the request in a nicely formatted row
                         System.out.printf("%-20s %-40s %s\n", 
                                 id, 

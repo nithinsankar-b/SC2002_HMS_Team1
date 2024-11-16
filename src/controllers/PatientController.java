@@ -11,7 +11,6 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Scanner;
 import models.Medication;
-import models.Doctor;
 
 import models.Patient;
 import models.Appointment;
@@ -25,17 +24,8 @@ import services.DoctorService;
 import services.UserService;
 import views.AllocatedAppointmentView;
 import views.AppointmentHistoryView;
-import views.MedicalRecordView;
 
-import java.io.BufferedReader;
-import java.io.FileReader;
 import java.io.IOException;
-import java.util.Scanner;
-import java.time.LocalDate;
-import java.time.LocalDateTime;
-import java.time.LocalTime;
-import java.time.format.DateTimeFormatter;
-import controllers.DoctorController;
 import java.util.stream.Collectors;
 
 public class PatientController {
@@ -43,7 +33,6 @@ public class PatientController {
     private final AppointmentService appointmentService;
     private final AllocatedAppointmentView allocatedAppointmentView;
     private final AppointmentHistoryView appointmentHistoryView;
-    private final MedicalRecordView medicalRecordView;
 
     // Constructor
     public PatientController(PatientService patientService, AppointmentService appointmentService) {
@@ -53,7 +42,6 @@ public class PatientController {
         // Pass the AppointmentService instance to each view
         this.allocatedAppointmentView = new AllocatedAppointmentView(appointmentService);
         this.appointmentHistoryView = new AppointmentHistoryView(appointmentService);
-        this.medicalRecordView = new MedicalRecordView(appointmentService);
     }
 
     // Method to view patient details
@@ -91,15 +79,6 @@ public class PatientController {
         }
     }
 
-    // Method to view medical records
-    public void viewMedicalRecords(Patient patient) {
-        if (patient != null) {
-            medicalRecordView.display(patient);
-        } else {
-            System.out.println("Patient not found.");
-        }
-    }
-
     // Method to update contact information
     public void updateContactInformation(Patient patient) {
         if (patient != null) {
@@ -128,7 +107,7 @@ public class PatientController {
             if (success) {
                 System.out.println("Contact information updated successfully.");
             } else {
-                System.out.println("Failed to update contact information. Patient not found.");
+                System.out.println("Failed to update contact information.");
             }
         } else {
             System.out.println("Patient not found.");
@@ -228,51 +207,52 @@ public class PatientController {
             }
 
             // Ask user to pick a time
-            System.out.print("Enter appointment time (24HRS format -> HH:mm): ");
-            String time = scanner.nextLine();
-            time = time.replaceAll("[^0-9]", "");
-            if (time.length() == 4) {
-                time = time.substring(0, 2) + ":" + time.substring(2);
-            }
-            LocalTime localTime = LocalTime.parse(time);
-            LocalDateTime dateTime = LocalDateTime.of(localDate, localTime);
+            boolean validTime = false;
+            while (!validTime) {
+                try {
+                    System.out.print("Enter appointment time (24HRS format -> HH:mm): ");
+                    String time = scanner.nextLine();
+                    time = time.replaceAll("[^0-9]", "");
+                    if (time.length() == 4) {
+                        time = time.substring(0, 2) + ":" + time.substring(2);
+                    }
+                    LocalTime localTime = LocalTime.parse(time);
+                    LocalDateTime dateTime = LocalDateTime.of(localDate, localTime);
 
-            List<Appointment> patientAppointments = appointmentService.viewScheduledAppointments();
-            boolean hasAppointmentOnSameDay = patientAppointments.stream()
-                    .anyMatch(appointment -> appointment.getPatientId().equals(patient.getHospitalID()) &&
-                            appointment.getAppointmentDateTime().toLocalDate().equals(localDate));
+                    if (!availableSlots.contains(dateTime)) {
+                        System.out.println("The selected time slot is not available. Please choose another time.");
+                    } else {
+                        validTime = true;
+                        // Existing code to handle valid time and schedule appointment
+                        String appointmentId = String.valueOf(System.currentTimeMillis()).substring(6);
+                        Appointment appointment = new Appointment(appointmentId, patient.getHospitalID(), doctorId, dateTime);
 
-            if (hasAppointmentOnSameDay) {
-                System.out.println("You already have an appointment booked on the selected day. Please choose another day.");
-                return;
-            }
+                        boolean success = appointmentService.scheduleAppointment(appointment);
+                        if (success) {
+                            System.out.println("Appointment created successfully.");
 
-            if (availableSlots.contains(dateTime)) {
-                String appointmentId = String.valueOf(System.currentTimeMillis()).substring(6);
-                Appointment appointment = new Appointment(appointmentId, patient.getHospitalID(), doctorId, dateTime);
-
-                boolean success = appointmentService.scheduleAppointment(appointment);
-                if (success) {
-                    System.out.println("Appointment created successfully.");
-
-                    // Create and save the corresponding AppointmentRequest
-                    AppointmentRequest appointmentRequest = new AppointmentRequest(
-                            appointmentId, // Use the same ID
-                            patient.getHospitalID(),
-                            doctorId,
-                            localDate,
-                            localTime,
-                            "Pending"
-                    );
-                    ScheduleService scheduleService=new ScheduleService();
-                    AppointmentRequestService appointmentRequestService=new AppointmentRequestService(scheduleService,appointmentService);
-                    appointmentRequestService.save(appointmentRequest);
-                    System.out.println("Appointment request created with ID: " + appointmentRequest.getRequestId());
-                } else {
-                    System.out.println("Failed to create appointment.");
+                            // Create and save the corresponding AppointmentRequest
+                            AppointmentRequest appointmentRequest = new AppointmentRequest(
+                                    appointmentId,
+                                    patient.getHospitalID(),
+                                    doctorId,
+                                    localDate,
+                                    localTime,
+                                    "Pending"
+                            );
+                            ScheduleService scheduleService = new ScheduleService();
+                            AppointmentRequestService appointmentRequestService = new AppointmentRequestService(scheduleService, appointmentService);
+                            appointmentRequestService.save(appointmentRequest);
+                            System.out.println("Appointment request created with ID: " + appointmentRequest.getRequestId());
+                        } else {
+                            System.out.println("Failed to create appointment.");
+                        }
+                    }
+                } catch (DateTimeParseException e) {
+                    System.out.println("Invalid time format. Please enter the time in HH:mm format.");
+                } catch (NumberFormatException e) {
+                    System.out.println("Invalid input. Please enter numeric values for the time.");
                 }
-            } else {
-                System.out.println("The selected time slot is not available. Please choose another time.");
             }
         } else {
             System.out.println("Patient not found.");

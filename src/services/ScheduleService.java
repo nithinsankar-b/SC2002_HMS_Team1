@@ -6,6 +6,7 @@ import models.Schedule;
 import java.io.*;
 import java.nio.file.Files;
 import java.nio.file.Paths;
+import java.time.DateTimeException;
 import java.time.LocalDate;
 import java.time.LocalTime;
 import java.time.format.DateTimeFormatter;
@@ -102,7 +103,7 @@ public class ScheduleService implements IScheduleService{
                     timeSlot = timeSlot.plusMinutes(30);
                 }
             }
-            System.out.println("Schedule generated for " + doctorID);
+            // System.out.println("Schedule generated for " + doctorID);
         } catch (IOException e) {
             e.printStackTrace();
         }
@@ -222,47 +223,81 @@ public class ScheduleService implements IScheduleService{
         }
     }
 
-
     public void unblockTimeSlots(String doctorID) {
         Scanner scanner = new Scanner(System.in);
+        LocalDate startDate = null;
+        LocalDate endDate = null;
+        LocalTime startTime = null;
+        LocalTime endTime = null;
 
-        // Prompt for start date (day, month, year)
-        System.out.print("Enter the start day (1-31): ");
-        int startDay = Integer.parseInt(scanner.nextLine());
+        // Prompt for start date
+        while (startDate == null) {
+            try {
+                System.out.print("Enter the start day (1-31): ");
+                int startDay = Integer.parseInt(scanner.nextLine());
 
-        System.out.print("Enter the start month (1-12): ");
-        int startMonth = Integer.parseInt(scanner.nextLine());
+                System.out.print("Enter the start month (1-12): ");
+                int startMonth = Integer.parseInt(scanner.nextLine());
 
-        System.out.print("Enter the start year (YYYY): ");
-        int startYear = Integer.parseInt(scanner.nextLine());
+                System.out.print("Enter the start year (YYYY): ");
+                int startYear = Integer.parseInt(scanner.nextLine());
 
-        // Parse start date
-        LocalDate startDate = LocalDate.of(startYear, startMonth, startDay);
+                startDate = LocalDate.of(startYear, startMonth, startDay);
+            } catch (NumberFormatException e) {
+                System.out.println("Invalid input. Please enter numeric values for day, month, and year.");
+            } catch (DateTimeException e) {
+                System.out.println("Invalid date. Please enter a valid day, month, and year.");
+            }
+        }
 
-        // Prompt for end date (day, month, year)
-        System.out.print("Enter the end day (1-31): ");
-        int endDay = Integer.parseInt(scanner.nextLine());
+        // Prompt for end date
+        while (endDate == null) {
+            try {
+                System.out.print("Enter the end day (1-31): ");
+                int endDay = Integer.parseInt(scanner.nextLine());
 
-        System.out.print("Enter the end month (1-12): ");
-        int endMonth = Integer.parseInt(scanner.nextLine());
+                System.out.print("Enter the end month (1-12): ");
+                int endMonth = Integer.parseInt(scanner.nextLine());
 
-        System.out.print("Enter the end year (YYYY): ");
-        int endYear = Integer.parseInt(scanner.nextLine());
+                System.out.print("Enter the end year (YYYY): ");
+                int endYear = Integer.parseInt(scanner.nextLine());
 
-        // Parse end date
-        LocalDate endDate = LocalDate.of(endYear, endMonth, endDay);
+                endDate = LocalDate.of(endYear, endMonth, endDay);
+            } catch (NumberFormatException e) {
+                System.out.println("Invalid input. Please enter numeric values for day, month, and year.");
+            } catch (DateTimeException e) {
+                System.out.println("Invalid date. Please enter a valid day, month, and year.");
+            }
+        }
 
-        // Prompt for start and end time for making slots available
-        System.out.print("Enter the start time (HH:mm, e.g., 14:00): ");
-        LocalTime startTime = LocalTime.parse(scanner.nextLine());
+        // Prompt for start time
+        while (startTime == null) {
+            try {
+                System.out.print("Enter the start time (HH:mm, e.g., 14:00): ");
+                startTime = LocalTime.parse(scanner.nextLine());
 
-        System.out.print("Enter the end time (HH:mm, e.g., 14:30): ");
-        LocalTime endTime = LocalTime.parse(scanner.nextLine());
+                if (startTime.getMinute() % 30 != 0) {
+                    System.out.println("Error: Time slots must be in 30-minute intervals (e.g., 14:00, 14:30).");
+                    startTime = null; // Reset to re-prompt
+                }
+            } catch (DateTimeParseException e) {
+                System.out.println("Invalid time. Please enter a valid time in HH:mm format.");
+            }
+        }
 
-        // Validate 30-minute intervals for the times
-        if (startTime.getMinute() % 30 != 0 || endTime.getMinute() % 30 != 0) {
-            System.out.println("Error: Time slots must be in 30-minute intervals (e.g., 14:00, 14:30).");
-            return;
+        // Prompt for end time
+        while (endTime == null) {
+            try {
+                System.out.print("Enter the end time (HH:mm, e.g., 14:30): ");
+                endTime = LocalTime.parse(scanner.nextLine());
+
+                if (endTime.getMinute() % 30 != 0) {
+                    System.out.println("Error: Time slots must be in 30-minute intervals (e.g., 14:00, 14:30).");
+                    endTime = null; // Reset to re-prompt
+                }
+            } catch (DateTimeParseException e) {
+                System.out.println("Invalid time. Please enter a valid time in HH:mm format.");
+            }
         }
 
         Map<LocalDate, Map<LocalTime, Schedule>> doctorSchedule = scheduleMap.get(doctorID);
@@ -285,11 +320,10 @@ public class ScheduleService implements IScheduleService{
                 Schedule schedule = dailySchedule.get(time);
 
                 if (schedule != null) {
-                    // Check for patient appointment
                     if (schedule.getStatus() != null && schedule.getStatus().startsWith("P")) {
                         System.out.println("Cannot make time available for " + date + " " + time +
-                                           " due to appointment with patient ID: " + schedule.getStatus());
-                        continue;  // Skip to the next time slot
+                                " due to appointment with patient ID: " + schedule.getStatus());
+                        continue; // Skip to the next time slot
                     }
 
                     if ("Available".equals(schedule.getStatus())) {
@@ -330,48 +364,81 @@ public class ScheduleService implements IScheduleService{
         }
     }
 
-  
-    
     public void blockTimeSlots(String doctorID) {
         Scanner scanner = new Scanner(System.in);
+        LocalDate startDate = null;
+        LocalDate endDate = null;
+        LocalTime startTime = null;
+        LocalTime endTime = null;
 
-        // Prompt for start date (day, month, year)
-        System.out.print("Enter the start day (1-31): ");
-        int startDay = Integer.parseInt(scanner.nextLine());
+        // Prompt for start date
+        while (startDate == null) {
+            try {
+                System.out.print("Enter the start day (1-31): ");
+                int startDay = Integer.parseInt(scanner.nextLine());
 
-        System.out.print("Enter the start month (1-12): ");
-        int startMonth = Integer.parseInt(scanner.nextLine());
+                System.out.print("Enter the start month (1-12): ");
+                int startMonth = Integer.parseInt(scanner.nextLine());
 
-        System.out.print("Enter the start year (YYYY): ");
-        int startYear = Integer.parseInt(scanner.nextLine());
+                System.out.print("Enter the start year (YYYY): ");
+                int startYear = Integer.parseInt(scanner.nextLine());
 
-        // Parse start date
-        LocalDate startDate = LocalDate.of(startYear, startMonth, startDay);
+                startDate = LocalDate.of(startYear, startMonth, startDay);
+            } catch (NumberFormatException e) {
+                System.out.println("Invalid input. Please enter numeric values for day, month, and year.");
+            } catch (DateTimeException e) {
+                System.out.println("Invalid date. Please enter a valid day, month, and year.");
+            }
+        }
 
-        // Prompt for end date (day, month, year)
-        System.out.print("Enter the end day (1-31): ");
-        int endDay = Integer.parseInt(scanner.nextLine());
+        // Prompt for end date
+        while (endDate == null) {
+            try {
+                System.out.print("Enter the end day (1-31): ");
+                int endDay = Integer.parseInt(scanner.nextLine());
 
-        System.out.print("Enter the end month (1-12): ");
-        int endMonth = Integer.parseInt(scanner.nextLine());
+                System.out.print("Enter the end month (1-12): ");
+                int endMonth = Integer.parseInt(scanner.nextLine());
 
-        System.out.print("Enter the end year (YYYY): ");
-        int endYear = Integer.parseInt(scanner.nextLine());
+                System.out.print("Enter the end year (YYYY): ");
+                int endYear = Integer.parseInt(scanner.nextLine());
 
-        // Parse end date
-        LocalDate endDate = LocalDate.of(endYear, endMonth, endDay);
+                endDate = LocalDate.of(endYear, endMonth, endDay);
+            } catch (NumberFormatException e) {
+                System.out.println("Invalid input. Please enter numeric values for day, month, and year.");
+            } catch (DateTimeException e) {
+                System.out.println("Invalid date. Please enter a valid day, month, and year.");
+            }
+        }
 
-        // Prompt for start and end time for blocking
-        System.out.print("Enter the start time (HH:mm, e.g., 14:00): ");
-        LocalTime startTime = LocalTime.parse(scanner.nextLine());
+        // Prompt for start time
+        while (startTime == null) {
+            try {
+                System.out.print("Enter the start time (HH:mm, e.g., 14:00): ");
+                startTime = LocalTime.parse(scanner.nextLine());
 
-        System.out.print("Enter the end time (HH:mm, e.g., 14:30): ");
-        LocalTime endTime = LocalTime.parse(scanner.nextLine());
+                if (startTime.getMinute() % 30 != 0) {
+                    System.out.println("Error: Time slots must be in 30-minute intervals (e.g., 14:00, 14:30).");
+                    startTime = null; // Reset to re-prompt
+                }
+            } catch (DateTimeParseException e) {
+                System.out.println("Invalid time. Please enter a valid time in HH:mm format.");
+            }
+        }
 
-        // Validate 30-minute intervals for the times
-        if (startTime.getMinute() % 30 != 0 || endTime.getMinute() % 30 != 0) {
-            System.out.println("Error: Time slots must be in 30-minute intervals (e.g., 14:00, 14:30).");
-            return;
+        // Prompt for end time
+        while (endTime == null) {
+            try {
+                System.out.print("Enter the end time (HH:mm, e.g., 14:30): ");
+                endTime = LocalTime.parse(scanner.nextLine());
+
+                if (endTime.getMinute() % 30 != 0) {
+                    System.out.println("Error: Time slots must be in 30-minute intervals (e.g., 14:00, 14:30).");
+                    endTime = null; // Reset to re-prompt
+                }
+            } catch (DateTimeParseException e) {
+                System.out.println("Invalid time. Please enter a valid time in HH:mm format.");
+            }
         }
 
         Map<LocalDate, Map<LocalTime, Schedule>> doctorSchedule = scheduleMap.get(doctorID);
@@ -397,7 +464,7 @@ public class ScheduleService implements IScheduleService{
                     if (schedule.getStatus() != null && schedule.getStatus().startsWith("P")) {
                         // Print message if slot has a patient appointment
                         System.out.println("Cannot block time for " + date + " " + time +
-                                           " due to appointment with patient ID: " + schedule.getStatus());
+                                " due to appointment with patient ID: " + schedule.getStatus());
                         continue;  // Skip to the next time slot
                     }
 
@@ -422,7 +489,6 @@ public class ScheduleService implements IScheduleService{
         }
     }
 
-    
     public void setUnavailable(String doctorID, LocalDate date, LocalTime timeSlot) {
         Map<LocalDate, Map<LocalTime, Schedule>> doctorSchedule = scheduleMap.get(doctorID);
         if (doctorSchedule != null) {
@@ -445,32 +511,42 @@ public class ScheduleService implements IScheduleService{
      *
      * @param doctorID the ID of the doctor whose schedule to print
      */
-    
+
     public void printSchedule(String doctorID) {
         Map<LocalDate, Map<LocalTime, Schedule>> doctorSchedule = scheduleMap.get(doctorID);
-        LocalDate currentDate = LocalDate.now();
-
-        // Ask user for the date
         Scanner scanner = new Scanner(System.in);
-        System.out.print("Enter the day (1-31): ");
-        int day = Integer.parseInt(scanner.nextLine());
+        LocalDate selectedDate = null;
 
-        System.out.print("Enter the month (1-12): ");
-        int month = Integer.parseInt(scanner.nextLine());
+        while (selectedDate == null) {
+            try {
+                // Ask user for the day
+                System.out.print("Enter the day (1-31): ");
+                int day = Integer.parseInt(scanner.nextLine());
 
-        System.out.print("Enter the year (YYYY): ");
-        int year = Integer.parseInt(scanner.nextLine());
+                // Ask user for the month
+                System.out.print("Enter the month (1-12): ");
+                int month = Integer.parseInt(scanner.nextLine());
 
-        // Create the selected date
-        LocalDate selectedDate = LocalDate.of(year, month, day);
+                // Ask user for the year
+                System.out.print("Enter the year (YYYY): ");
+                int year = Integer.parseInt(scanner.nextLine());
 
-        // Check if the selected date is within the allowed range (18 Nov 2024 to 18 Dec 2024)
-        LocalDate startDate = LocalDate.of(2024, 11, 18);
-        LocalDate endDate = LocalDate.of(2024, 12, 18);
+                // Attempt to create the selected date
+                selectedDate = LocalDate.of(year, month, day);
 
-        if (selectedDate.isBefore(startDate) || selectedDate.isAfter(endDate)) {
-            System.out.println("Selected date is outside one month range");
-            return;
+                // Check if the selected date is within the allowed range (18 Nov 2024 to 18 Dec 2024)
+                LocalDate startDate = LocalDate.of(2024, 11, 18);
+                LocalDate endDate = LocalDate.of(2024, 12, 18);
+
+                if (selectedDate.isBefore(startDate) || selectedDate.isAfter(endDate)) {
+                    System.out.println("Selected date is outside the one-month range. Please try again.");
+                    selectedDate = null; // Reset to continue the loop
+                }
+            } catch (NumberFormatException e) {
+                System.out.println("Invalid input. Please enter numeric values only for day, month, and year.");
+            } catch (DateTimeException e) {
+                System.out.println("Invalid date. Please ensure the day, month, and year form a valid date.");
+            }
         }
 
         // Check if the doctor has a schedule
@@ -492,8 +568,6 @@ public class ScheduleService implements IScheduleService{
             System.out.println("No schedule found for Doctor ID: " + doctorID + " on " + selectedDate);
         }
     }
-
-
 
     /**
      * Prints upcoming appointments for a specific doctor.

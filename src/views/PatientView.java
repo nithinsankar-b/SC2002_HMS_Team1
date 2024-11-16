@@ -30,6 +30,9 @@ public class PatientView implements iPatientView {
 
     public void start(User user) {
         PatientService patientService = new PatientService(userService);
+        if (patientService.checkAndPromptPasswordChange(user.getHospitalID(), scanner)) {
+            System.out.println("Proceeding after password change.");
+        }
         boolean isRunning = true;
 
         Patient patient = patientService.getPatientById(user.getHospitalID());
@@ -40,6 +43,7 @@ public class PatientView implements iPatientView {
 
             if (userInput.equals("Y")) {
                 registerNewPatient(user);
+                System.out.println();
             } else {
                 System.out.println("Unable to proceed without patient information.");
                 return;

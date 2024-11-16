@@ -13,3 +13,6 @@
 
 # Ignore any out/production folder files containing all .class files
 /out/
+
+# Ignore all .idea files
+*.idea

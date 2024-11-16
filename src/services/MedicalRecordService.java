@@ -35,7 +35,7 @@ public class MedicalRecordService implements IMedicalRecordService {
      * Loads all medical records from the CSV file into memory.
      * Each record is parsed and stored in the {@code medicalRecords} map.
      */
-    private void loadRecordsFromCSV() {
+    public void loadRecordsFromCSV() {
         try (BufferedReader br = new BufferedReader(new FileReader(medicalRecordFile))) {
             String line;
             while ((line = br.readLine()) != null) {
