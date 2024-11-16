@@ -11,16 +11,27 @@ import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
 
+/**
+ * Service class for managing user data and providing user-related functionality.
+ * Implements the IUserService interface for user management operations.
+ */
 public class UserService implements IUserService {
     private final Map<String, User> users;
 
-    // There is already a database in the CSV file
+    /**
+     * Constructs a UserService object and loads user data from the "data/User.csv" file.
+     */
     public UserService() {
         users = new HashMap<>();
-        loadUsersFromCSV( "data/User.csv"); // Adjusted for relative path
+        loadUsersFromCSV("data/User.csv"); // Adjusted for relative path
     }
 
-    // Load users from CSV
+    /**
+     * Loads users from a specified CSV file and populates the users map.
+     * Skips the header row and ensures valid data is loaded.
+     *
+     * @param filePath the path to the CSV file containing user data.
+     */
     private void loadUsersFromCSV(String filePath) {
         String line;
         try (BufferedReader br = new BufferedReader(new FileReader(filePath))) {
@@ -30,10 +41,14 @@ public class UserService implements IUserService {
                     String hospitalID = userData[0].trim();
                     String password = userData[1].trim();
                     String roleString = userData[2].trim();
-                    if(roleString.equals("role"))
+
+                    // Skip the header row if present
+                    if (roleString.equals("role")) {
                         continue;
+                    }
+
+                    // Parse the user role and add the user to the map
                     UserRole role = UserRole.valueOf(userData[2].trim());
-                    //System.out.println(hospitalID+password+userData[2].trim());
                     users.put(hospitalID, new User(hospitalID, password, role));
                 }
             }
@@ -41,15 +56,17 @@ public class UserService implements IUserService {
             System.out.println("Error reading CSV file: " + e.getMessage());
         }
     }
-    
- // Save users to CSV
+
+    /**
+     * Saves the current list of users to the "data/User.csv" file.
+     * Includes a header row and writes each user's details.
+     */
     public void saveToCSV() {
         try (FileWriter writer = new FileWriter("data/User.csv")) {
-            writer.write("hospitalID,password,role\n"); // CSV header
+            writer.write("hospitalID,password,role\n"); // Write CSV header
             for (User user : users.values()) {
                 writer.write(user.getHospitalID() + "," + user.getPassword() + "," + user.getRole() + "\n");
             }
-            
         } catch (IOException e) {
             System.out.println("Error writing to CSV file: " + e.getMessage());
         }
@@ -127,43 +144,60 @@ public class UserService implements IUserService {
         return false;
     }
 
-    public void addUser(User user) {
-        users.put(user.getHospitalID(), user);
+/**
+ * Adds a new user to the system and saves the updated list to the CSV file.
+ *
+ * @param user the User object to be added.
+ */
+public void addUser(User user) {
+    users.put(user.getHospitalID(), user);
+    saveUsersToCSV();
+}
+
+/**
+ * Removes a user from the system by their hospital ID and saves the updated list to the CSV file.
+ *
+ * @param hospitalID the unique identifier of the user to be removed.
+ * @return true if the user was successfully removed, false otherwise.
+ */
+public boolean removeUser(String hospitalID) {
+    if (users.remove(hospitalID) != null) {
         saveUsersToCSV();
+        return true;
     }
+    return false;
+}
 
-    public boolean removeUser(String hospitalID) {
-        if (users.remove(hospitalID) != null) {
-            saveUsersToCSV();
-            return true;
+/**
+ * Saves the current list of users to the "data/User.csv" file.
+ */
+private void saveUsersToCSV() {
+    try (FileWriter writer = new FileWriter("data/User.csv")) {
+        for (User user : users.values()) {
+            writer.write(user.getHospitalID() + "," + user.getPassword() + "," + user.getRole() + "\n");
         }
-        return false;
+    } catch (IOException e) {
+        System.out.println("Error writing to CSV file: " + e.getMessage());
     }
+}
 
-    private void saveUsersToCSV() {
-        try (FileWriter writer = new FileWriter("data/User.csv")) {
-            for (User user : users.values()) {
-                writer.write(user.getHospitalID() + "," + user.getPassword() + "," + user.getRole() + "\n");
-            }
-        } catch (IOException e) {
-            System.out.println("Error writing to CSV file: " + e.getMessage());
+/**
+ * Writes the current list of users to the "data/User.csv" file, including a header row.
+ */
+private void writeUsersToCSV() {
+    try (FileWriter writer = new FileWriter("data/User.csv")) {
+        // Write the header row
+        writer.write("hospitalID,password,role\n");
+
+        // Write each user's details to the CSV
+        for (User user : users.values()) {
+            writer.write(user.getHospitalID() + "," + user.getPassword() + "," + user.getRole() + "\n");
         }
+
+        System.out.println("User data saved successfully to user.csv.");
+    } catch (IOException e) {
+        System.out.println("Error writing to CSV file: " + e.getMessage());
     }
-    private void writeUsersToCSV() {
-        try (FileWriter writer = new FileWriter("data/User.csv")) {
-            // Write header, if needed
-            writer.write("hospitalID,password,role\n");
-    
-            // Write each user's details to the CSV
-            for (User user : users.values()) {
-                writer.write(user.getHospitalID() + "," + user.getPassword() + "," + user.getRole() + "\n");
-            }
-    
-            System.out.println("User data saved successfully to user.csv.");
-        } catch (IOException e) {
-            System.out.println("Error writing to CSV file: " + e.getMessage());
-        }
-    }
-    
+}
 }
 

@@ -2,15 +2,30 @@ package services;
 
 import models.Appointment;
 
+/**
+ * Service class for calculating bills for appointments, including charges for consultations and medications.
+ * The `BillingService` provides a method to calculate the total cost of an appointment based on the 
+ * consultation fee and medication costs.
+ */
 public class BillingService {
+
+    // Constants representing fixed charges for consultation and medications
     public static final double CONSULTATION_CHARGE = 100.0;
     public static final double PARACETAMOL_CHARGE = 10.0;
     public static final double IBUPROFEN_CHARGE = 20.0;
     public static final double AMOXICILLIN_CHARGE = 15.0;
 
+    /**
+     * Calculates the total bill for an appointment, including the consultation charge and medication costs.
+     *
+     * @param appointment The appointment for which the bill is calculated.
+     *                    This includes details about the medications prescribed and their quantities.
+     * @return The total calculated bill amount.
+     */
     public double calculateBill(Appointment appointment) {
-        double totalBill = CONSULTATION_CHARGE; // Start with consultation charge
+        double totalBill = CONSULTATION_CHARGE; // Start with the consultation charge
 
+        // Iterate through the medications and add charges based on their names and quantities
         for (int i = 0; i < appointment.getMedications().size(); i++) {
             String medicationName = appointment.getMedications().get(i).getName();
             int quantity = appointment.getQuantities().get(i);
@@ -27,3 +42,4 @@ public class BillingService {
         return totalBill;
     }
 }
+
