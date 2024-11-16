@@ -63,7 +63,28 @@ public class DoctorView implements IDoctorView {
             System.out.println("Doctor record not found for user: " + user.getHospitalID());
             return; // Exit if no doctor record is found
         }
-        
+
+        if (doctor.getContactInformation().equals("default@example.com") && user.getPassword().equals("password")) {
+            System.out.println("Your email and password are both set to default and must be updated.");
+
+            System.out.println("\nChange Password");
+            System.out.println("===========================================");
+            changePassword(); // Change password
+
+            System.out.println("\nChange Email");
+            System.out.println("===========================================");
+            // Update contact information
+            promptForEmailChange(doctor);
+
+        } else if (doctor.getContactInformation().equals("default@example.com")) {
+            System.out.println("Your email is set to the default and must be updated.\n");
+            promptForEmailChange(doctor);
+
+        } else if (user.getPassword().equals("password")) {
+            System.out.println("Your password is set to the default and must be updated.\n");
+            changePassword();
+        }
+
         boolean isRunning = true;
    
         while (isRunning) {
@@ -114,6 +135,16 @@ public class DoctorView implements IDoctorView {
             }
         }
         // Do not close the scanner here as it's used in the main UserView
+    }
+
+    private void promptForEmailChange(Doctor doctor) {
+        System.out.print("Enter new email: ");
+        String newEmail = scanner.nextLine();
+        if (doctorService.updateDoctorContact(doctor.getHospitalID(), newEmail)) {
+            System.out.println("Email updated successfully.");
+        } else {
+            System.out.println("Failed to update email.");
+        }
     }
 
     /**
@@ -229,13 +260,13 @@ public class DoctorView implements IDoctorView {
     private void changePassword()
     {
       Scanner sc=new Scanner(System.in);
-      System.out.println("Enter Hospital ID");
+      System.out.print("Enter Hospital ID: ");
       String id = sc.nextLine();
       
-      System.out.println("Enter old password");
+      System.out.print("Enter old password: ");
       String oldPassword = sc.nextLine();
       
-      System.out.println("Enter new password");
+      System.out.print("Enter new password: ");
       String newPassword = sc.nextLine();
       
       doctorController.changePassword(id, oldPassword, newPassword);
