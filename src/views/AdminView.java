@@ -40,7 +40,7 @@ public class AdminView implements IAdministratorView {
      * Displays the administrator's main menu.
      */
     public void displayMenu() {
-        System.out.println("==== Administrator Menu ====");
+        System.out.println("Please choose an option:");
         System.out.println("1. Manage Hospital Staff");
         System.out.println("2. Manage Inventory");
         System.out.println("3. View Appointments");
@@ -109,59 +109,59 @@ public class AdminView implements IAdministratorView {
      * @return A new Staff object with the provided details.
      */
     public Staff getStaffDetails() {
-        String staffID; // Declaration so that can return in Staff object
-        while (true) {
-            System.out.print("Enter Staff ID: ");
-            staffID = scanner.nextLine().trim();
+        System.out.print("\nEnter Staff ID: ");
+        String staffID = scanner.nextLine().trim();
 
-            // Check if Staff ID is in the correct format
-            if (!staffID.matches("(D|PH)\\d+")) {
-                System.out.println("Invalid Staff ID format. Must start with 'D' or 'PH' followed by numbers.");
-                continue;
-            }
+        Staff existingStaff = adminService.getStaffById(staffID); // Check if staff already exists
+        if (existingStaff != null) {
+            System.out.println("\nStaff ID exists.");
+            System.out.println("===========================================");
+            System.out.println("1. Update existing staff details");
+            System.out.println("2. Cancel");
+            System.out.print("Enter your choice: ");
+            int choice = scanner.nextInt();
+            scanner.nextLine(); // Consume newline
 
-            // Check if Staff ID already exists
-            if (userService.getUserById(staffID) != null) {
-                System.out.println("Staff ID already exists. Please try again.");
-                continue;
+            if (choice == 1) {
+                System.out.println("\nDetails to update for existing staff...");
+                System.out.println("===========================================");
+                System.out.print("Enter New Name (Leave EMPTY if no change): ");
+                String name = scanner.nextLine();
+                name = name.isEmpty() ? existingStaff.getName() : name;
+
+                System.out.print("Enter New Gender (Leave EMPTY if no change): ");
+                String gender = scanner.nextLine();
+                gender = gender.isEmpty() ? existingStaff.getGender() : gender;
+
+                System.out.print("Enter New Age (Leave EMPTY if no change): ");
+                String ageInput = scanner.nextLine();
+                int age = ageInput.isEmpty() ? existingStaff.getAge() : Integer.parseInt(ageInput);
+
+                return new Staff(existingStaff.getId(), name, existingStaff.getRole(), gender, age);
+            } else {
+                System.out.println("Operation cancelled.");
+                return null;
             }
-            break;
         }
 
+        System.out.println("===========================================");
+        System.out.println("Adding new staff...");
+        System.out.println("===========================================");
         System.out.print("Enter Name: ");
         String name = scanner.nextLine();
 
-        // Determine Role based on Staff ID prefix
         String role = staffID.startsWith("D") ? "Doctor" : "Pharmacist";
+        System.out.println("Role: " + role);
 
-        // Validate Gender with first letter capitalized
-        String gender;
-        while (true) {
-            System.out.print("Enter Gender (Male/Female): ");
-            gender = scanner.nextLine().trim();
-            gender = gender.substring(0, 1).toUpperCase() + gender.substring(1).toLowerCase();
-            if (gender.equals("Male") || gender.equals("Female")) {
-                break;
-            } else {
-                System.out.println("Invalid input. Gender must be Male or Female.");
-            }
-        }
+        System.out.print("Enter Gender (Male/Female): ");
+        String gender = scanner.nextLine();
 
-        int age; // Declaration of age variable
-        while (true) {
-            System.out.print("Enter Age: ");
-            age = scanner.nextInt();
-            scanner.nextLine(); // Consume newline
-            if (age > 21 && age < 81) {
-                break;
-            } else {
-                System.out.println("Invalid age. Please enter a valid age between 21 and 80.");
-            }
-        }
+        System.out.print("Enter Age: ");
+        int age = scanner.nextInt();
+        scanner.nextLine(); // Consume newline
 
         return new Staff(staffID, name, role, gender, age);
     }
-
 
     /**
      * Prompts the user to enter a staff ID for removal.

@@ -93,7 +93,9 @@ public class AdministratorController {
         boolean exit = false;
 
         while (!exit) {
-            System.out.println("\n-- Manage Hospital Staff --");
+            System.out.println("===========================================");
+            System.out.println("-- Manage Hospital Staff --");
+            System.out.println("===========================================");
             System.out.println("1. Add or Update Staff");
             System.out.println("2. Remove Staff");
             System.out.println("3. View Staff List");
@@ -107,6 +109,7 @@ public class AdministratorController {
                     Staff newStaff = adminView.getStaffDetails();
                     adminService.addOrUpdateStaff(newStaff);
                     System.out.println("Staff added/updated successfully.");
+                    System.out.println("===========================================");
                     break;
 
                 case 2:

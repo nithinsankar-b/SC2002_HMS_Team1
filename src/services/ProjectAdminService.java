@@ -55,6 +55,10 @@ public class ProjectAdminService implements IProjectAdmService {
         }
     }
 
+    public Staff getStaffById(String staffId) {
+        return staffDataStore.getStaffList().get(staffId);
+    }
+
     // ---------------------- Staff Management ----------------------
 
     /**
@@ -72,6 +76,7 @@ public void addOrUpdateStaff(Staff staffMember) {
     if (existingStaff != null) {
         // If the staff member exists, preserve the existing role
         role = existingStaff.getRole();
+        System.out.println("===========================================");
         System.out.println("Updating existing staff. Preserving role: " + role);
     } else {
         // For NEW staff, validate that the role is either Doctor or Pharmacist
