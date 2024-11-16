@@ -146,6 +146,7 @@ public class UserView {
             String response = scanner.nextLine().trim().toLowerCase();
 
             if (response.equals("yes")) {
+                userService.saveToCSV(); // Ensure CSV sorted before exiting
                 return false; // Exit the loop and end the program
             } else if (response.equals("no")) {
                 System.out.println("Returning to main login screen...");

@@ -11,13 +11,63 @@ import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
 
+import java.security.MessageDigest;
+import java.security.NoSuchAlgorithmException;
+
+import javax.crypto.Cipher;
+import javax.crypto.KeyGenerator;
+import javax.crypto.SecretKey;
+import javax.crypto.spec.SecretKeySpec;
+import java.util.Base64;
+
 public class UserService implements IUserService {
     private final Map<String, User> users;
+
+    private static final String ALGORITHM = "AES";
+    // For encryption
+    private static final String SECRET_KEY = "MySuperSecretKey";
 
     // There is already a database in the CSV file
     public UserService() {
         users = new HashMap<>();
         loadUsersFromCSV( "data/User.csv"); // Adjusted for relative path
+    }
+
+    private static String encryptPassword(String plainPassword) throws Exception {
+        SecretKey secretKey = new SecretKeySpec(SECRET_KEY.getBytes(), ALGORITHM);
+        Cipher cipher = Cipher.getInstance(ALGORITHM);
+        cipher.init(Cipher.ENCRYPT_MODE, secretKey);
+        byte[] encryptedBytes = cipher.doFinal(plainPassword.getBytes());
+        return Base64.getEncoder().encodeToString(encryptedBytes);
+    }
+
+    private static String decryptPassword(String encryptedPassword) throws Exception {
+        SecretKey secretKey = new SecretKeySpec(SECRET_KEY.getBytes(), ALGORITHM);
+        Cipher cipher = Cipher.getInstance(ALGORITHM);
+        cipher.init(Cipher.DECRYPT_MODE, secretKey);
+        byte[] decodedBytes = Base64.getDecoder().decode(encryptedPassword);
+        return new String(cipher.doFinal(decodedBytes));
+    }
+
+    // Utility function to encrypt existing passwords (To be removed)
+    public void encryptExistingPasswords() {
+        try {
+            for (User user : users.values()) {
+                String currentPassword = user.getPassword();
+                if (!currentPassword.startsWith("ENC(")) {
+                    try {
+                        String encryptedPassword = encryptPassword(currentPassword);
+                        user.setPassword("ENC(" + encryptedPassword + ")");
+                    } catch (Exception e) {
+                        System.out.println("Error encrypting password for user: " + user.getHospitalID());
+                    }
+                }
+            }
+            saveToCSV();
+            System.out.println("Passwords have been encrypted successfully!");
+        } catch (Exception e) {
+            throw new RuntimeException("Error during password encryption process", e);
+        }
     }
 
     // Load users from CSV
@@ -30,26 +80,33 @@ public class UserService implements IUserService {
                     String hospitalID = userData[0].trim();
                     String password = userData[1].trim();
                     String roleString = userData[2].trim();
-                    if(roleString.equals("role"))
-                        continue;
-                    UserRole role = UserRole.valueOf(userData[2].trim());
-                    //System.out.println(hospitalID+password+userData[2].trim());
+                    if (roleString.equalsIgnoreCase("role")) continue;
+
+                    UserRole role = UserRole.valueOf(roleString.toUpperCase());
                     users.put(hospitalID, new User(hospitalID, password, role));
+                } else {
+                    System.out.println("Skipping malformed line in CSV: " + line);
                 }
             }
         } catch (IOException e) {
             System.out.println("Error reading CSV file: " + e.getMessage());
         }
     }
-    
- // Save users to CSV
+
+    // Save users to CSV include sorting
     public void saveToCSV() {
         try (FileWriter writer = new FileWriter("data/User.csv")) {
-            writer.write("hospitalID,password,role\n"); // CSV header
-            for (User user : users.values()) {
-                writer.write(user.getHospitalID() + "," + user.getPassword() + "," + user.getRole() + "\n");
-            }
-            
+            writer.write("hospitalID,password,role\n");
+            users.entrySet().stream()
+                    .sorted(Map.Entry.comparingByKey()) // Sort by hospitalID
+                    .forEach(entry -> {
+                        try {
+                            User user = entry.getValue();
+                            writer.write(user.getHospitalID() + "," + user.getPassword() + "," + user.getRole() + "\n");
+                        } catch (IOException e) {
+                            throw new RuntimeException(e);
+                        }
+                    });
         } catch (IOException e) {
             System.out.println("Error writing to CSV file: " + e.getMessage());
         }
@@ -65,7 +122,22 @@ public class UserService implements IUserService {
     @Override
     public boolean login(String hospitalID, String password) {
         User user = users.get(hospitalID);
-        return user != null && user.getPassword().equals(password);
+        if (user != null) {
+            try {
+                String storedPassword = user.getPassword();
+                if (storedPassword.startsWith("ENC(") && storedPassword.endsWith(")")) {
+                    // Decrypt the encrypted password
+                    String decryptedPassword = decryptPassword(storedPassword.substring(4, storedPassword.length() - 1));
+                    return decryptedPassword.equals(password);
+                } else {
+                    // If the password is not encrypted, compare directly
+                    return storedPassword.equals(password);
+                }
+            } catch (Exception e) {
+                System.out.println("Error during password verification: " + e.getMessage());
+            }
+        }
+        return false;
     }
 
     /**
@@ -78,16 +150,26 @@ public class UserService implements IUserService {
      */
     @Override
     public boolean changePassword(String hospitalID, String oldPassword, String newPassword) {
-        User user = users.get(hospitalID); // Retrieve the user by hospitalID
-        if (user != null && user.getPassword().equals(oldPassword)) {
-            // Update the password
-            user.setPassword(newPassword);
-            users.put(hospitalID, user);
-            saveToCSV();
-            System.out.println("Password changed successfully!");
-            return true;
+        User user = users.get(hospitalID);
+        if (user != null) {
+            try {
+                String encryptedPassword = user.getPassword();
+                if (encryptedPassword.startsWith("ENC(") && encryptedPassword.endsWith(")")) {
+                    String decryptedPassword = decryptPassword(encryptedPassword.substring(4, encryptedPassword.length() - 1));
+                    if (decryptedPassword.equals(oldPassword)) {
+                        String newEncryptedPassword = encryptPassword(newPassword);
+                        user.setPassword("ENC(" + newEncryptedPassword + ")");
+                        users.put(hospitalID, user);
+                        saveToCSV();
+                        System.out.println("Password changed successfully!");
+                        return true;
+                    }
+                }
+            } catch (Exception e) {
+                System.out.println("Error during password change: " + e.getMessage());
+            }
         }
-        System.out.println("Error! Wrong details entered!");
+        System.out.println("Error! Wrong details entered or unable to process.");
         return false;
     }
 
