@@ -66,23 +66,39 @@ public class PatientService {
     public boolean updatePatientContact(String hospitalID, String newContactInformation, String contactType) {
         Patient patient = patients.get(hospitalID);
         if (patient != null) {
-            MedicalRecordService medicalRecordService=new MedicalRecordService();
-            // Update the corresponding medical record as well
+            MedicalRecordService medicalRecordService = new MedicalRecordService();
             MedicalRecord medicalRecord = medicalRecordService.getMedicalRecord(hospitalID);
+
             if (medicalRecord != null) {
-                if ("phone".equalsIgnoreCase(contactType)) {
+                if (contactType.equalsIgnoreCase("phone")) {
+                    newContactInformation = newContactInformation.replaceAll("(\\d{4})(?=\\d)", "$1 ");
                     medicalRecord.setPhoneNumber(newContactInformation);
-                } else if ("email".equalsIgnoreCase(contactType)) {
+                } else if (contactType.equalsIgnoreCase("email")) {
+                    if (!newContactInformation.matches("^[A-Za-z0-9+_.-]+@[A-Za-z0-9.-]+$")) {
+                        System.out.println("Invalid email format. Please provide a valid email address.");
+                        return false;
+                    }
                     medicalRecord.setEmailAddress(newContactInformation);
                 }
-                medicalRecordService.saveRecordsToCSV(); // Save medical records after update
+                medicalRecordService.saveRecordsToCSV();
             }
 
-            savePatientsToCSV(); // Save changes after update
+            if (contactType.equalsIgnoreCase("phone")) {
+                newContactInformation = newContactInformation.replaceAll("(\\d{4})(?=\\d)", "$1 ");
+            } else if (contactType.equalsIgnoreCase("email")) {
+                if (!newContactInformation.matches("^[A-Za-z0-9+_.-]+@[A-Za-z0-9.-]+$")) {
+                    System.out.println("Invalid email format. Please provide a valid email address.");
+                    return false;
+                }
+            }
+
+            patient.setContactInformation(newContactInformation);
+            savePatientsToCSV(); // Ensure the updated email or phone is saved to Patient.csv
             return true;
         }
         return false;
     }
+
 
     // Method to list all patients
     // For administrator to use

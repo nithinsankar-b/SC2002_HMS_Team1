@@ -128,7 +128,7 @@ public class PatientController {
             if (success) {
                 System.out.println("Contact information updated successfully.");
             } else {
-                System.out.println("Failed to update contact information. Patient not found.");
+                System.out.println("Failed to update contact information.");
             }
         } else {
             System.out.println("Patient not found.");
@@ -228,51 +228,52 @@ public class PatientController {
             }
 
             // Ask user to pick a time
-            System.out.print("Enter appointment time (24HRS format -> HH:mm): ");
-            String time = scanner.nextLine();
-            time = time.replaceAll("[^0-9]", "");
-            if (time.length() == 4) {
-                time = time.substring(0, 2) + ":" + time.substring(2);
-            }
-            LocalTime localTime = LocalTime.parse(time);
-            LocalDateTime dateTime = LocalDateTime.of(localDate, localTime);
+            boolean validTime = false;
+            while (!validTime) {
+                try {
+                    System.out.print("Enter appointment time (24HRS format -> HH:mm): ");
+                    String time = scanner.nextLine();
+                    time = time.replaceAll("[^0-9]", "");
+                    if (time.length() == 4) {
+                        time = time.substring(0, 2) + ":" + time.substring(2);
+                    }
+                    LocalTime localTime = LocalTime.parse(time);
+                    LocalDateTime dateTime = LocalDateTime.of(localDate, localTime);
 
-            List<Appointment> patientAppointments = appointmentService.viewScheduledAppointments();
-            boolean hasAppointmentOnSameDay = patientAppointments.stream()
-                    .anyMatch(appointment -> appointment.getPatientId().equals(patient.getHospitalID()) &&
-                            appointment.getAppointmentDateTime().toLocalDate().equals(localDate));
+                    if (!availableSlots.contains(dateTime)) {
+                        System.out.println("The selected time slot is not available. Please choose another time.");
+                    } else {
+                        validTime = true;
+                        // Existing code to handle valid time and schedule appointment
+                        String appointmentId = String.valueOf(System.currentTimeMillis()).substring(6);
+                        Appointment appointment = new Appointment(appointmentId, patient.getHospitalID(), doctorId, dateTime);
 
-            if (hasAppointmentOnSameDay) {
-                System.out.println("You already have an appointment booked on the selected day. Please choose another day.");
-                return;
-            }
+                        boolean success = appointmentService.scheduleAppointment(appointment);
+                        if (success) {
+                            System.out.println("Appointment created successfully.");
 
-            if (availableSlots.contains(dateTime)) {
-                String appointmentId = String.valueOf(System.currentTimeMillis()).substring(6);
-                Appointment appointment = new Appointment(appointmentId, patient.getHospitalID(), doctorId, dateTime);
-
-                boolean success = appointmentService.scheduleAppointment(appointment);
-                if (success) {
-                    System.out.println("Appointment created successfully.");
-
-                    // Create and save the corresponding AppointmentRequest
-                    AppointmentRequest appointmentRequest = new AppointmentRequest(
-                            appointmentId, // Use the same ID
-                            patient.getHospitalID(),
-                            doctorId,
-                            localDate,
-                            localTime,
-                            "Pending"
-                    );
-                    ScheduleService scheduleService=new ScheduleService();
-                    AppointmentRequestService appointmentRequestService=new AppointmentRequestService(scheduleService,appointmentService);
-                    appointmentRequestService.save(appointmentRequest);
-                    System.out.println("Appointment request created with ID: " + appointmentRequest.getRequestId());
-                } else {
-                    System.out.println("Failed to create appointment.");
+                            // Create and save the corresponding AppointmentRequest
+                            AppointmentRequest appointmentRequest = new AppointmentRequest(
+                                    appointmentId,
+                                    patient.getHospitalID(),
+                                    doctorId,
+                                    localDate,
+                                    localTime,
+                                    "Pending"
+                            );
+                            ScheduleService scheduleService = new ScheduleService();
+                            AppointmentRequestService appointmentRequestService = new AppointmentRequestService(scheduleService, appointmentService);
+                            appointmentRequestService.save(appointmentRequest);
+                            System.out.println("Appointment request created with ID: " + appointmentRequest.getRequestId());
+                        } else {
+                            System.out.println("Failed to create appointment.");
+                        }
+                    }
+                } catch (DateTimeParseException e) {
+                    System.out.println("Invalid time format. Please enter the time in HH:mm format.");
+                } catch (NumberFormatException e) {
+                    System.out.println("Invalid input. Please enter numeric values for the time.");
                 }
-            } else {
-                System.out.println("The selected time slot is not available. Please choose another time.");
             }
         } else {
             System.out.println("Patient not found.");
