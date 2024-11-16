@@ -190,14 +190,24 @@ public class AdministratorController {
                     }
                     break;
 
-                case 5:
-                    // Approve replenishment request
+                    case 5:
+                    // Get the request ID from the user
                     String requestId = adminView.getRequestIdForReplenishment();
+
+                    // Approve the request in ReplenishmentService and get the medicine name
                     String medicineNames = replenishmentService.approveRequest(requestId);
+
+                    // If a valid medicine name is returned, update the inventory stock
                     if (medicineNames != null) {
-                        System.out.println("Replenishment request approved successfully.");
+                        boolean inventoryUpdateSuccess = inventoryService.approveReplenishmentRequest(medicineNames);
+
+                        if (inventoryUpdateSuccess) {
+                            System.out.println("Replenishment request approved and inventory updated successfully.");
+                        } else {
+                            System.out.println("Failed to update inventory for replenished medicine.");
+                        }
                     } else {
-                        System.out.println("Failed to approve replenishment request. Request ID not found.");
+                        System.out.println("Approval failed. Request ID not found in ReplenishmentService.");
                     }
                     break;
 
