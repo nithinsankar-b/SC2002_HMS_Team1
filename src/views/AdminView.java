@@ -6,9 +6,11 @@ import models.Appointment;
 import models.Inventory;
 import services.ProjectAdminService;
 import controllers.AdministratorController;
+import services.UserService;
 
 import java.util.List;
 import java.util.Scanner;
+import java.lang.String;
 
 /**
  * The AdminView class implements the IAdministratorView interface and provides
@@ -19,6 +21,7 @@ public class AdminView implements IAdministratorView {
     private final Scanner scanner = new Scanner(System.in);
     private final AdministratorController adminController;
     private final ProjectAdminService adminService;
+    private final UserService userService;
 
     /**
      * Constructs an AdminView with the specified AdministratorController and ProjectAdminService.
@@ -26,10 +29,12 @@ public class AdminView implements IAdministratorView {
      * @param adminController The controller managing administrator actions.
      * @param adminService    The service handling administrative operations.
      */
-    public AdminView(AdministratorController adminController, ProjectAdminService adminService) {
+    public AdminView(AdministratorController adminController, ProjectAdminService adminService, UserService userService) {
         this.adminController = adminController;
         this.adminService = adminService;
+        this.userService = userService;
     }
+
 
     /**
      * Displays the administrator's main menu.
@@ -104,25 +109,31 @@ public class AdminView implements IAdministratorView {
      * @return A new Staff object with the provided details.
      */
     public Staff getStaffDetails() {
-        System.out.print("Enter Staff ID: ");
-        String staffID = scanner.nextLine();
-    
+        String staffID; // Declaration so that can return in Staff object
+        while (true) {
+            System.out.print("Enter Staff ID: ");
+            staffID = scanner.nextLine().trim();
+
+            // Check if Staff ID is in the correct format
+            if (!staffID.matches("(D|PH)\\d+")) {
+                System.out.println("Invalid Staff ID format. Must start with 'D' or 'PH' followed by numbers.");
+                continue;
+            }
+
+            // Check if Staff ID already exists
+            if (userService.getUserById(staffID) != null) {
+                System.out.println("Staff ID already exists. Please try again.");
+                continue;
+            }
+            break;
+        }
+
         System.out.print("Enter Name: ");
         String name = scanner.nextLine();
-    
-        // Validate Role with first letter capitalized
-        String role;
-        while (true) {
-            System.out.print("Enter Role (Doctor/Pharmacist): "); // Exclude Administrator
-            role = scanner.nextLine().trim();
-            role = role.substring(0, 1).toUpperCase() + role.substring(1).toLowerCase();
-            if (role.equals("Doctor") || role.equals("Pharmacist")) { // Only allow Doctor or Pharmacist
-                break;
-            } else {
-                System.out.println("Invalid input. Role must be Doctor or Pharmacist.");
-            }
-        }
-    
+
+        // Determine Role based on Staff ID prefix
+        String role = staffID.startsWith("D") ? "Doctor" : "Pharmacist";
+
         // Validate Gender with first letter capitalized
         String gender;
         while (true) {
@@ -135,14 +146,22 @@ public class AdminView implements IAdministratorView {
                 System.out.println("Invalid input. Gender must be Male or Female.");
             }
         }
-    
-        System.out.print("Enter Age: ");
-        int age = scanner.nextInt();
-        scanner.nextLine();  // Consume newline
-    
+
+        int age; // Declaration of age variable
+        while (true) {
+            System.out.print("Enter Age: ");
+            age = scanner.nextInt();
+            scanner.nextLine(); // Consume newline
+            if (age > 21 && age < 81) {
+                break;
+            } else {
+                System.out.println("Invalid age. Please enter a valid age between 21 and 80.");
+            }
+        }
+
         return new Staff(staffID, name, role, gender, age);
     }
-    
+
 
     /**
      * Prompts the user to enter a staff ID for removal.
@@ -237,7 +256,7 @@ public class AdminView implements IAdministratorView {
         System.out.print("Enter Request ID: ");
         return scanner.nextLine();
     }
-    
+
 }
 
 

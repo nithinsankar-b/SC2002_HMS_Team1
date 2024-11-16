@@ -74,7 +74,7 @@ public void addOrUpdateStaff(Staff staffMember) {
         role = existingStaff.getRole();
         System.out.println("Updating existing staff. Preserving role: " + role);
     } else {
-        // For new staff, validate that the role is either Doctor or Pharmacist
+        // For NEW staff, validate that the role is either Doctor or Pharmacist
         if (!"Doctor".equalsIgnoreCase(staffMember.getRole()) && !"Pharmacist".equalsIgnoreCase(staffMember.getRole())) {
             System.out.println("Error: Only Doctor or Pharmacist roles can be added.");
             return; // Exit the method if an invalid role is provided for new staff
@@ -100,7 +100,7 @@ public void addOrUpdateStaff(Staff staffMember) {
     // Write updated staff list to CSV
     try {
         staffDataStore.writeStaffToCSV(STAFF_CSV_PATH);
-        System.out.println("Staff member added/updated: " + staffMember.getId());
+        System.out.println("Staff member ID (added/updated): " + staffMember.getId());
         
         // Update the respective doctor or pharmacist CSV
         if (role.equalsIgnoreCase("Doctor")) {

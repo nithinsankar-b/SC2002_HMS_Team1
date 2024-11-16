@@ -48,7 +48,7 @@ public class AdministratorController {
         InventoryDataStore inventoryDataStore = new InventoryDataStore();
         this.inventoryService = new InventoryService(inventoryDataStore);
 
-        this.adminView = new AdminView(this, adminService);
+        this.adminView = new AdminView(this, adminService, userService);
     }
 
     /**

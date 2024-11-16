@@ -210,8 +210,8 @@ public class UserView {
                 break;
 
             case ADMINISTRATOR:
-                navigateToAdministratorPage(user);
                 // Implement the AdministratorView and corresponding logic here
+                navigateToAdministratorPage(user);
                 break;
 
             default:

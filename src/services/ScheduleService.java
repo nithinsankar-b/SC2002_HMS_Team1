@@ -102,7 +102,7 @@ public class ScheduleService implements IScheduleService{
                     timeSlot = timeSlot.plusMinutes(30);
                 }
             }
-            System.out.println("Schedule generated for " + doctorID);
+            // System.out.println("Schedule generated for " + doctorID);
         } catch (IOException e) {
             e.printStackTrace();
         }
