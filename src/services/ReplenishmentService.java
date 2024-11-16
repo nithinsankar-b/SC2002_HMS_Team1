@@ -187,29 +187,31 @@ public class ReplenishmentService {
      * @param requestId The ID of the replenishment request to approve.
      * @return The name of the medicine in the approved request, or `null` if not found.
      */
-    public String approveRequest(String requestId) {
+    public List<String> approveRequest(String requestId) {
+        List<String> approvedMedicines = new ArrayList<>();
         boolean found = false;
-        String medicineName = null;
-
+    
         List<ReplenishmentRequest> requests = getAllRequests();
         for (ReplenishmentRequest request : requests) {
             if (request.getId().equals(requestId) && request.getStatus() == StatusEnum.PENDING) {
                 request.setStatus(StatusEnum.APPROVED);
-                medicineName = request.getMedicines().get(0); // Assuming single medicine per request
+                approvedMedicines.addAll(request.getMedicines());
                 found = true;
-                break;
             }
         }
-
+    
         if (found) {
             saveRequestsToCSV(requests);
-            System.out.println("Replenishment request approved for: " + medicineName);
-            return medicineName;
+            System.out.println("Replenishment request approved for: " + approvedMedicines);
+            return approvedMedicines;
         } else {
             System.out.println("Request ID not found or already approved.");
             return null;
         }
     }
+    
+    
+    
 
     /**
      * Rejects a replenishment request by changing its status to `REJECTED`.

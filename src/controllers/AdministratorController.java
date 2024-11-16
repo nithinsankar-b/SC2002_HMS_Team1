@@ -193,23 +193,36 @@ public class AdministratorController {
                     case 5:
                     // Get the request ID from the user
                     String requestId = adminView.getRequestIdForReplenishment();
-
-                    // Approve the request in ReplenishmentService and get the medicine name
-                    String medicineNames = replenishmentService.approveRequest(requestId);
-
-                    // If a valid medicine name is returned, update the inventory stock
-                    if (medicineNames != null) {
-                        boolean inventoryUpdateSuccess = inventoryService.approveReplenishmentRequest(medicineNames);
-
-                        if (inventoryUpdateSuccess) {
+                
+                    // Approve the request in ReplenishmentService and get the medicine names
+                    List<String> medicineNames = replenishmentService.approveRequest(requestId);
+                
+                    // If valid medicine names are returned, update the inventory stock for each medicine
+                    if (medicineNames != null && !medicineNames.isEmpty()) {
+                        boolean allUpdatesSuccessful = true;
+                
+                        for (String medName : medicineNames) {
+                            boolean updateSuccess = inventoryService.approveReplenishmentRequest(medName);
+                
+                            if (!updateSuccess) {
+                                allUpdatesSuccessful = false;
+                                System.out.println("Failed to update inventory for medicine: " + medName);
+                            }
+                        }
+                
+                        if (allUpdatesSuccessful) {
                             System.out.println("Replenishment request approved and inventory updated successfully.");
                         } else {
-                            System.out.println("Failed to update inventory for replenished medicine.");
+                            System.out.println("Replenishment request partially updated. Check inventory for details.");
                         }
                     } else {
                         System.out.println("Approval failed. Request ID not found in ReplenishmentService.");
                     }
                     break;
+                
+
+                
+                
 
                 case 6:
                     viewPendingReplenishmentRequests();

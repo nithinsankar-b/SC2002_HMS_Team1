@@ -407,24 +407,22 @@ public class InventoryService implements IInventoryService {
      */
     public boolean approveReplenishmentRequest(String medicineName) {
         List<Inventory> inventoryDataList = inventoryDataStore.getInventoryList();
-
+    
         for (Inventory item : inventoryDataList) {
             if (item.getMedicineName().equalsIgnoreCase(medicineName)) {
-
                 int replenishedAmount = calculateReplenishmentAmount(item.getCurrentStock(), item.getLowLevelAlert());
-
-                item.setCurrentStock(item.getCurrentStock() + replenishedAmount);
-                
-                
-                saveDataToCSV();
+                item.setCurrentStock(item.getCurrentStock() + replenishedAmount); // Update stock
+                saveDataToCSV(); // Save updated inventory
                 System.out.println("Replenishment approved and completed for: " + medicineName);
                 return true;
             }
         }
-        
-        System.out.println("Replenishment request not found or already processed for: " + medicineName);
-        return false;
+        return false; // Medicine not found
     }
+    
+    
+    
+    
     
     public List<InventoryDisplay> getLowStockInventory() {
         List<InventoryDisplay> lowStockInventory = new ArrayList<>();
