@@ -4,7 +4,6 @@ import controllers.AdministratorController;
 import controllers.PatientController;
 import controllers.PharmacistController;
 import controllers.DoctorController;
-import controllers.UserController;
 import enums.UserRole;
 import services.UserService;
 import services.AppointmentService;
@@ -21,14 +20,9 @@ import services.MedicalRecordService;
 import controllers.BillingController;
 import services.BillingService;
 import stores.StaffDataStore;
-import views.DoctorView;
-import controllers.DoctorController;
-import views.PharmacistView;
 import stores.InventoryDataStore;
 import models.User;
-import views.PatientView;
 
-import java.io.Console;
 import java.io.IOException;
 import java.util.Scanner;
 
@@ -102,9 +96,6 @@ public class UserView {
             String hospitalID = scanner.nextLine();
 
             System.out.print("Enter Password: ");
-           // Console console = System.console();
-           // char[] passwordArray = console.readPassword("Enter Password: ");
-            //String password = new String(passwordArray);
             String password = scanner.nextLine();
 
             userService.reloadUserData(); // Reload user data before login attempt
@@ -291,21 +282,28 @@ public class UserView {
 
 
     private void navigateToAdministratorPage(User user) {
-        // Create necessary services for Administrator
         InventoryDataStore inventoryDataStore = new InventoryDataStore();
         InventoryService inventoryService = new InventoryService(inventoryDataStore);
-        ProjectAdminService adminService = new ProjectAdminService(new Administrator(user.getHospitalID(), user.getPassword(), null), inventoryService,userService);
+        PatientService patientService = new PatientService(userService);
+        ProjectAdminService adminService = new ProjectAdminService(
+                new Administrator(user.getHospitalID(), user.getPassword(), null),
+                inventoryService,
+                userService,
+                patientService
+        );
         AppointmentService appointmentService = new AppointmentService();
-    
-        // Instantiate AdministratorController
-        AdministratorController adminController = new AdministratorController(appointmentService, adminService, userService);
-    
-        // Start the administrator operations (menu), passing in the logged-in hospital ID
+
+        AdministratorController adminController = new AdministratorController(
+                appointmentService,
+                adminService,
+                userService,
+                patientService
+        );
+
         System.out.println("Navigating to Administrator view...");
         System.out.println(SEPARATOR);
         adminController.start(user.getHospitalID());
     }
-
 
     /**
      * Displays the change password interface for the logged-in user.

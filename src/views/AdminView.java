@@ -1,13 +1,17 @@
 package views;
 
+import enums.UserRole;
 import interfaces.IAdministratorView;
 import models.Staff;
+import models.*;
 import models.Appointment;
 import models.Inventory;
+import services.PatientService;
 import services.ProjectAdminService;
 import controllers.AdministratorController;
 import services.UserService;
 
+import java.time.LocalDate;
 import java.util.List;
 import java.util.Scanner;
 import java.lang.String;
@@ -22,6 +26,7 @@ public class AdminView implements IAdministratorView {
     private final AdministratorController adminController;
     private final ProjectAdminService adminService;
     private final UserService userService;
+    private final PatientService patientService;
 
     /**
      * Constructs an AdminView with the specified AdministratorController and ProjectAdminService.
@@ -29,10 +34,11 @@ public class AdminView implements IAdministratorView {
      * @param adminController The controller managing administrator actions.
      * @param adminService    The service handling administrative operations.
      */
-    public AdminView(AdministratorController adminController, ProjectAdminService adminService, UserService userService) {
+    public AdminView(AdministratorController adminController, ProjectAdminService adminService, UserService userService, PatientService patientService) {
         this.adminController = adminController;
         this.adminService = adminService;
         this.userService = userService;
+        this.patientService = patientService;
     }
 
 
@@ -41,7 +47,7 @@ public class AdminView implements IAdministratorView {
      */
     public void displayMenu() {
         System.out.println("Please choose an option:");
-        System.out.println("1. Manage Hospital Staff");
+        System.out.println("1. Manage Hospital Staff & Patients");
         System.out.println("2. Manage Inventory");
         System.out.println("3. View Appointments");
         System.out.println("4. Change Password");
@@ -262,6 +268,87 @@ public class AdminView implements IAdministratorView {
         return scanner.nextLine();
     }
 
+    // Add a method to get patient details
+    public Patient getPatientDetails() {
+        String patientID;
+        Patient existingPatient;
+
+        while (true) {
+            System.out.print("\nEnter Patient ID: ");
+            patientID = scanner.nextLine().trim();
+
+            existingPatient = adminService.getPatientById(patientID);
+            if (existingPatient == null) {
+                break;
+            }
+
+            System.out.println("Patient ID already exists. Please enter a new ID.");
+        }
+
+        System.out.print("Enter Name: ");
+        String name = scanner.nextLine();
+
+        LocalDate dateOfBirth;
+        while (true) {
+            System.out.print("Enter Date of Birth (yyyy-MM-dd): ");
+            String dobInput = scanner.nextLine().trim();
+            try {
+                dateOfBirth = LocalDate.parse(dobInput);
+                break;
+            } catch (Exception e) {
+                System.out.println("Invalid date format. Please enter in yyyy-MM-dd format.");
+            }
+        }
+
+        String gender;
+        while (true) {
+            System.out.print("Enter Gender (Male/Female): ");
+            gender = scanner.nextLine().trim().toLowerCase();
+            if (gender.equals("male") || gender.equals("female")) {
+                break;
+            }
+            System.out.println("Invalid gender. Please enter 'Male' or 'Female'.");
+        }
+
+        String bloodType;
+        while (true) {
+            System.out.print("Enter Blood Type: ");
+            bloodType = scanner.nextLine().trim().toUpperCase();
+            if (bloodType.matches("^(A|B|AB|O)[+-]$")) {
+                break;
+            }
+            System.out.println("Invalid blood type. Please enter a valid blood type.");
+        }
+
+        String contactInformation;
+        while (true) {
+            System.out.print("Enter Contact Information (email): ");
+            contactInformation = scanner.nextLine().trim();
+            if (contactInformation.matches("^[A-Za-z0-9+_.-]+@[A-Za-z0-9.-]+$")) {
+                break;
+            }
+            System.out.println("Invalid email format. Please enter a valid email address.");
+        }
+
+        return new Patient(
+                new User(patientID, "password", UserRole.PATIENT),
+                name, dateOfBirth, gender, bloodType, contactInformation
+        );
+    }
+
+    // Add a new method to display the list of patients
+    public void displayPatientList(List<Patient> patientList) {
+        System.out.println("Patient List:");
+        if (patientList.isEmpty()) {
+            System.out.println("No patients found.");
+        } else {
+            for (Patient patient : patientList) {
+                System.out.println("Patient ID: " + patient.getHospitalID() + ", Name: " + patient.getName() +
+                        ", DOB: " + patient.getDateOfBirth() + ", Gender: " + patient.getGender() +
+                        ", Blood Type: " + patient.getBloodType() + ", Contact: " + patient.getContactInformation());
+            }
+        }
+    }
 
 }
 

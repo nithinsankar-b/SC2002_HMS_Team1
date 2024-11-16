@@ -1,7 +1,6 @@
 package controllers;
 
 import services.UserService;
-import controllers.BillingController;
 import services.BillingService;
 import views.UserView;
 import enums.UserRole;
@@ -16,9 +15,6 @@ import services.DoctorService;
 import services.ScheduleService;
 import services.AppointmentRequestService;
 import services.MedicalRecordService;
-import controllers.PatientController;
-import controllers.PharmacistController;
-import controllers.DoctorController;
 import views.PharmacistView;
 import views.PatientView;
 import views.DoctorView;

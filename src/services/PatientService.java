@@ -41,6 +41,12 @@ public class PatientService {
         }
     }
 
+    // Add a method to retrieve all patients as a list
+    public Map<String, Patient> getPatients() {
+        return patients;
+    }
+
+
     // Method to retrieve a patient by their hospital ID
     public Patient getPatientById(String hospitalID) {
         return patients.get(hospitalID);
