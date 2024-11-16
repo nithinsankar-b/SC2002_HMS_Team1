@@ -150,7 +150,7 @@ public class AdministratorController {
             System.out.println("6. View Pending Replenishment Requests");
             System.out.println("7. Decline Replenishment Request");
             System.out.println("8. View Inventory");
-            System.out.println("9. Return to Main Menu");;
+            System.out.println("9. Return to Main Menu");
             
             int choice = adminView.getMenuChoice();
 
@@ -190,50 +190,38 @@ public class AdministratorController {
                     }
                     break;
 
-                    case 5:
-                    // Get the request ID from the user
+                case 5:
+                    // Approve replenishment request
                     String requestId = adminView.getRequestIdForReplenishment();
-                    
-                    // Approve the request in ReplenishmentService and get the medicine name
                     String medicineNames = replenishmentService.approveRequest(requestId);
-                
-                    // If a valid medicine name is returned, update the inventory stock
                     if (medicineNames != null) {
-                        boolean inventoryUpdateSuccess = inventoryService.approveReplenishmentRequest(medicineNames);
-                        
-                        if (inventoryUpdateSuccess) {
-                            System.out.println("Replenishment request approved and inventory updated successfully.");
-                        } else {
-                            System.out.println("Failed to update inventory for replenished medicine.");
-                        }
+                        System.out.println("Replenishment request approved successfully.");
                     } else {
-                        System.out.println("Approval failed. Request ID not found in ReplenishmentService.");
+                        System.out.println("Failed to approve replenishment request. Request ID not found.");
                     }
                     break;
-                
-                
 
-                    case 6:
+                case 6:
                     viewPendingReplenishmentRequests();
                     break;
-            
+
                 case 7:
                     declineReplenishmentRequest();
                     break;
-            
+
                 case 8:
                     inventoryService.viewMedicationInventory();
                     break;
-            
+
                 case 9:
                     exit = true;
                     break;
-            
+
                 default:
                     System.out.println("Invalid choice. Please try again.");
             }
+        }
     }
-}
 
     /**
      * Manages appointments, displaying the list of scheduled appointments.
@@ -255,35 +243,37 @@ public class AdministratorController {
         return userService.changePassword(hospitalID, oldPassword, newPassword);
     }
 
+    /**
+     * Views all pending replenishment requests.
+     */
     private void viewPendingReplenishmentRequests() {
         List<ReplenishmentRequest> pendingRequests = replenishmentService.getRequestsByStatus(StatusEnum.PENDING);
-        
         if (pendingRequests.isEmpty()) {
             System.out.println("No pending replenishment requests found.");
         } else {
-            System.out.println("Pending Replenishment Requests:");
             for (ReplenishmentRequest request : pendingRequests) {
                 System.out.println("Request ID: " + request.getId() + ", Medicines: " + request.getMedicines() + ", Status: " + request.getStatus());
             }
         }
     }
-    
 
-private void declineReplenishmentRequest() {
-    Scanner sc = new Scanner(System.in);
-    System.out.print("Enter Request ID to decline: ");
-    String requestId = sc.nextLine();
+    /**
+     * Declines a replenishment request.
+     */
+    private void declineReplenishmentRequest() {
+        Scanner sc = new Scanner(System.in);
+        System.out.print("Enter Request ID to decline: ");
+        String requestId = sc.nextLine();
 
-    boolean success = replenishmentService.rejectRequest(requestId);
-    if (success) {
-        System.out.println("Replenishment request declined successfully.");
-    } else {
-        System.out.println("Failed to decline replenishment request. Request ID not found.");
+        boolean success = replenishmentService.rejectRequest(requestId);
+        if (success) {
+            System.out.println("Replenishment request declined successfully.");
+        } else {
+            System.out.println("Failed to decline replenishment request. Request ID not found.");
+        }
     }
 }
 
-
-}
 
 
 

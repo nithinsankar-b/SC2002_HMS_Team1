@@ -25,19 +25,37 @@ import views.DoctorView;
 
 import java.util.Scanner;
 
+/**
+ * Controller class for handling user-related operations.
+ * This includes user login, role-based navigation, and user account management functionalities.
+ */
 public class UserController {
     private final UserService userService;
     private final UserView userView;
 
+    /**
+     * Constructor for the UserController.
+     *
+     * @param userService The UserService instance for managing user-related operations.
+     */
     public UserController(UserService userService) {
         this.userService = userService;
         this.userView = new UserView(userService);
     }
 
+    /**
+     * Starts the UserController by displaying the login interface.
+     */
     public void run() {
         userView.displayLogin();
     }
 
+    /**
+     * Handles user login attempts, allowing a maximum of three attempts.
+     *
+     * @param scanner The Scanner instance for user input.
+     * @return True if login is successful, false otherwise.
+     */
     public boolean attemptLogin(Scanner scanner) {
         int attempts = 3; // Maximum number of attempts allowed
         boolean isAuthenticated = false;
@@ -66,6 +84,12 @@ public class UserController {
         return isAuthenticated;
     }
 
+    /**
+     * Navigates to the role-specific page based on the user's role.
+     *
+     * @param user The authenticated user.
+     * @param role The role of the user.
+     */
     private void navigateToRoleSpecificPage(User user, UserRole role) {
         switch (role) {
             case PATIENT:
@@ -90,10 +114,15 @@ public class UserController {
         }
     }
 
+    /**
+     * Navigates to the patient-specific page.
+     *
+     * @param user The authenticated patient user.
+     */
     private void navigateToPatientPage(User user) {
         AppointmentService appointmentService = new AppointmentService();
-        BillingService billingService=new BillingService();
-        BillingController billingController=new BillingController();
+        BillingService billingService = new BillingService();
+        BillingController billingController = new BillingController();
         PatientService patientService = new PatientService(userService);
         PatientController patientController = new PatientController(patientService, appointmentService);
         PatientView patientView = new PatientView(patientController, userService, billingController);
@@ -103,6 +132,11 @@ public class UserController {
         patientView.start(user);
     }
 
+    /**
+     * Navigates to the pharmacist-specific page.
+     *
+     * @param user The authenticated pharmacist user.
+     */
     private void navigateToPharmacistPage(User user) {
         AppointmentService appointmentService = new AppointmentService();
         InventoryDataStore inventoryDataStore = new InventoryDataStore();
@@ -118,6 +152,11 @@ public class UserController {
         pharmacistView.start(user);
     }
 
+    /**
+     * Navigates to the doctor-specific page.
+     *
+     * @param user The authenticated doctor user.
+     */
     private void navigateToDoctorPage(User user) {
         ScheduleService scheduleService = new ScheduleService();
         MedicalRecordService medicalRecordService = new MedicalRecordService();
@@ -132,7 +171,16 @@ public class UserController {
         doctorView.start(user);
     }
 
+    /**
+     * Changes the password for a user.
+     *
+     * @param hospitalID  The hospital ID of the user.
+     * @param oldPassword The old password of the user.
+     * @param newPassword The new password of the user.
+     * @return True if the password was successfully changed, false otherwise.
+     */
     public boolean changePassword(String hospitalID, String oldPassword, String newPassword) {
         return userService.changePassword(hospitalID, oldPassword, newPassword);
     }
 }
+

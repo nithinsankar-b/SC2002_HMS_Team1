@@ -40,7 +40,14 @@ public class PharmacistController {
     private final AppointmentOutcomeRecordView appointmentOutcomeRecordView;
     private final String csvFile = "data/replenishment_requests.csv";
 
-    // Constructor
+    /**
+     * Constructor for PharmacistController.
+     *
+     * @param pharmacistService    Service for managing pharmacist-specific operations.
+     * @param inventoryService     Service for managing inventory.
+     * @param appointmentService   Service for handling appointment-related tasks.
+     * @param replenishmentService Service for handling replenishment requests.
+     */
     public PharmacistController(PharmacistService pharmacistService, 
                                 InventoryService inventoryService, 
                                 AppointmentService appointmentService,
@@ -56,16 +63,20 @@ public class PharmacistController {
         this.appointmentOutcomeRecordView = new AppointmentOutcomeRecordView();
     }
 
-    // Method to view medication inventory
+    /**
+     * Displays the current medication inventory.
+     */
     public void viewMedicationInventory() {
         List<InventoryDisplay> inventory = inventoryService.getInventoryDisplay();
         medicalInventoryView.display(inventory);
     }
 
-    // Method to submit a replenishment request
+    /**
+     * Submits a replenishment request for low-stock medications.
+     * Prompts the user to enter medicine names to request replenishment.
+     */
     public void submitReplenishmentRequest() {
-    	
-    	List<InventoryDisplay> lowStockInventory = inventoryService.getLowStockInventory();
+        List<InventoryDisplay> lowStockInventory = inventoryService.getLowStockInventory();
         if (lowStockInventory.isEmpty()) {
             System.out.println("No low-stock medications in the inventory.");
             return;
@@ -73,13 +84,13 @@ public class PharmacistController {
             System.out.println("Low-Stock Medications:");
             medicalInventoryView.display(lowStockInventory);
         }
-        
+
         Scanner scanner = new Scanner(System.in);
         List<String> medicines = new ArrayList<>();
-        
-     InventoryDataStore inventoryDataStore = new InventoryDataStore();
-		// Load all medicines from the inventory
-        List<Inventory> inventoryList = inventoryDataStore .getInventoryList();
+        InventoryDataStore inventoryDataStore = new InventoryDataStore();
+
+        // Load all medicines from the inventory
+        List<Inventory> inventoryList = inventoryDataStore.getInventoryList();
         List<String> validMedicines = new ArrayList<>();
         for (Inventory inventory : inventoryList) {
             validMedicines.add(inventory.getMedicineName());
@@ -91,14 +102,13 @@ public class PharmacistController {
             if ("done".equalsIgnoreCase(medicineName)) {
                 break;
             }
-         // Validate if the entered medicine name is valid
+            // Validate if the entered medicine name is valid
             if (validMedicines.contains(medicineName)) {
                 medicines.add(medicineName); // Add valid medicine to the list
             } else {
                 System.out.println("Invalid medicine name: " + medicineName + ". Please try again.");
             }
         }
-        
 
         if (!medicines.isEmpty()) {
             replenishmentService.createReplenishmentRequest(medicines);
@@ -108,7 +118,9 @@ public class PharmacistController {
         }
     }
 
-    // Method to view all replenishment requests
+    /**
+     * Displays all replenishment requests, including their statuses.
+     */
     public void viewReplenishmentRequests() {
         List<ReplenishmentRequest> requests = replenishmentService.getAllRequests();
 
@@ -133,7 +145,6 @@ public class PharmacistController {
                         String medicines = parts[1].trim();
                         String status = parts[2].trim();
                         
-                        
                         // Print the request in a nicely formatted row
                         System.out.printf("%-20s %-40s %s\n", 
                                 id, 
@@ -146,13 +157,14 @@ public class PharmacistController {
                 e.printStackTrace();
             }
         }
-        }
-    
+    }
 
-    // Method to handle updating prescription status
+    /**
+     * Updates the prescription status for a given appointment.
+     *
+     * @param appointmentId The ID of the appointment to update.
+     */
     public void updatePrescription(String appointmentId) {
-    	
-    	
         boolean isUpdated = pharmacistService.updatePrescriptionStatus(appointmentId);
         if (isUpdated) {
             System.out.println("Prescription status updated successfully.");
@@ -161,13 +173,22 @@ public class PharmacistController {
         }
     }
 
-    // New method to view appointment outcome records
+    /**
+     * Displays the outcome records of appointments.
+     */
     public void viewAppointmentOutcomeRecords() {
         appointmentOutcomeRecordView.loadAndPrintAppointments();
     }
-    
-    // Method to change password
+
+    /**
+     * Changes the password for the pharmacist.
+     *
+     * @param hospitalID  The hospital ID of the pharmacist.
+     * @param oldPassword The old password of the pharmacist.
+     * @param newPassword The new password to be set.
+     */
     public void changePassword(String hospitalID, String oldPassword, String newPassword) {
         userService.changePassword(hospitalID, oldPassword, newPassword);
     }
 }
+
