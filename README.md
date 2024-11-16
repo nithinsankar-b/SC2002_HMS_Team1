@@ -8,6 +8,15 @@
 
 **Team Members:** [<img src="https://avatars.githubusercontent.com/u/119853913?v=4" height="20" width="20" /> Zhan You](https://github.com/donkey-king-kong) | [<img src="https://avatars.githubusercontent.com/u/144437711?v=4" height="20" width="20" /> Nithin](https://github.com/nithinsankar-b) | [<img src="https://avatars.githubusercontent.com/u/167533024?v=4" height="20" width="20" /> Janhavee](https://github.com/JanhaveeSingh) | [<img src="https://avatars.githubusercontent.com/u/164110710?v=4" height="20" width="20" /> Risha](https://github.com/RISHASUN001) | [<img src="https://avatars.githubusercontent.com/u/113620532?v=4" height="20" width="20" /> Chang Lin](https://github.com/Velosion)
 
+| Number   | Full Name    | 
+|---------------|--------------|
+|14| Lau Zhan You|
+|04| Babu Sankar Nithin Sankar|
+|20|Singh Janhavee|
+|18| Risha Sunil Shetty|
+|22| Tan Chang Lin|
+
+
 **Documentation:** [Report](https://github.com/nithinsankar-b/SC2002_HMS_Team1/blob/main/Report/SC2002%20Report%20-%20HMS%20Application.pdf) | [UML Class Diagram](https://github.com/nithinsankar-b/SC2002_HMS_Team1/blob/main/UML%20diagram/HMS-UML-ClassDigram.jpg.jpg) | [JavaDocs](https://nithinsankar-b.github.io/SC2002_HMS_Team1/)
 
 > A Java-based application for managing a Hospital Management System for doctors, patients, pharmacists, and administrators. Features include user authentication, user management, appointment scheduling, and inventory management.
