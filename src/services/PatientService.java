@@ -9,6 +9,7 @@ import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Scanner;
 
 import enums.UserRole;
 import models.Patient;
@@ -26,7 +27,6 @@ public class PatientService {
         this.userService = userService;
         this.patients = new HashMap<>();
         new AppointmentService();// Initialize AppointmentService
-// UserService will provide user details
         loadPatientsFromCSV(); // Load patients from the CSV file
     }
 
@@ -45,7 +45,6 @@ public class PatientService {
     public Map<String, Patient> getPatients() {
         return patients;
     }
-
 
     // Method to retrieve a patient by their hospital ID
     public Patient getPatientById(String hospitalID) {
@@ -159,4 +158,36 @@ public class PatientService {
             System.out.println("Error saving the CSV file: " + e.getMessage());
         }
     }
+
+    public boolean checkAndPromptPasswordChange(String hospitalID, Scanner scanner) {
+        User user = userService.getUserById(hospitalID);
+        try {
+            String encryptedDefaultPassword = UserService.encryptPassword("password");
+            if (user != null && user.getPassword().equals("ENC(" + encryptedDefaultPassword + ")")) {
+                System.out.println("Your password is set to the default value. Please change it immediately.");
+                while (true) {
+                    System.out.print("Enter New Password: ");
+                    String newPassword = scanner.nextLine();
+
+                    System.out.print("Confirm New Password: ");
+                    String confirmPassword = scanner.nextLine();
+
+                    if (newPassword.equals(confirmPassword)) {
+                        if (userService.changePassword(hospitalID, "password", newPassword)) {
+                            System.out.println("Password changed successfully!");
+                            return true;
+                        } else {
+                            System.out.println("Failed to change password. Please try again.");
+                        }
+                    } else {
+                        System.out.println("Passwords do not match. Please try again.");
+                    }
+                }
+            }
+        } catch (Exception e) {
+            System.out.println("Error: " + e.getMessage());
+        }
+        return false;
+    }
+
 }
