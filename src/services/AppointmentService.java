@@ -265,63 +265,97 @@ public class AppointmentService implements IAppointmentService {
         }
     }
 
-    // Load appointments from CSV file
-    public void loadAppointmentsFromCSV() {
-        appointments.clear();
-        try (BufferedReader reader = new BufferedReader(new FileReader(APPOINTMENT_FILE))) {
-            String line;
-            // Skip header line
-            reader.readLine();
-            while ((line = reader.readLine()) != null) {
-                Appointment appointment = Appointment.fromString(line);
-                if (appointment != null) {
-                    appointments.add(appointment);
-                }
+/**
+ * Loads all appointments from a CSV file into the appointments list.
+ * <p>
+ * This method clears any existing appointments in memory and then reads each line from the CSV file,
+ * skipping the header line. Each line is converted into an `Appointment` object and added to the appointments list.
+ * If there is an issue reading the file, an error message is logged to the console.
+ * </p>
+ */
+public void loadAppointmentsFromCSV() {
+    appointments.clear();
+    try (BufferedReader reader = new BufferedReader(new FileReader(APPOINTMENT_FILE))) {
+        String line;
+        // Skip header line
+        reader.readLine();
+        while ((line = reader.readLine()) != null) {
+            Appointment appointment = Appointment.fromString(line);
+            if (appointment != null) {
+                appointments.add(appointment);
             }
-        } catch (IOException e) {
-            System.err.println("Error reading appointments from CSV at path: " + APPOINTMENT_FILE + " - " + e.getMessage());
         }
+    } catch (IOException e) {
+        System.err.println("Error reading appointments from CSV at path: " + APPOINTMENT_FILE + " - " + e.getMessage());
     }
+}
 
-    // Save appointments to CSV file
-    public void saveAppointmentsToCSV() {
-        try (BufferedWriter writer = new BufferedWriter(new FileWriter(APPOINTMENT_FILE))) {
-            // Write header to the CSV file
-            writer.write("appointmentId,patientId,doctorId,appointmentDateTime,status,consultationNotes,serviceProvided,medications,quantity,medicationStatus");
-            writer.newLine();
-            for (Appointment appointment : appointments) {
-                writer.write(appointment.toString());
-                writer.newLine();
-            }
-        } catch (IOException e) {
-            System.err.println("Error writing appointments to CSV at path: " + APPOINTMENT_FILE + " - " + e.getMessage());
-        }
-    }
-
-    public Appointment findAppointment(String patientId, String doctorId, LocalDate date, LocalTime timeSlot) {
+/**
+ * Saves all appointments from the appointments list to a CSV file.
+ * <p>
+ * This method overwrites the CSV file with the current list of appointments in memory. 
+ * It writes a header row followed by each appointment in the list, converted to its string representation.
+ * If there is an issue writing to the file, an error message is logged to the console.
+ * </p>
+ */
+public void saveAppointmentsToCSV() {
+    try (BufferedWriter writer = new BufferedWriter(new FileWriter(APPOINTMENT_FILE))) {
+        // Write header to the CSV file
+        writer.write("appointmentId,patientId,doctorId,appointmentDateTime,status,consultationNotes,serviceProvided,medications,quantity,medicationStatus");
+        writer.newLine();
         for (Appointment appointment : appointments) {
-            if (appointment.getPatientId().equals(patientId) &&
-                    appointment.getDoctorId().equals(doctorId) &&
-                    appointment.getAppointmentDateTime().toLocalDate().equals(date) &&
-                    appointment.getAppointmentDateTime().toLocalTime().equals(timeSlot)) {
-
-                return appointment;
-            }
+            writer.write(appointment.toString());
+            writer.newLine();
         }
-        return null; // Return null if no matching appointment is found
+    } catch (IOException e) {
+        System.err.println("Error writing appointments to CSV at path: " + APPOINTMENT_FILE + " - " + e.getMessage());
     }
+}
 
-    public void updateAppointment(Appointment updatedAppointment) {
-        for (int i = 0; i < appointments.size(); i++) {
-            Appointment appointment = appointments.get(i);
-            if (appointment.getAppointmentId().equals(updatedAppointment.getAppointmentId())) {
-                appointments.set(i, updatedAppointment);
-                //System.out.println("Appointment updated successfully.");
-                saveAppointmentsToCSV();
-                return;
-            }
+
+/**
+ * Finds an appointment based on the patient ID, doctor ID, appointment date, and time slot.
+ *
+ * @param patientId the ID of the patient
+ * @param doctorId the ID of the doctor
+ * @param date the date of the appointment
+ * @param timeSlot the time slot of the appointment
+ * @return the `Appointment` object if a match is found, or `null` if no matching appointment exists
+ */
+public Appointment findAppointment(String patientId, String doctorId, LocalDate date, LocalTime timeSlot) {
+    for (Appointment appointment : appointments) {
+        if (appointment.getPatientId().equals(patientId) &&
+                appointment.getDoctorId().equals(doctorId) &&
+                appointment.getAppointmentDateTime().toLocalDate().equals(date) &&
+                appointment.getAppointmentDateTime().toLocalTime().equals(timeSlot)) {
+
+            return appointment;
         }
-        System.out.println("Appointment not found.");
     }
+    return null; // Return null if no matching appointment is found
+}
+
+/**
+ * Updates an existing appointment in the appointments list.
+ * <p>
+ * This method searches for the appointment by its ID and replaces it with the updated version.
+ * If the appointment is found and updated, the changes are saved to the CSV file.
+ * If the appointment is not found, a message is printed to the console.
+ * </p>
+ *
+ * @param updatedAppointment the updated `Appointment` object to replace the existing one
+ */
+public void updateAppointment(Appointment updatedAppointment) {
+    for (int i = 0; i < appointments.size(); i++) {
+        Appointment appointment = appointments.get(i);
+        if (appointment.getAppointmentId().equals(updatedAppointment.getAppointmentId())) {
+            appointments.set(i, updatedAppointment);
+            saveAppointmentsToCSV(); // Save the updated list to the CSV file
+            return;
+        }
+    }
+    System.out.println("Appointment not found.");
+}
+
 
 }

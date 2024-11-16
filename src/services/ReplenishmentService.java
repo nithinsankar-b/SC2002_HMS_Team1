@@ -10,8 +10,18 @@ import java.util.stream.Collectors;
 import enums.StatusEnum;
 import models.ReplenishmentRequest;
 
+/**
+ * Service class for managing replenishment requests in the healthcare system.
+ * <p>
+ * This class provides functionality to create, retrieve, approve, and reject replenishment requests,
+ * and handles the persistence of these requests in a CSV file.
+ * </p>
+ */
 public class ReplenishmentService {
 
+    /**
+     * Path to the CSV file that stores replenishment requests.
+     */
     private final String csvFile = "data/replenishment_requests.csv";
 
     /**

@@ -227,51 +227,67 @@ public class InventoryService implements IInventoryService {
         }
         System.out.println("Medicine not found: " + medicineName);
     }*/
-    public void updateStock(String medicineName, int quantity, String appointmentID) {
-        List<Inventory> inventoryDataList = inventoryDataStore.getInventoryList();
-        Appointment appointment = appointmentService.getAppointmentById(appointmentID);
-        boolean medicineFound = false;
+/**
+ * Updates the stock of a specified medicine based on the quantity dispensed for an appointment.
+ * 
+ * @param medicineName  The name of the medicine to update.
+ * @param quantity      The quantity of the medicine dispensed.
+ * @param appointmentID The ID of the appointment associated with the dispensed medicine.
+ */
+public void updateStock(String medicineName, int quantity, String appointmentID) {
+    List<Inventory> inventoryDataList = inventoryDataStore.getInventoryList();
+    Appointment appointment = appointmentService.getAppointmentById(appointmentID);
 
-        // Loop through inventory to find the specified medicine
-        for (Inventory data : inventoryDataList) {
-            if (data.getMedicineName().equalsIgnoreCase(medicineName)) {
-                medicineFound = true;
+    // Validate appointment
+    if (appointment == null) {
+        System.out.println("Appointment not found: " + appointmentID);
+        return;
+    }
 
-                // Check if the medication has already been dispensed for this appointment
-                if (appointment.getMedicationStatus() == MedicationStatus.DISPENSED) {
-                    System.out.println("Medication " + data.getMedicineName()+ " already dispensed for appointment ID: " + appointmentID);
-                    return;
-                }
+    boolean medicineFound = false;
 
-                // Check for sufficient stock
-                if (data.getCurrentStock() < quantity) {
-                    System.out.println("Not enough medicine in the inventory for: " + medicineName);
-                    return;
-                }
-                System.out.println(quantity);
-                // Update stock and set medication status to DISPENSED
-                data.setCurrentStock(data.getCurrentStock() - quantity);
-                appointment.setMedicationStatus(MedicationStatus.DISPENSED);
-                System.out.println("Updated stock for medicine: " + medicineName + ". New stock: " + data.getCurrentStock());
+    // Loop through inventory to find the specified medicine
+    for (Inventory data : inventoryDataList) {
+        if (data.getMedicineName().equalsIgnoreCase(medicineName)) {
+            medicineFound = true;
 
-                // Check if stock falls below the low-level alert and update status
-                if (data.getCurrentStock() <= data.getLowLevelAlert()) {
-                    data.setInventoryStatus(InventoryStatus.LOWSTOCK);
-                    System.out.println("Stock for " + medicineName + " is now LOWSTOCK.");
-                }
-
-                // Save updates to CSV files
-                saveDataToCSV();
-                appointmentService.saveAppointmentsToCSV();
+            // Check if the medication has already been dispensed for this appointment
+            if (appointment.getMedicationStatus() == MedicationStatus.DISPENSED) {
+                System.out.println("Medication " + data.getMedicineName() + " already dispensed for appointment ID: " + appointmentID);
                 return;
             }
-        }
 
-        // If no matching medicine is found
-        if (!medicineFound) {
-            System.out.println("Medicine not found: " + medicineName);
+            // Check for sufficient stock
+            if (data.getCurrentStock() < quantity) {
+                System.out.println("Not enough medicine in the inventory for: " + medicineName);
+                return;
+            }
+
+            // Update stock and set medication status to DISPENSED
+            data.setCurrentStock(data.getCurrentStock() - quantity);
+            appointment.setMedicationStatus(MedicationStatus.DISPENSED);
+
+            System.out.println("Updated stock for medicine: " + medicineName + ". New stock: " + data.getCurrentStock());
+
+            // Check if stock falls below the low-level alert and update status
+            if (data.getCurrentStock() <= data.getLowLevelAlert()) {
+                data.setInventoryStatus(InventoryStatus.LOWSTOCK);
+                System.out.println("Stock for " + medicineName + " is now LOWSTOCK.");
+            }
+
+            // Save updates to CSV files
+            saveDataToCSV();
+            appointmentService.saveAppointmentsToCSV();
+            return;
         }
     }
+
+    // If no matching medicine is found
+    if (!medicineFound) {
+        System.out.println("Medicine not found: " + medicineName);
+    }
+}
+
 
 
     /**
@@ -424,24 +440,39 @@ public class InventoryService implements IInventoryService {
     
     
     
-    public List<InventoryDisplay> getLowStockInventory() {
-        List<InventoryDisplay> lowStockInventory = new ArrayList<>();
+/**
+ * Retrieves a list of low-stock inventory items, including their statuses and replenishment statuses.
+ * 
+ * @return A list of `InventoryDisplay` objects representing low-stock items.
+ */
+public List<InventoryDisplay> getLowStockInventory() {
+    List<InventoryDisplay> lowStockInventory = new ArrayList<>();
 
-        // Get low stock items from the InventoryDataStore
-        for (Inventory item : inventoryDataStore.getLowStockInventory()) {
-            // Determine inventory status (Low or Sufficient)
-            InventoryStatus status = InventoryDisplay.getInventoryStatus(item.getCurrentStock(), item.getLowLevelAlert());
+    // Get low stock items from the InventoryDataStore
+    for (Inventory item : inventoryDataStore.getLowStockInventory()) {
+        /**
+         * Determine inventory status (e.g., Low or Sufficient) based on current stock and alert level.
+         * 
+         * @param currentStock The current stock of the item.
+         * @param lowLevelAlert The low-level alert threshold for the item.
+         * @return The inventory status (LOW or SUFFICIENT).
+         */
+        InventoryStatus status = InventoryDisplay.getInventoryStatus(item.getCurrentStock(), item.getLowLevelAlert());
 
-            InventoryDisplay displayItem = new InventoryDisplay(
-                    item.getMedicineName(),
-                    item.getCurrentStock(),
-                    status, // Set the inventory status (Low or Sufficient)
-                    item.getReplenishmentStatus()
-            );
-            lowStockInventory.add(displayItem);
-        }
+        // Create the display item with relevant details
+        InventoryDisplay displayItem = new InventoryDisplay(
+                item.getMedicineName(),
+                item.getCurrentStock(),
+                status, // Set the inventory status (Low or Sufficient)
+                item.getReplenishmentStatus()
+        );
 
-        return lowStockInventory;
+        // Add the display item to the low-stock inventory list
+        lowStockInventory.add(displayItem);
     }
+
+    return lowStockInventory;
+}
+
 
 }

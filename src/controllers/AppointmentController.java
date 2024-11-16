@@ -74,18 +74,20 @@ public class AppointmentController {
         return appointmentService.getAppointment(appointmentId);
     }
 
-    /**
-     * Records the outcome of an appointment, including the service provided, prescribed medications,
-     * and consultation notes.
-     *
-     * @param appointmentId         the ID of the appointment
-     * @param serviceProvided        the service provided during the appointment
-     * @param prescribedMedications  the list of medications prescribed during the appointment
-     * @param consultationNotes      notes from the consultation
-     */
-    public void recordAppointmentOutcome(String appointmentId, String serviceProvided, List<Medication> prescribedMedications, List<Integer> prescribedQuantities, String consultationNotes) {
-        appointmentService.recordAppointmentOutcome(appointmentId, serviceProvided, prescribedMedications, prescribedQuantities, consultationNotes);
-    }
+/**
+ * Records the outcome of an appointment, including the service provided, prescribed medications,
+ * prescribed quantities, and consultation notes.
+ *
+ * @param appointmentId         the ID of the appointment
+ * @param serviceProvided       the service provided during the appointment
+ * @param prescribedMedications the list of medications prescribed during the appointment
+ * @param prescribedQuantities  the quantities of each prescribed medication
+ * @param consultationNotes     notes from the consultation
+ */
+public void recordAppointmentOutcome(String appointmentId, String serviceProvided, List<Medication> prescribedMedications, List<Integer> prescribedQuantities, String consultationNotes) {
+    appointmentService.recordAppointmentOutcome(appointmentId, serviceProvided, prescribedMedications, prescribedQuantities, consultationNotes);
+}
+
 
     /**
      * Retrieves available time slots for scheduling an appointment based on the doctor's ID and date.

@@ -73,16 +73,28 @@ public class DoctorService implements IDoctorService {
         this.appointmentRequestService = new AppointmentRequestService(scheduleService, appointmentService);
         loadDoctorFromCSV();
     }
-    //add doctor function added.
-    public void addDoctor(Doctor doctor) {
-        if (!doctors.containsKey(doctor.getHospitalID())) {
-            doctors.put(doctor.getHospitalID(), doctor);
-            saveDoctorsToCSV();
-            System.out.println("Doctor added successfully.");
-        } else {
-            System.out.println("Doctor already exists.");
-        }
+/**
+ * Adds a new doctor to the system.
+ * <p>
+ * This method checks if a doctor with the given hospital ID already exists in the system. 
+ * If not, the doctor is added to the collection of doctors and the updated list is saved to the CSV file. 
+ * A success message is displayed upon successful addition. If the doctor already exists, 
+ * a message indicating the duplication is displayed.
+ * </p>
+ *
+ * @param doctor The `Doctor` object to be added to the system. This object contains 
+ *               details such as the hospital ID, name, specialization, and other relevant data.
+ */
+public void addDoctor(Doctor doctor) {
+    if (!doctors.containsKey(doctor.getHospitalID())) { // Check if the doctor exists
+        doctors.put(doctor.getHospitalID(), doctor); // Add the doctor to the map
+        saveDoctorsToCSV(); // Save the updated doctor list to the CSV file
+        System.out.println("Doctor added successfully.");
+    } else {
+        System.out.println("Doctor already exists."); // Indicate if the doctor is a duplicate
     }
+}
+
 
     /**
      * Retrieves a doctor by their hospital ID.

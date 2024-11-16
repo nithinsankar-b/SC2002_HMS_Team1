@@ -193,21 +193,32 @@ public class AppointmentRequestService implements IAppointmentRequestService {
 
 
 
-    public void save(AppointmentRequest request) {
-        try {
-            // Open the file in append mode, which adds new data to the end of the file
-            try (BufferedWriter writer = new BufferedWriter(new FileWriter(appointmentRequestFile, true))) {
-                // Ensure there is a new line before writing the request if file isn't empty
-                writer.newLine();  // This ensures a new line before appending data
-                
-                // Write the request to the CSV file
-                writer.write(request.toString());
-                writer.flush(); // Ensure the data is written to disk
-            }
-        } catch (IOException e) {
-            System.err.println("Error saving appointment request: " + e.getMessage());
+/**
+ * Saves an `AppointmentRequest` to the specified CSV file.
+ * <p>
+ * The request is appended to the file in a new line. If the file does not exist,
+ * it will be created. The `toString` method of `AppointmentRequest` is used
+ * to format the data for saving.
+ * </p>
+ *
+ * @param request the `AppointmentRequest` object to save
+ */
+public void save(AppointmentRequest request) {
+    try {
+        // Open the file in append mode, which adds new data to the end of the file
+        try (BufferedWriter writer = new BufferedWriter(new FileWriter(appointmentRequestFile, true))) {
+            // Ensure there is a new line before writing the request if file isn't empty
+            writer.newLine();  // This ensures a new line before appending data
+            
+            // Write the request to the CSV file
+            writer.write(request.toString());
+            writer.flush(); // Ensure the data is written to disk
         }
+    } catch (IOException e) {
+        System.err.println("Error saving appointment request: " + e.getMessage());
     }
+}
+
 
 
 

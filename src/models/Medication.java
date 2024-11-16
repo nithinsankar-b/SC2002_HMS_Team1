@@ -95,7 +95,15 @@ public class Medication {
                 '}';
     }
 
-    public void setMedicationStatus(enums.MedicationStatus medicationStatus) {
+/**
+ * Sets the medication status for the associated appointment or inventory item.
+ * 
+ * @param medicationStatus The status to set for the medication. This can represent 
+ *                         states such as DISPENSED, PENDING, or other statuses defined in the 
+ *                         {@link enums.MedicationStatus} enumeration.
+ */
+public void setMedicationStatus(enums.MedicationStatus medicationStatus) {
+    // Implementation can be added here if required in the future.
+}
 
-    }
 }

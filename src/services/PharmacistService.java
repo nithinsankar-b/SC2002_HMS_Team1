@@ -23,8 +23,12 @@ import services.UserService;
 import services.AppointmentService;
 import services.InventoryService;
 
+/**
+ * Service class for managing pharmacists and their interactions with appointments, inventory, and medications.
+ * The class provides functionality to load pharmacists, manage appointments, and handle inventory-related tasks.
+ */
 public class PharmacistService {
-    
+
     private final Map<String, Pharmacist> pharmacists;
     private final UserService userService;
     private final AppointmentService appointmentService;
@@ -35,9 +39,9 @@ public class PharmacistService {
     /**
      * Constructs a {@code PharmacistService} with the specified user, appointment, and inventory services.
      *
-     * @param userService the user service instance for retrieving user details
-     * @param appointmentService the appointment service instance for managing appointments
-     * @param inventoryService the inventory service instance for managing medication stock
+     * @param userService         the user service instance for retrieving user details
+     * @param appointmentService  the appointment service instance for managing appointments
+     * @param inventoryService    the inventory service instance for managing medication stock
      */
     public PharmacistService(UserService userService, AppointmentService appointmentService, InventoryService inventoryService) {
         this.userService = userService;

@@ -125,17 +125,23 @@ public class InventoryDataStore {
         }
     }
     
-    public List<Inventory> getLowStockInventory() {
-        List<Inventory> lowStockInventory = new ArrayList<>();
+   /**
+ * Retrieves a list of inventory items with stock levels below or equal to the low-level alert threshold.
+ *
+ * @return A list of `Inventory` objects that are low in stock.
+ */
+public List<Inventory> getLowStockInventory() {
+    List<Inventory> lowStockInventory = new ArrayList<>();
 
-        for (Inventory item : inventoryList) {
-            if (item.getCurrentStock() <= item.getLowLevelAlert()) {
-                lowStockInventory.add(item);
-            }
+    for (Inventory item : inventoryList) {
+        if (item.getCurrentStock() <= item.getLowLevelAlert()) {
+            lowStockInventory.add(item);
         }
-
-        return lowStockInventory;
     }
+
+    return lowStockInventory;
+}
+
 
 }
 

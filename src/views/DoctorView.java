@@ -133,26 +133,47 @@ public class DoctorView implements IDoctorView {
         System.out.println("10. Log Out");
     }
     
-    public void manageAvailabilityMenu(User user) {
-    	Doctor doctor = doctorService.getDoctorById(user.getHospitalID());
-        boolean managingAvailability = true;
-        while (managingAvailability) {
-            System.out.println("Manage Availability:");
-            System.out.println("1. Set Date to Available");
-            System.out.println("2. Set Date to Unavailable");
-            System.out.println("3. Return to Main Menu");
+   /**
+ * Displays the "Manage Availability" menu for a doctor.
+ * <p>
+ * This method allows a doctor to manage their availability by setting dates as available or unavailable.
+ * The menu runs in a loop until the doctor chooses to return to the main menu.
+ * </p>
+ * 
+ * <ul>
+ *     <li>Option 1: Set a date as available by unblocking slots.</li>
+ *     <li>Option 2: Set a date as unavailable by blocking slots.</li>
+ *     <li>Option 3: Exit the availability management menu and return to the main menu.</li>
+ * </ul>
+ * 
+ * @param user The `User` object representing the doctor managing their availability.
+ *             This includes their hospital ID, which is used to retrieve the corresponding `Doctor` object.
+ */
+public void manageAvailabilityMenu(User user) {
+    Doctor doctor = doctorService.getDoctorById(user.getHospitalID()); // Retrieve the doctor object using the hospital ID
+    boolean managingAvailability = true; // Flag to keep the menu running
 
-            int choice = getUserInput();
+    while (managingAvailability) {
+        System.out.println("Manage Availability:");
+        System.out.println("1. Set Date to Available");
+        System.out.println("2. Set Date to Unavailable");
+        System.out.println("3. Return to Main Menu");
 
-            switch (choice) {
-                case 1 -> doctorController.unblockSlots(doctor);
-                case 2 -> doctorController.blockSlots(doctor);
-                case 3 -> {managingAvailability = false;
-                return;}
-                default -> System.out.println("ERROR: Invalid choice, please try again.");
+        int choice = getUserInput(); // Get the user's menu choice
+
+        // Handle the user's menu choice
+        switch (choice) {
+            case 1 -> doctorController.unblockSlots(doctor); // Unblock slots to set date as available
+            case 2 -> doctorController.blockSlots(doctor); // Block slots to set date as unavailable
+            case 3 -> { 
+                managingAvailability = false; // Exit the loop
+                return;
             }
+            default -> System.out.println("ERROR: Invalid choice, please try again."); // Handle invalid input
         }
     }
+}
+
     
     private void manageAppointmentRequestsMenu(Doctor doctor) {
         boolean managingRequests = true;

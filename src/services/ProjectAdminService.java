@@ -377,16 +377,24 @@ public void addOrUpdateStaff(Staff staffMember) {
     public boolean approveReplenishmentRequest(String medicineName) {
         return inventoryService.approveReplenishmentRequest(medicineName);
     }
-    // Method to view pending replenishment requests
-    public List<ReplenishmentRequest> viewPendingReplenishmentRequests() {
-        return replenishmentService.getRequestsByStatus(StatusEnum.PENDING);
-    }
+/**
+ * Retrieves and displays a list of all pending replenishment requests.
+ *
+ * @return A list of {@code ReplenishmentRequest} objects with a status of {@code PENDING}.
+ */
+public List<ReplenishmentRequest> viewPendingReplenishmentRequests() {
+    return replenishmentService.getRequestsByStatus(StatusEnum.PENDING);
+}
 
-
-    // Method to decline a replenishment request
-    public boolean declineReplenishmentRequest(String requestId) {
-        return replenishmentService.rejectRequest(requestId);
-    }
+/**
+ * Declines a replenishment request by updating its status to {@code REJECTED}.
+ *
+ * @param requestId The ID of the replenishment request to decline.
+ * @return {@code true} if the request was successfully declined, {@code false} otherwise.
+ */
+public boolean declineReplenishmentRequest(String requestId) {
+    return replenishmentService.rejectRequest(requestId);
+}
 }
 
 

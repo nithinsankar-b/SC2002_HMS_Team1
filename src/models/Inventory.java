@@ -7,7 +7,7 @@ import static enums.InventoryStatus.INSTOCK;
 
 /**
  * Represents the inventory of a medicine in the healthcare system.
- * This class contains information about the medicine's stock levels, 
+ * This class contains information about the medicine's stock levels,
  * alert thresholds, and replenishment status.
  */
 public class Inventory {
@@ -31,18 +31,10 @@ public class Inventory {
         this.currentStock = currentStock;
         this.lowLevelAlert = lowLevelAlert;
         this.replenishmentStatus = replenishmentStatus != null ? replenishmentStatus : ReplenishmentStatus.APPROVED;
-        this.inventoryStatus = INSTOCK; // Note: This might need to be initialized explicitly
+        this.inventoryStatus = INSTOCK; // Default to IN STOCK
     }
 
-    /**
-     * Retrieves the name of the medication.
-     *
-     * @return The name of the medication.
-        this.replenishmentStatus = replenishmentStatus;
-        this.inventoryStatus = inventoryStatus; // Note: This might need to be initialized explicitly
-    }
-
-    // Getters and setters
+    // Getters and Setters
 
     /**
      * Returns the name of the medicine.
@@ -81,48 +73,57 @@ public class Inventory {
     }
 
     /**
-     * Returns the low level alert threshold for the medicine.
+     * Returns the low-level alert threshold for the medicine.
      *
-     * @return The low level alert threshold.
+     * @return The low-level alert threshold.
      */
     public int getLowLevelAlert() {
         return lowLevelAlert;
     }
 
     /**
-     * Sets the low level alert threshold for the medicine.
+     * Sets the low-level alert threshold for the medicine.
      *
-     * @param lowLevelAlert The low level alert threshold to set.
+     * @param lowLevelAlert The low-level alert threshold to set.
      */
     public void setLowLevelAlert(int lowLevelAlert) {
         this.lowLevelAlert = lowLevelAlert;
     }
 
     /**
-     * Returns the current status of the replenishment request for the medicine.
+     * Returns the current replenishment status for the medicine.
      *
      * @return The replenishment status.
      */
     public ReplenishmentStatus getReplenishmentStatus() {
-     return replenishmentStatus;
- }
+        return replenishmentStatus;
+    }
 
- /**
-  * Sets the replenishment status for the medicine.
-  *
-  * @param replenishmentStatus The replenishment status to set.
-  */
- public void setReplenishmentStatus(ReplenishmentStatus replenishmentStatus) {
-     this.replenishmentStatus = replenishmentStatus;
- }
+    /**
+     * Sets the replenishment status for the medicine.
+     *
+     * @param replenishmentStatus The replenishment status to set.
+     */
+    public void setReplenishmentStatus(ReplenishmentStatus replenishmentStatus) {
+        this.replenishmentStatus = replenishmentStatus;
+    }
 
- /**
-  * Sets the inventory status for the medicine.
-  *
-  * @param inventoryStatus The inventory status to set.
-  */
- public void setInventoryStatus(InventoryStatus inventoryStatus) {
-     this.inventoryStatus = inventoryStatus;
- }
+    /**
+     * Returns the current inventory status for the medicine.
+     *
+     * @return The inventory status.
+     */
+    public InventoryStatus getInventoryStatus() {
+        return inventoryStatus;
+    }
 
+    /**
+     * Sets the inventory status for the medicine.
+     *
+     * @param inventoryStatus The inventory status to set.
+     */
+    public void setInventoryStatus(InventoryStatus inventoryStatus) {
+        this.inventoryStatus = inventoryStatus;
+    }
 }
+
