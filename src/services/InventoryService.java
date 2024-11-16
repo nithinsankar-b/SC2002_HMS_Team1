@@ -409,13 +409,12 @@ public class InventoryService implements IInventoryService {
         List<Inventory> inventoryDataList = inventoryDataStore.getInventoryList();
 
         for (Inventory item : inventoryDataList) {
-            if (item.getMedicineName().equalsIgnoreCase(medicineName) &&
-                item.getReplenishmentStatus() == ReplenishmentStatus.PENDING) {
+            if (item.getMedicineName().equalsIgnoreCase(medicineName)) {
 
                 int replenishedAmount = calculateReplenishmentAmount(item.getCurrentStock(), item.getLowLevelAlert());
 
                 item.setCurrentStock(item.getCurrentStock() + replenishedAmount);
-                item.setReplenishmentStatus(ReplenishmentStatus.APPROVED);
+                
                 
                 saveDataToCSV();
                 System.out.println("Replenishment approved and completed for: " + medicineName);
