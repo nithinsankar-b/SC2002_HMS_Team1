@@ -2,8 +2,7 @@ package stores;
 
 import models.Staff;
 import java.io.*;
-import java.util.HashMap;
-import java.util.Map;
+import java.util.*;
 
 /**
  * The StaffDataStore class is responsible for managing staff data,
@@ -22,19 +21,39 @@ public class StaffDataStore {
     public void loadStaffFromCSV(String csvFilePath) throws IOException {
         BufferedReader reader = new BufferedReader(new FileReader(csvFilePath));
         String line;
+        boolean skipHeader = true; // Skip the header row
         while ((line = reader.readLine()) != null) {
+            if (skipHeader) {
+                skipHeader = false;
+                continue;
+            }
             String[] fields = line.split(",");
-            // Assuming fields are: id, name, gender, role, age
-            String id = fields[0];
-            String name = fields[1];
-            String role = fields[2];
-            String gender = fields[3];
-            int age = Integer.parseInt(fields[4]);
-
-            Staff staff = new Staff(id, name, role, gender, age);
-            staffList.put(id, staff);  // Add to staffList
+            if (fields.length != 5) {
+                System.err.println("Skipping malformed line: " + line);
+                continue;
+            }
+            try {
+                String id = fields[0];
+                String name = fields[1];
+                String role = fields[2];
+                String gender = fields[3];
+                int age = Integer.parseInt(fields[4].trim());
+                Staff staff = new Staff(id, name, role, gender, age);
+                staffList.put(id, staff);
+            } catch (NumberFormatException e) {
+                System.err.println("Skipping line with invalid age: " + line);
+            }
         }
         reader.close();
+    }
+
+    public void sortStaffList() {
+        List<Staff> sortedStaff = new ArrayList<>(staffList.values());
+        sortedStaff.sort(Comparator.comparing(Staff::getId)); // Ensures sorting by staffID
+        staffList = new LinkedHashMap<>(); // Preserve insertion order
+        for (Staff staff : sortedStaff) {
+            staffList.put(staff.getId(), staff);
+        }
     }
 
     /**
@@ -44,7 +63,10 @@ public class StaffDataStore {
      * @throws IOException If an error occurs while writing the file.
      */
     public void writeStaffToCSV(String csvFilePath) throws IOException {
+        sortStaffList();
         BufferedWriter writer = new BufferedWriter(new FileWriter(csvFilePath));
+        writer.write("staffID,name,role,gender,age"); // Add header
+        writer.newLine();
         for (Staff staff : staffList.values()) {
             writer.write(staff.getId() + "," + staff.getName() + "," +
                          staff.getRole() + "," + staff.getGender() + "," +

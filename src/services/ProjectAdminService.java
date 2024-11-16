@@ -92,6 +92,13 @@ public void addOrUpdateStaff(Staff staffMember) {
     // Add or update the user in UserService
     User existingUser = userService.getUserById(staffMember.getId());
     String password = (existingUser != null) ? existingUser.getPassword() : "password"; // Default password for new users
+    try {
+        String encryptedPassword = UserService.encryptPassword(password);
+        password = "ENC(" + encryptedPassword + ")";// Encrypt the default password
+    } catch (Exception e) {
+        System.err.println("Error encrypting password for staff ID: " + staffMember.getId());
+        return;
+    }
 
     // Set the appropriate role for UserService only if the user is new
     UserRole userRole = UserRole.valueOf(role.toUpperCase());

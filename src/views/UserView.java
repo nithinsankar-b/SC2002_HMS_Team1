@@ -20,6 +20,7 @@ import services.AppointmentRequestService;
 import services.MedicalRecordService;
 import controllers.BillingController;
 import services.BillingService;
+import stores.StaffDataStore;
 import views.DoctorView;
 import controllers.DoctorController;
 import views.PharmacistView;
@@ -28,6 +29,7 @@ import models.User;
 import views.PatientView;
 
 import java.io.Console;
+import java.io.IOException;
 import java.util.Scanner;
 
 /**
@@ -140,13 +142,17 @@ public class UserView {
      * @param scanner the Scanner object for user input
      * @return true to retry login, false to exit the application
      */
-    private boolean promptToExitOrRetry(Scanner scanner) {
+    private boolean promptToExitOrRetry(Scanner scanner) throws IOException {
         while (true) {
             System.out.print("Would you like to exit the application? (yes/no): ");
             String response = scanner.nextLine().trim().toLowerCase();
 
             if (response.equals("yes")) {
                 userService.saveToCSV(); // Ensure CSV sorted before exiting
+                // Save sorted staff list
+                StaffDataStore staffDataStore = new StaffDataStore();
+                staffDataStore.loadStaffFromCSV("data/Staff_List.csv");
+                staffDataStore.writeStaffToCSV("data/Staff_List.csv");
                 return false; // Exit the loop and end the program
             } else if (response.equals("no")) {
                 System.out.println("Returning to main login screen...");

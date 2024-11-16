@@ -33,7 +33,7 @@ public class UserService implements IUserService {
         loadUsersFromCSV( "data/User.csv"); // Adjusted for relative path
     }
 
-    private static String encryptPassword(String plainPassword) throws Exception {
+    static String encryptPassword(String plainPassword) throws Exception {
         SecretKey secretKey = new SecretKeySpec(SECRET_KEY.getBytes(), ALGORITHM);
         Cipher cipher = Cipher.getInstance(ALGORITHM);
         cipher.init(Cipher.ENCRYPT_MODE, secretKey);
