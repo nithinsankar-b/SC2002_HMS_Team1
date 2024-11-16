@@ -257,6 +257,12 @@ public class AdminView implements IAdministratorView {
         return scanner.nextLine();
     }
 
+    public String getUserIDForPassword() {
+        System.out.print("\nEnter User ID to view password: ");
+        return scanner.nextLine();
+    }
+
+
 }
 
 

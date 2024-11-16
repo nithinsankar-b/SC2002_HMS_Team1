@@ -251,6 +251,24 @@ public class UserService implements IUserService {
             System.out.println("Error writing to CSV file: " + e.getMessage());
         }
     }
-    
+
+    public String getPlaintextPassword(String userId) {
+        User user = users.get(userId);
+        if (user != null) {
+            try {
+                String encryptedPassword = user.getPassword();
+                if (encryptedPassword.startsWith("ENC(") && encryptedPassword.endsWith(")")) {
+                    return decryptPassword(encryptedPassword.substring(4, encryptedPassword.length() - 1));
+                } else {
+                    return encryptedPassword; // Return unencrypted password if stored directly
+                }
+            } catch (Exception e) {
+                System.out.println("Error decrypting password for user ID: " + userId);
+            }
+        }
+        return null; // Return null if user not found or decryption fails
+    }
+
+
 }
 

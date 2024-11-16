@@ -99,7 +99,8 @@ public class AdministratorController {
             System.out.println("1. Add or Update Staff");
             System.out.println("2. Remove Staff");
             System.out.println("3. View Staff List");
-            System.out.println("4. Return to Main Menu");
+            System.out.println("4. User Password Recovery");
+            System.out.println("5. Return to Main Menu");
             System.out.print("Choose an option: ");
             
             int choice = adminView.getMenuChoice();
@@ -128,6 +129,16 @@ public class AdministratorController {
                     break;
 
                 case 4:
+                    String userId = adminView.getUserIDForPassword();
+                    String plaintextPassword = userService.getPlaintextPassword(userId);
+                    if (plaintextPassword != null) {
+                        System.out.println("Password: " + plaintextPassword);
+                    } else {
+                        System.out.println("User not found or unable to retrieve password.");
+                    }
+                    break;
+
+                case 5:
                     exit = true;
                     break;
 
