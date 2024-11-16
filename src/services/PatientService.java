@@ -190,4 +190,25 @@ public class PatientService {
         return false;
     }
 
+    public boolean removePatient(String patientId) {
+        if (!patients.containsKey(patientId)) {
+            return false;
+        }
+
+        patients.remove(patientId);
+
+        try (BufferedWriter writer = new BufferedWriter(new FileWriter("data/Patient.csv"))) {
+            for (Patient patient : patients.values()) {
+                writer.write(patient.getHospitalID() + "," + patient.getName() + "," + patient.getDateOfBirth() + ","
+                        + patient.getGender() + "," + patient.getBloodType() + "," + patient.getContactInformation());
+                writer.newLine();
+            }
+            return true;
+        } catch (IOException e) {
+            System.err.println("Error updating Patient.csv: " + e.getMessage());
+            return false;
+        }
+    }
+
+
 }

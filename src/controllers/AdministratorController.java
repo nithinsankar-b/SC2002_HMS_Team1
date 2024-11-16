@@ -247,7 +247,8 @@ public class AdministratorController {
             System.out.println("===========================================");
             System.out.println("1. Add New Patient");
             System.out.println("2. View Patient List");
-            System.out.println("3. Return to Main Menu");
+            System.out.println("3. Remove Patient");
+            System.out.println("4. Return to Main Menu");
             System.out.print("Choose an option: ");
 
             int choice = adminView.getMenuChoice();
@@ -259,16 +260,23 @@ public class AdministratorController {
                         adminService.addOrUpdatePatient(newPatient);
                     }
                     break;
-
                 case 2:
                     List<Patient> patientList = adminService.getAllPatients();
                     adminView.displayPatientList(patientList);
                     break;
-
                 case 3:
+                    System.out.print("Enter Patient ID to remove: ");
+                    String patientIdToDelete = new Scanner(System.in).nextLine();
+                    boolean deleted = adminService.removePatient(patientIdToDelete);
+                    if (deleted) {
+                        System.out.println("Patient removed successfully.");
+                    } else {
+                        System.out.println("Failed to remove patient.");
+                    }
+                    break;
+                case 4:
                     exit = true;
                     break;
-
                 default:
                     System.out.println("Invalid choice. Please try again.");
             }

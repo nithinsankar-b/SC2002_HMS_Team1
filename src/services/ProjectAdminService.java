@@ -164,6 +164,26 @@ public class ProjectAdminService implements IProjectAdmService {
         }
     }
 
+    public boolean removePatient(String patientId) {
+        Patient patient = patientService.getPatientById(patientId);
+        if (patient == null) {
+            System.out.println("Patient not found: " + patientId);
+            return false;
+        }
+
+        boolean patientRemoved = patientService.removePatient(patientId);
+        boolean userRemoved = userService.removeUser(patientId);
+
+        if (patientRemoved && userRemoved) {
+            System.out.println("Patient data removed successfully.");
+            return true;
+        } else {
+            System.out.println("Error removing patient data for: " + patientId);
+            return false;
+        }
+    }
+
+
     public Patient getPatientById(String patientId) {
         return patientService.getPatientById(patientId);
     }
