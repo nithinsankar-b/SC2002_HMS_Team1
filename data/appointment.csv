@@ -13,6 +13,6 @@ appointmentId,patientId,doctorId,appointmentDateTime,status,consultationNotes,se
 "2843876",P1006,D001,2024-12-18T15:00,COMPLETED,Checkup,Checkup,Paracetamol;Amoxicillin,50;10,DISPENSED
 "3342793",P1006,D002,2024-12-17T15:00,COMPLETED,checkup,Checkup,Paracetamol,50,PENDING
 "4082225",P1006,D002,2024-12-13T10:30,COMPLETED,checkup,Checkup,Paracetamol;Amoxicillin,50;10,PENDING
-"4905299",P1007,D002,2024-12-16T14:00,CONFIRMED,,,No medications,0,PENDING
+"4905299",P1007,D002,2024-12-16T14:00,COMPLETED,checkup,checkup,Paracetamol,10,PENDING
 "2607696",P1014,D001,2024-12-12T15:00,COMPLETED,Checkup,Checkup,Paracetamol,10,PENDING
 "2748275",P1005,D001,2024-12-17T15:00,COMPLETED,Checkup,Checkup,Paracetamol,10,PENDING

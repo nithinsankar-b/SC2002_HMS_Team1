@@ -125,12 +125,12 @@ public class DoctorView implements IDoctorView {
                 
                 String continueInput = sc.nextLine().trim().toUpperCase();
 
-                if (continueInput.equals("N")) {
+                if (continueInput.equals("N") || continueInput.equals("NO")) {
                     isRunning = false;
-                } else if (!continueInput.equals("Y")) {
-                    System.out.println("Invalid input. Please enter Y or N.");
-                } else {
+                } else if (continueInput.equals("Y") || continueInput.equals("YES")) {
                     System.out.println("==============================\n");
+                } else {
+                    System.out.println("Invalid input. Please enter Y or N.");
                 }
             }
         }
