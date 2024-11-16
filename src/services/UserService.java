@@ -91,6 +91,11 @@ public class UserService implements IUserService {
         return false;
     }
 
+    public void reloadUserData() {
+        users.clear(); // Clear existing data
+        loadUsersFromCSV("data/User.csv"); // Reload data from CSV
+    }
+
     /**
      * Retrieves the role of the user identified by the hospital ID.
      *

@@ -105,6 +105,8 @@ public class UserView {
             //String password = new String(passwordArray);
             String password = scanner.nextLine();
 
+            userService.reloadUserData(); // Reload user data before login attempt
+
             if (userService.login(hospitalID, password)) {
                 loggedInHospitalID = hospitalID;
                 System.out.println("Login successful!");
