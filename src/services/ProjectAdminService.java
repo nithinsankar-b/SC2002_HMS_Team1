@@ -136,13 +136,12 @@ public class ProjectAdminService implements IProjectAdmService {
         String encryptedPassword;
         try {
             encryptedPassword = UserService.encryptPassword(password);
-            encryptedPassword = "ENC(" + encryptedPassword + ")";// Encrypt the default password
+            encryptedPassword = "ENC(" + encryptedPassword + ")";
         } catch (Exception e) {
             System.err.println("Error encrypting password for patientID: " + patient.getHospitalID());
             return;
         }
 
-        // Update User.csv file
         try (BufferedWriter writer = new BufferedWriter(new FileWriter("data/User.csv", true))) {
             writer.write(patient.getHospitalID() + "," + encryptedPassword + "," + patient.getRole());
             writer.newLine();
@@ -150,9 +149,9 @@ public class ProjectAdminService implements IProjectAdmService {
             System.err.println("Error updating User.csv: " + e.getMessage());
         }
 
-        // Sort and write Patient.csv
         List<Patient> patients = new ArrayList<>(patientService.getPatients().values());
         patients.sort((p1, p2) -> p1.getHospitalID().compareToIgnoreCase(p2.getHospitalID()));
+
         try (BufferedWriter writer = new BufferedWriter(new FileWriter("data/Patient.csv"))) {
             for (Patient p : patients) {
                 writer.write(p.getHospitalID() + "," + p.getName() + "," + p.getDateOfBirth() + ","
@@ -178,6 +177,7 @@ public class ProjectAdminService implements IProjectAdmService {
             System.out.println("Patient data removed successfully.");
             return true;
         } else {
+            System.out.println("Error removing patient data for: " + patientId);
             System.out.println("Error removing patient data for: " + patientId);
             return false;
         }

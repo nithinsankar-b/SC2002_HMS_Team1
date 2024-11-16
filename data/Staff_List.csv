@@ -1,9 +1,11 @@
 staffID,name,role,gender,age
 A001,Sarah Lee,Administrator,Female,40
 D001,John Smith,Doctor,Male,25
-D002,Emily Clarke,Doctor,Female,35
+D002,Will Smith,Doctor,Female,35
+D003,Gal Gadot,Doctor,Female,29
 PH001,Anny Yang,Pharmacist,Female,41
 PH002,Sarah Wong,Pharmacist,Female,29
 PH003,Genevieve Price,Pharmacist,Female,33
 PH004,Bill Gates,Pharmacist,Male,50
 PH005,Muhammad Ali,Pharmacist,Male,49
+PH006,Joe Biden,Pharmacist,Male,38

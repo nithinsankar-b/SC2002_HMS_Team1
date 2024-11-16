@@ -10,6 +10,7 @@ import java.util.List;
 import java.util.Scanner;
 
 import enums.StatusEnum;
+import views.MedicalInventoryView;
 
 /**
  * The AdministratorController class handles the core functionalities
@@ -86,14 +87,14 @@ public class AdministratorController {
 
         while (!exit) {
             System.out.println("===========================================");
-            System.out.println("-- Manage Hospital Staff & Patients --");
+            System.out.println("-- Manage Hospital Staff --");
             System.out.println("===========================================");
             System.out.println("1. Add or Update Staff");
             System.out.println("2. Remove Staff");
             System.out.println("3. View Staff List");
-            System.out.println("4. Manage Patients");
-            System.out.println("5. User Password Recovery");
-            System.out.println("6. Return to Main Menu");
+//            System.out.println("4. Manage Patients");
+            System.out.println("4. User Password Recovery");
+            System.out.println("5. Return to Main Menu");
             System.out.print("Choose an option: ");
 
             int choice = adminView.getMenuChoice();
@@ -101,8 +102,13 @@ public class AdministratorController {
             switch (choice) {
                 case 1:
                     Staff newStaff = adminView.getStaffDetails();
-                    adminService.addOrUpdateStaff(newStaff);
-                    System.out.println("Staff added/updated successfully.");
+                    if (newStaff != null) {
+                        adminService.addOrUpdateStaff(newStaff);
+                        System.out.println("Staff added/updated successfully.");
+                    } else{
+                        continue;
+                    }
+
                     break;
                 case 2:
                     String staffId = adminView.getStaffIDForRemoval();
@@ -117,10 +123,10 @@ public class AdministratorController {
                     List<Staff> staffList = adminService.getAllStaff();
                     adminView.displayListOfStaff(staffList);
                     break;
+//                case 4:
+//                    managePatients();
+//                    break;
                 case 4:
-                    managePatients();
-                    break;
-                case 5:
                     String userId = adminView.getUserIDForPassword();
                     String plaintextPassword = userService.getPlaintextPassword(userId);
                     if (plaintextPassword != null) {
@@ -129,7 +135,7 @@ public class AdministratorController {
                         System.out.println("User not found or unable to retrieve password.");
                     }
                     break;
-                case 6:
+                case 5:
                     exit = true;
                     break;
                 default:
@@ -195,20 +201,30 @@ public class AdministratorController {
                     break;
 
                     case 5:
+                    viewPendingReplenishmentRequests();
                     // Get the request ID from the user
                     String requestId = adminView.getRequestIdForReplenishment();
-                    
-                    // Approve the request in ReplenishmentService and get the medicine name
-                    String medicineNames = replenishmentService.approveRequest(requestId);
-                
-                    // If a valid medicine name is returned, update the inventory stock
-                    if (medicineNames != null) {
-                        boolean inventoryUpdateSuccess = inventoryService.approveReplenishmentRequest(medicineNames);
-                        
-                        if (inventoryUpdateSuccess) {
+
+                    // Approve the request in ReplenishmentService and get the medicine names
+                    List<String> medicineNames = replenishmentService.approveRequest(requestId);
+
+                    // If valid medicine names are returned, update the inventory stock for each medicine
+                    if (medicineNames != null && !medicineNames.isEmpty()) {
+                        boolean allUpdatesSuccessful = true;
+
+                        for (String medName : medicineNames) {
+                            boolean updateSuccess = inventoryService.approveReplenishmentRequest(medName);
+
+                            if (!updateSuccess) {
+                                allUpdatesSuccessful = false;
+                                System.out.println("Failed to update inventory for medicine: " + medName);
+                            }
+                        }
+
+                        if (allUpdatesSuccessful) {
                             System.out.println("Replenishment request approved and inventory updated successfully.");
                         } else {
-                            System.out.println("Failed to update inventory for replenished medicine.");
+                            System.out.println("Replenishment request partially updated. Check inventory for details.");
                         }
                     } else {
                         System.out.println("Approval failed. Request ID not found in ReplenishmentService.");
@@ -224,7 +240,9 @@ public class AdministratorController {
                     break;
             
                 case 8:
-                    inventoryService.viewMedicationInventory();
+                    MedicalInventoryView medicalInventoryView = new MedicalInventoryView(inventoryService);
+                    List<InventoryDisplay> inventory = inventoryService.getInventoryDisplay();
+                    medicalInventoryView.display(inventory);
                     break;
             
                 case 9:

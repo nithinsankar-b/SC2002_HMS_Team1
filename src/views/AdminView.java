@@ -47,7 +47,7 @@ public class AdminView implements IAdministratorView {
      */
     public void displayMenu() {
         System.out.println("Please choose an option:");
-        System.out.println("1. Manage Hospital Staff & Patients");
+        System.out.println("1. Manage Hospital Staff");
         System.out.println("2. Manage Inventory");
         System.out.println("3. View Appointments");
         System.out.println("4. Change Password");
@@ -335,6 +335,7 @@ public class AdminView implements IAdministratorView {
                 name, dateOfBirth, gender, bloodType, contactInformation
         );
     }
+
 
     // Add a new method to display the list of patients
     public void displayPatientList(List<Patient> patientList) {

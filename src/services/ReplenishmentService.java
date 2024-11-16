@@ -144,25 +144,23 @@ public class ReplenishmentService {
     
     
     // Approves a replenishment request by changing its status to APPROVED
-    public String approveRequest(String requestId) {
+    public List<String> approveRequest(String requestId) {
+        List<String> approvedMedicines = new ArrayList<>();
         boolean found = false;
-        String medicineName = null;
-    
+
         List<ReplenishmentRequest> requests = getAllRequests();
         for (ReplenishmentRequest request : requests) {
             if (request.getId().equals(requestId) && request.getStatus() == StatusEnum.PENDING) {
                 request.setStatus(StatusEnum.APPROVED);
-                medicineName = request.getMedicines().get(0); // Assuming single medicine per request
+                approvedMedicines.addAll(request.getMedicines());
                 found = true;
-                break;
             }
         }
-    
+
         if (found) {
-            // Save the updated status to CSV
             saveRequestsToCSV(requests);
-            System.out.println("Replenishment request approved for: " + medicineName);
-            return medicineName;
+            System.out.println("Replenishment request approved for: " + approvedMedicines);
+            return approvedMedicines;
         } else {
             System.out.println("Request ID not found or already approved.");
             return null;

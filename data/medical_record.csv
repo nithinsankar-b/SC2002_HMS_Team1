@@ -3,12 +3,13 @@ P1007,Grace Lee,30/9/83,Female,2134 5678,grace.lee@example.com,O+,Headache,Parac
 P1008,Henry Clark,22/4/95,Male,3034 5678,henry.clark@example.com,B+,Stomach pain,Ibuprofen,Fever,Paracetamol
 P1005,Eve Johnson,5/12/92,Female,1234 5678,johnson.eve@example.com,B-,Cough; Bacterial infection,Paracetamol ,Found out got cancer,Amoxicillin
 P1006,Frank Wright,16/7/78,Male,4834 5678,frank.wright@example.com,A-,Pneumonia ,Amoxicillin ,Stomach pain,Ibuprofen
-P1003,Charlie White,8/7/90,Male,5734 5678,test@example.com,O-,Fever,Paracetamol ,Dental Abscess,Amoxicillin 
+P1003,Charlie White,8/7/90,Male,5734 5678,charlie.white@example.com,O-,Fever,Paracetamol ,Dental Abscess,Amoxicillin
 P1004,David Smith,20/2/85,Male,6634 5678,david.smith@example.com,AB+,Headache,Paracetamol ,Cough,Paracetamol
-P1001,Alice Brown,14/5/80,Female,7534 5678,alice@nit.com,A+,Stomach pain,Ibuprofen,Fever,Paracetamol
+P1001,Alice Brown,14/5/80,Female,7534 5678,alice.brown@example.com,A+,Stomach pain,Ibuprofen,Fever,Paracetamol
 P1012,Liam Turner,25/1/87,Male,8434 5678,liam.turner@example.com,O+,Cough,Paracetamol ,Bacterial infection,Amoxicillin 
 P1002,Bob Stone,22/11/75,Male,9334 5678,bob@e.example.com,B+,Pneumonia ,Amoxicillin ,Stomach pain,Ibuprofen
 P1013,Mia Parker,19/10/84,Female,1023 5678,mia.parker@example.com,B-,Fever,Paracetamol ,Dental Abscess,Amoxicillin 
 P1010,Jack Evans,8/3/79,Male,1113 5678,jack.evans@example.com,A+,Headache,Paracetamol ,Cough,Paracetamol
 P1011,Karen Scott,14/6/90,Female,1203 5678,karen.scott@example.com,AB-,Stomach pain,Ibuprofen,Fever,Paracetamol
+P1014,Homer Simpson,21/7/65,Male,1203 5678,homer.simpson@example.com,A+,Stomach pain,Ibuprofen,Fever,Paracetamol
 ﻿patient ID,Name,Date of Birth,Gender,Phone number ,Email Address,Blood Type,Past Diagnosis,Past Prescriptions,New diagnosis,New Prescriptions

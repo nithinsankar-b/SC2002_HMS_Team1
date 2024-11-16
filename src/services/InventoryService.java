@@ -248,10 +248,10 @@ public class InventoryService implements IInventoryService {
                     System.out.println("Not enough medicine in the inventory for: " + medicineName);
                     return;
                 }
-                System.out.println(quantity);
+//                System.out.println(quantity);
                 // Update stock and set medication status to DISPENSED
                 data.setCurrentStock(data.getCurrentStock() - quantity);
-                appointment.setMedicationStatus(MedicationStatus.DISPENSED);
+//                appointment.setMedicationStatus(MedicationStatus.DISPENSED);
                 System.out.println("Updated stock for medicine: " + medicineName + ". New stock: " + data.getCurrentStock());
 
                 // Check if stock falls below the low-level alert and update status
@@ -405,26 +405,20 @@ public class InventoryService implements IInventoryService {
      * @param medicineName The name of the medication.
      * @return True if the request was approved and stock updated, false otherwise.
      */
+
     public boolean approveReplenishmentRequest(String medicineName) {
         List<Inventory> inventoryDataList = inventoryDataStore.getInventoryList();
 
         for (Inventory item : inventoryDataList) {
-            if (item.getMedicineName().equalsIgnoreCase(medicineName) &&
-                item.getReplenishmentStatus() == ReplenishmentStatus.PENDING) {
-
+            if (item.getMedicineName().equalsIgnoreCase(medicineName)) {
                 int replenishedAmount = calculateReplenishmentAmount(item.getCurrentStock(), item.getLowLevelAlert());
-
-                item.setCurrentStock(item.getCurrentStock() + replenishedAmount);
-                item.setReplenishmentStatus(ReplenishmentStatus.APPROVED);
-                
-                saveDataToCSV();
+                item.setCurrentStock(item.getCurrentStock() + replenishedAmount); // Update stock
+                saveDataToCSV(); // Save updated inventory
                 System.out.println("Replenishment approved and completed for: " + medicineName);
                 return true;
             }
         }
-        
-        System.out.println("Replenishment request not found or already processed for: " + medicineName);
-        return false;
+        return false; // Medicine not found
     }
     
     public List<InventoryDisplay> getLowStockInventory() {

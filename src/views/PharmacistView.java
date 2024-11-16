@@ -61,6 +61,11 @@ public class PharmacistView implements IPharmacistView {
             }
         }
 
+        if (user.getPassword().equals("password")) {
+            System.out.println("Your password is set to the default and must be updated.\n");
+            changePassword();
+        }
+
         boolean isRunning = true;
         while (isRunning) {
             displayMenu();
@@ -146,7 +151,7 @@ System.out.println("Appointments with Pending Medication Status:");
      * Displays the menu options available to the pharmacist.
      */
     public void displayMenu() {
-        System.out.println("Please choose an option:");
+        System.out.println("\nPlease choose an option:");
         System.out.println("1. View Medication Inventory");
         System.out.println("2. Submit Replenishment Request");
         System.out.println("3. View Replenishment Requests");  // New option to view requests
@@ -174,13 +179,13 @@ System.out.println("Appointments with Pending Medication Status:");
     private void changePassword()
     {
       Scanner sc=new Scanner(System.in);
-      System.out.println("Enter Hospital ID");
+      System.out.print("Enter Hospital ID: ");
       String id = sc.nextLine();
       
-      System.out.println("Enter old password");
+      System.out.print("Enter old password: ");
       String oldPassword = sc.nextLine();
       
-      System.out.println("Enter new password");
+      System.out.print("Enter new password: ");
       String newPassword = sc.nextLine();
       
       pharmacistController.changePassword(id, oldPassword, newPassword);

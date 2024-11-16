@@ -11,7 +11,6 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Scanner;
 import models.Medication;
-import models.Doctor;
 
 import models.Patient;
 import models.Appointment;
@@ -25,17 +24,8 @@ import services.DoctorService;
 import services.UserService;
 import views.AllocatedAppointmentView;
 import views.AppointmentHistoryView;
-import views.MedicalRecordView;
 
-import java.io.BufferedReader;
-import java.io.FileReader;
 import java.io.IOException;
-import java.util.Scanner;
-import java.time.LocalDate;
-import java.time.LocalDateTime;
-import java.time.LocalTime;
-import java.time.format.DateTimeFormatter;
-import controllers.DoctorController;
 import java.util.stream.Collectors;
 
 public class PatientController {
@@ -43,7 +33,6 @@ public class PatientController {
     private final AppointmentService appointmentService;
     private final AllocatedAppointmentView allocatedAppointmentView;
     private final AppointmentHistoryView appointmentHistoryView;
-    private final MedicalRecordView medicalRecordView;
 
     // Constructor
     public PatientController(PatientService patientService, AppointmentService appointmentService) {
@@ -53,7 +42,6 @@ public class PatientController {
         // Pass the AppointmentService instance to each view
         this.allocatedAppointmentView = new AllocatedAppointmentView(appointmentService);
         this.appointmentHistoryView = new AppointmentHistoryView(appointmentService);
-        this.medicalRecordView = new MedicalRecordView(appointmentService);
     }
 
     // Method to view patient details
@@ -86,15 +74,6 @@ public class PatientController {
     public void viewAppointmentHistory(Patient patient) {
         if (patient != null) {
             appointmentHistoryView.display(patient);
-        } else {
-            System.out.println("Patient not found.");
-        }
-    }
-
-    // Method to view medical records
-    public void viewMedicalRecords(Patient patient) {
-        if (patient != null) {
-            medicalRecordView.display(patient);
         } else {
             System.out.println("Patient not found.");
         }

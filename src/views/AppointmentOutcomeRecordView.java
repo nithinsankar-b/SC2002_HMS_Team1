@@ -21,7 +21,7 @@ public class AppointmentOutcomeRecordView {
 
                 if (fields.length == 10) { // Ensure we have all 10 fields
                     //System.out.println("\nAppointment Details:");
-                    if(!fields[4].trim().equals("COMPLETED") && !(fields[9].trim().equals("PENDING")))
+                    if(!fields[4].trim().equals("COMPLETED") || !(fields[9].trim().equals("PENDING")))
                     {
                         continue;
                     }

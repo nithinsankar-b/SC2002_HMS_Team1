@@ -43,6 +43,7 @@ public class PatientView implements iPatientView {
 
             if (userInput.equals("Y")) {
                 registerNewPatient(user);
+                System.out.println();
             } else {
                 System.out.println("Unable to proceed without patient information.");
                 return;
