@@ -233,10 +233,15 @@ public class AdminView implements IAdministratorView {
         }
     }
 
-    public String getRequestIdForReplenishment() {
-        System.out.print("Enter Request ID: ");
-        return scanner.nextLine();
-    }
+/**
+ * Prompts the user to enter a replenishment request ID and returns the input.
+ *
+ * @return The request ID entered by the user as a String.
+ */
+public String getRequestIdForReplenishment() {
+    System.out.print("Enter Request ID: ");
+    return scanner.nextLine(); // Reads user input and returns it
+}
     
 }
 

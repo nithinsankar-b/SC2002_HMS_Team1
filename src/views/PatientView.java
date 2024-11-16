@@ -15,12 +15,23 @@ import java.time.format.DateTimeFormatter;
 import java.util.List;
 import java.util.Scanner;
 
+/**
+ * The PatientView class provides the user interface for patients.
+ * It allows patients to view their details, manage appointments, view billing information, and update contact details.
+ */
 public class PatientView implements iPatientView {
     private final Scanner scanner;
     private final PatientController patientController;
     private final UserService userService;
     private final BillingController billingController;
 
+    /**
+     * Constructor for PatientView.
+     *
+     * @param patientController Controller for managing patient-related actions.
+     * @param userService Service for managing user data.
+     * @param billingController Controller for managing billing operations.
+     */
     public PatientView(PatientController patientController, UserService userService, BillingController billingController) {
         this.scanner = new Scanner(System.in); // Centralized Scanner management
         this.patientController = patientController;
@@ -28,6 +39,11 @@ public class PatientView implements iPatientView {
         this.billingController = billingController;
     }
 
+    /**
+     * Starts the patient interface.
+     *
+     * @param user The user object representing the logged-in patient.
+     */
     public void start(User user) {
         PatientService patientService = new PatientService(userService);
         boolean isRunning = true;
@@ -62,7 +78,7 @@ public class PatientView implements iPatientView {
                 case 9 -> patientController.viewAvailableAppointmentSlots();
                 case 10 -> patientController.viewPastRecords(patient);
                 case 11 -> showBillingOptions(patient);
-                case 12-> patientController.changePassword(patient);
+                case 12 -> patientController.changePassword(patient);
                 case 13 -> {
                     System.out.println("Logging out...");
                     isRunning = false;
@@ -83,6 +99,11 @@ public class PatientView implements iPatientView {
         }
     }
 
+    /**
+     * Registers a new patient.
+     *
+     * @param user The user object for the new patient.
+     */
     private void registerNewPatient(User user) {
         System.out.print("Enter Patient Name: ");
         String name = scanner.nextLine().trim();
@@ -105,6 +126,9 @@ public class PatientView implements iPatientView {
         System.out.println("New patient registered successfully.");
     }
 
+    /**
+     * Displays the main menu options for the patient.
+     */
     public void displayMenu() {
         System.out.println("Please choose an option:");
         System.out.println("1. View Medical Record");
@@ -122,16 +146,26 @@ public class PatientView implements iPatientView {
         System.out.println("13. Log Out");
     }
 
+    /**
+     * Gets the user's menu choice.
+     *
+     * @return The menu option chosen by the user.
+     */
     private int getUserInput() {
         int choice = -1;
         try {
             choice = Integer.parseInt(scanner.nextLine());
         } catch (NumberFormatException e) {
-            showErrorMessage("Invalid input. Please enter a number between 1 and 12.");
+            showErrorMessage("Invalid input. Please enter a number between 1 and 13.");
         }
         return choice;
     }
 
+    /**
+     * Displays billing options for the patient.
+     *
+     * @param patient The patient for whom billing details are displayed.
+     */
     public void showBillingOptions(Patient patient) {
         boolean isBillingMenuRunning = true;
 
@@ -205,8 +239,6 @@ public class PatientView implements iPatientView {
             }
         }
     }
-
-
 
     @Override
     public void display(Patient patient) {

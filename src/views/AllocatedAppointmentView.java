@@ -15,14 +15,27 @@ import services.UserService;
 import services.ScheduleService;
 import models.Doctor;
 
+/**
+ * Represents a view for displaying allocated appointments for a patient.
+ * Implements the iPatientView interface to manage the patient-specific display operations.
+ */
 public class AllocatedAppointmentView implements iPatientView {
     private final AppointmentService appointmentService;
 
-    // Constructor
+    /**
+     * Constructor for AllocatedAppointmentView.
+     *
+     * @param appointmentService the AppointmentService instance used to fetch appointment details.
+     */
     public AllocatedAppointmentView(AppointmentService appointmentService) {
         this.appointmentService = appointmentService;
     }
 
+    /**
+     * Displays the details of a given patient.
+     *
+     * @param patient the Patient object whose details are to be displayed.
+     */
     @Override
     public void showPatientDetails(Patient patient) {
         System.out.println("Patient ID: " + patient.getHospitalID());
@@ -33,82 +46,92 @@ public class AllocatedAppointmentView implements iPatientView {
         System.out.println("Contact Information: " + patient.getContactInformation());
     }
 
+    /**
+     * Displays a success message to the user.
+     *
+     * @param message the success message to be displayed.
+     */
     @Override
     public void showSuccessMessage(String message) {
         System.out.println("SUCCESS: " + message);
     }
 
+    /**
+     * Displays an error message to the user.
+     *
+     * @param message the error message to be displayed.
+     */
     @Override
     public void showErrorMessage(String message) {
         System.out.println("ERROR: " + message);
     }
 
-    // Display method
+    /**
+     * Displays the allocated appointments for a given patient.
+     * Filters the appointments to include only pending, confirmed, or canceled appointments.
+     *
+     * @param patient the Patient object whose allocated appointments are to be displayed.
+     */
     @Override
     public void display(Patient patient) {
-        //System.out.println("Displaying allocated appointments for Patient ID: " + patient.getHospitalID());
-
-        // Get the list of all scheduled appointments from the AppointmentService
         List<Appointment> appointments = appointmentService.viewScheduledAppointments();
-
-        // Define a DateTimeFormatter for a 24-hour format
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd MMM yyyy, HH:mm");
-
-        // Filter appointments allocated to this patient and display them
         boolean found = false;
+
         for (Appointment appointment : appointments) {
-            // Check if the appointment is allocated to the patient and is pending
-            if (appointment.getPatientId().equals(patient.getHospitalID()) && (appointment.getStatus() == enums.AppointmentStatus.PENDING|| appointment.getStatus() == AppointmentStatus.CONFIRMED || appointment.getStatus() == AppointmentStatus.CANCELLED))
-            {
+            if (appointment.getPatientId().equals(patient.getHospitalID()) &&
+                    (appointment.getStatus() == enums.AppointmentStatus.PENDING ||
+                            appointment.getStatus() == AppointmentStatus.CONFIRMED ||
+                            appointment.getStatus() == AppointmentStatus.CANCELLED)) {
                 found = true;
                 System.out.println("Appointment ID: " + appointment.getAppointmentId());
                 System.out.println("Doctor ID: " + appointment.getDoctorId());
-
-                // Format the appointment date and time for better readability
-                String formattedDateTime = appointment.getAppointmentDateTime().format(formatter);
-                System.out.print("Date & Time: " + formattedDateTime);
+                System.out.print("Date & Time: " + appointment.getAppointmentDateTime().format(formatter));
                 System.out.println(" HRS");
-
                 System.out.println("Status: " + appointment.getStatus());
                 System.out.println("------------------------");
             }
         }
+
         if (!found) {
             System.out.println("No allocated appointments found for Patient ID: " + patient.getHospitalID());
         }
     }
+
+    /**
+     * Displays confirmed appointments for a given patient.
+     * Includes additional information about the doctor's name.
+     *
+     * @param patient the Patient object whose confirmed appointments are to be displayed.
+     */
     public void display2(Patient patient) {
-        //System.out.println("Displaying allocated appointments for Patient ID: " + patient.getHospitalID());
-
-        // Get the list of all scheduled appointments from the AppointmentService
         List<Appointment> appointments = appointmentService.viewScheduledAppointments();
-
-        // Define a DateTimeFormatter for a 24-hour format
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd MMM yyyy, HH:mm");
-
-        // Filter appointments allocated to this patient and display them
         boolean found = false;
+
         for (Appointment appointment : appointments) {
-            // Check if the appointment is allocated to the patient and is pending
-            UserService userService=new UserService();
-            MedicalRecordService medicalRecordService=new MedicalRecordService();
-            ScheduleService scheduleService=new services.ScheduleService();
-            DoctorService doctorService=new services.DoctorService(userService, scheduleService, medicalRecordService,appointmentService);
-            Doctor doctor=doctorService.getDoctorById(appointment.getDoctorId());
-            if (appointment.getPatientId().equals(patient.getHospitalID()) && (appointment.getStatus() == AppointmentStatus.CONFIRMED)) {
+            UserService userService = new UserService();
+            MedicalRecordService medicalRecordService = new MedicalRecordService();
+            ScheduleService scheduleService = new services.ScheduleService();
+            DoctorService doctorService = new services.DoctorService(userService, scheduleService, medicalRecordService, appointmentService);
+            Doctor doctor = doctorService.getDoctorById(appointment.getDoctorId());
+
+            if (appointment.getPatientId().equals(patient.getHospitalID()) &&
+                    (appointment.getStatus() == AppointmentStatus.CONFIRMED)) {
                 found = true;
                 System.out.println("Appointment ID: " + appointment.getAppointmentId());
                 System.out.println("Doctor ID: " + appointment.getDoctorId());
-                System.out.println("Doctor Name: "+ doctor.getName());
-
-                // Format the appointment date and time for better readability
-                String formattedDateTime = appointment.getAppointmentDateTime().format(formatter);
-                System.out.print("Date & Time: " + formattedDateTime);
+                System.out.println("Doctor Name: " + doctor.getName());
+                System.out.print("Date & Time: " + appointment.getAppointmentDateTime().format(formatter));
                 System.out.println(" HRS");
-
                 System.out.println("Status: " + appointment.getStatus());
                 System.out.println("------------------------");
             }
         }
+
+        if (!found) {
+            System.out.println("No confirmed appointments found for Patient ID: " + patient.getHospitalID());
+        }
     }
 }
+

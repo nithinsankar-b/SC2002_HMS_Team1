@@ -8,14 +8,27 @@ import models.Appointment;
 import models.Patient;
 import services.AppointmentService;
 
+/**
+ * View class to display the appointment history of a patient.
+ * Implements the iPatientView interface to handle patient-specific operations.
+ */
 public class AppointmentHistoryView implements iPatientView {
     private final AppointmentService appointmentService;
 
-    // Constructor
+    /**
+     * Constructor for AppointmentHistoryView.
+     *
+     * @param appointmentService the AppointmentService instance used to fetch appointment data.
+     */
     public AppointmentHistoryView(AppointmentService appointmentService) {
         this.appointmentService = appointmentService;
     }
 
+    /**
+     * Displays the details of the patient.
+     *
+     * @param patient the Patient object whose details are to be displayed.
+     */
     @Override
     public void showPatientDetails(Patient patient) {
         System.out.println("Patient ID: " + patient.getHospitalID());
@@ -26,28 +39,40 @@ public class AppointmentHistoryView implements iPatientView {
         System.out.println("Contact Information: " + patient.getContactInformation());
     }
 
+    /**
+     * Displays a success message.
+     *
+     * @param message the success message to display.
+     */
     @Override
     public void showSuccessMessage(String message) {
         System.out.println("SUCCESS: " + message);
     }
 
+    /**
+     * Displays an error message.
+     *
+     * @param message the error message to display.
+     */
     @Override
     public void showErrorMessage(String message) {
         System.out.println("ERROR: " + message);
     }
 
-    // Display method with formatted date and time, including "HRS"
+    /**
+     * Displays the appointment history of the patient.
+     *
+     * @param patient the Patient object whose appointment history is to be displayed.
+     */
     @Override
     public void display(Patient patient) {
-        //System.out.println("Displaying appointment history for Patient ID: " + patient.getHospitalID());
-
-        // Get the list of all scheduled appointments from AppointmentService
+        // Get the list of all scheduled appointments from the AppointmentService
         List<Appointment> appointments = appointmentService.viewScheduledAppointments();
 
         // Define a DateTimeFormatter for a 24-hour format
-        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd MMM yyyy, HH:mm"); // Example: 24 Oct 2024, 14:30
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd MMM yyyy, HH:mm");
 
-        // Filter appointments that belong to the patient and are in any status (completed, cancelled, rescheduled)
+        // Filter appointments that belong to the patient
         boolean found = false;
         for (Appointment appointment : appointments) {
             if (appointment.getPatientId().equals(patient.getHospitalID())) {
@@ -60,10 +85,13 @@ public class AppointmentHistoryView implements iPatientView {
                 System.out.println("Date & Time: " + formattedDateTime);
 
                 System.out.println("Status: " + appointment.getStatus());
+
+                // Display additional details for completed appointments
                 if (appointment.getStatus() == enums.AppointmentStatus.COMPLETED) {
                     System.out.println("Service Provided: " + appointment.getServiceProvided());
                     System.out.println("Consultation Notes: " + appointment.getConsultationNotes());
                 }
+
                 System.out.println("------------------------");
             }
         }
